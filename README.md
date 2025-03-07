@@ -2,8 +2,6 @@
 OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. This is currently a re-organized Nanami/OS, but that is subject to change in the future.
 Source code to be added as soon as a working build with a more organized strcture is made!
 
-*** THE SOURCE CODE IS NOT YET PRESENT. I AM RESTRUCTURING IT AS IT WAS A HOT MESS. MY APOLOGIES!!! ***
-
 What OpenSteel/OS changes:
  - Organization of code
  - A more lenient roadmap
@@ -25,5 +23,11 @@ Major Issues:
  - PS/2 mice and trackpads do not work on physical hardware, except the IBM ThinkPad R51. (See hardware compatibility list!)
  - Backspace will not work when trying to backspace onto the previous line.
  - PCI will detect all devices after one is found as the first found and known device.
+
+OS Sources:
+- Write Your Own Operating System
+- OSDev.org Wiki
+- The PIT and speaker drivers are relatively similar to those found in osakaOS.
+- Some small bits of code written entirely myself, such as the backspace function
 
 OpenSteel/OS Copyright 2023-2025 SteelsOfLiquid.
