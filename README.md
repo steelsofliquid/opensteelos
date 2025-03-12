@@ -28,6 +28,6 @@ OS Sources:
 - OSDev.org Wiki
 - The PIT and speaker drivers are relatively similar to those found in osakaOS.
 - Some small bits of code written entirely myself, such as the backspace function
-- Some aspects were the result of the sin called artificial insmelligence, and despite that I've reworked it since Gemini can't nail down the code perfectly. (this code is to be added)
+- Some aspects were the result of the sin called artificial insmelligence, and despite that I've reworked it since Gemini can't nail down the code perfectly. (this code is not in the repo yet)
 
 OpenSteel/OS Copyright 2023-2025 SteelsOfLiquid.
