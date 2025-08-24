@@ -94,7 +94,7 @@ void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager
                         driverManager->AddDriver(driver); // Kyaaa, it happened again...
                 }
 
-                printf("[pci] bus "); // almost forgot a semi-colon...
+                printf("\n[pci] bus "); // almost forgot a semi-colon...
                 printfHex(bus & 0xFF);
 
                 printf(" dev ");
@@ -110,7 +110,7 @@ void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager
                 printfHex((dev.device_id & 0xFF00) >> 8);
                 printfHex(dev.device_id & 0xFF);
 
-                printf("     ");
+                // printf("");
                 
                // Feel free to remove the comment pins to get more debug info. I did, for now.
 
@@ -164,14 +164,14 @@ Driver* PCIController::GetDriver(PCIDevDesc dev, InterruptManager* interrupts)
         case 0x1022: // AMD
             switch(dev.device_id)
             {
-                case 0x2000: // idk what this is, no device repository exists yet >_<
-                    /* driver = (amd_am79c973*)MemoryManager::activeMemoryManager->malloc(sizeof(amd_am79c973));
+                /* case 0x2000: // idk what this is, no device repository exists yet >_<
+                    driver = (Driver*)MemoryManager::activeMemoryManager->malloc(sizeof(amd_am79c973));
                     if(driver != 0)
-                        new (driver) amd_am79c973(...);
-                        */
-                    printf("[pci] Device Found! AMD am79c973\n");
+                        new (driver) amd_am79c973(&dev, interrupts);
+                    // printf("[pci] Device Found! AMD am79c973\n");
                     break;
                 // Supposed to be an AM79C973 driver.
+                */
             }
             break;
         
