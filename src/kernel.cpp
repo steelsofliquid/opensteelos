@@ -1,3 +1,24 @@
+/*
+  OpenSteel/OS kernel, written based off of the WYOOS tutorial.
+  Some parts are actually code I wrote myself, and I'd expect that percent to expand in the later 2020's if I get into Oakland University
+  since their computer science course touches up at least a little bit on operating systems
+
+  Also for anyone wondering, this project was previously called NanamiOS (later stylized as Nanami/OS). The project's namesake was Nanami Madobe,
+  the famous Windows 7 OS-tan, and that is why the project is not called Nanami/OS anymore - As OS-tans have somewhat socially unacceptable themes
+  here in the Western world and so I don't want my OS project outright endorsing an OS-tan through its name. Imagine if I started the project in
+  mid-2025...
+
+  As for why I renamed it to OpenSteel/OS in particular...
+  In 2021, I created SteelOS, a PowerPoint-based OS thing that didn't really do much. I adapted it into Steel OS in late 2022, and this project
+  lasted a few years into mid-to-late 2024, when it was succeeded by Project Nova Carbonium and OpenSteelEnvy. "Open" conveys that it is open-source
+  (GNU GPL, yo) and eventually I want it to resemble Steel OS in a strong way. That may never happen (sad >_<) but I wish it does happen, even if
+  I have to vibe code to get it done (honestly my dad seems fine with AI, and his job involves AI systems and automotive engineering).
+
+  But, this is essentially to be an open-source Steel OS. A la OpenSolaris, etc., etc. Why there's the / in there, it's because it's used with
+  many historical OSes. And because OpenSteel/OS just looks more badass than a wimpy OpenSteel OS or OpenSteelOS. And because it's my project,
+  my rules, even if it's mostly tutorial code I didn't write, damnit!
+*/
+
 #include <common/types.h>
 #include <gdt.h>
 #include <dmm.h>
@@ -17,19 +38,20 @@ using namespace osos::drivers;
 using namespace osos::hwcom;
 // using namespace osos::gui;
 
-void WriteCharacter(unsigned char c, unsigned char forecolour, unsigned char backcolour, uint8_t x, uint8_t y)
-{
-     uint16_t attrib = (backcolour << 4) | (forecolour & 0x0F);
-     volatile uint16_t * where;
-     where = (volatile uint16_t *)0xB8000 + (y * 80 + x) ;
-     *where = c | (attrib << 8);
-}
+/*
+  The three int32_t values below denote the version number. It is some degree of "version control" or version indicator.
+  They are essentially useless at the moment as no function can properly use them.
+*/
 
-void printf(char* str)
+uint32_t VersionMajor = 0;
+uint32_t VersionMinor = 22;
+uint32_t VersionBuild = 39;
+
+void printf(char* str) // the main screen output function.
 {
   static uint16_t* VideoMemory = (uint16_t*)0xb8000;
   
-  static uint8_t x =0 , y=0;
+  static uint8_t x = 0 , y = 0;
 
   for(int i = 0; str[i] != '\0'; ++i)
   {
@@ -37,24 +59,41 @@ void printf(char* str)
     switch(str[i])
     {
 
+      /*
+        Just a simple rundown on what each thing here does:
+
+         - \n means new line. That is the case for most languages.
+
+         - \b means backspace. I wrote this bit myself as I had to figure it out one morning in government class (what does an operating system have to do with politics T_T)
+
+         - Anything else on the keyboard placed in printf() will just input an ordinary IBM Code Page 437 character.
+          - Use \' or \" if you need to insert an apostrophe or quotation mark as you'll break it otherwise!
+          - Don't input anything not in the keyboard unless you want to break the graphics, I tried it and that's what happened!
+      */
+
       case '\n':
         y++;
         x = 0;
         break;
 
-      case '\b': // Interim solution for the no backspace problem. It works!!
+      case '\b':
         if(x == 0)
         {
+          if(y != 0) // i swear to god, no, i swear to neisa-sama if you somehow get a number below zero, there's something seriously wrong with your pc. mind you, this is an int!
+          {
+            y--;
+            x = 79;
+          }
         } // Safeguard to ensure a negative number isn't... you know.
         else
         {
           x--;
-          VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
         }
+        VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
         break;
 
       default:
-        VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i]; // And, now, for a more serious comment, this system takes the current line, and moves the text """""placer""""" until it's at a new line.
+        VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i];
         x++;
         break;
     }
@@ -69,19 +108,31 @@ void printf(char* str)
     {
       for(y = 0; y < 25; y++)
         for(x = 0; x < 80; x++)
-          VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' '; // Video memory!! Immediately in the kernel! Yayyy! ^_^
+        {
+          if(y == 0) // read the comment below
+          {
+          }
+          else
+          {
+            VideoMemory[80 * (y - 1) + x] = VideoMemory[80 * y + x]; // now that i think, what the fuck did i just say about the y-integer and -1!?
+            // i know uint8_t is a char, but it's supposed to be treated as an integer number here. simple. 25 rows, including zero, no lower than zero.
+            // don't make uint8_t x and y uint32_t, the code will break and i know that without even testing it to see.
+
+            // it ain't perfect (or close to, *for now*) but it works. will need to make it not print cursor spaghetti in a later build
+          }
+        }
+      
+      for(x = 0; x < 80; x++)
+        VideoMemory[80 * 24 + x] = (VideoMemory[80*24+x] & 0xFF00) | ' ';
 
       x = 0;
-      y = 0;
+      y = 24;
     }
   }
 }
 
 void sleep(uint32_t interval)
 {
-  // Code in this thing is based off of the equivalent in osakaOS.
-  // If interval = 1, that is 1 ms. Probably.
-
   ProgrammableIntervalTimer ProgrammableIntervalTimer;
 
   for (uint32_t i = 0; i < interval; i++)
@@ -116,7 +167,7 @@ public:
 
 };
 
-class MouseToConsole : public MouseEventHandler
+class MouseToConsole : public MouseEventHandler // This moves the sometimes very useless mouse cursor.
 {
   int8_t x, y;
 public:
@@ -132,7 +183,7 @@ public:
 
   void OnMouseMove(int xoffset, int yoffset)
   {
-    static uint16_t* VideoMemory = (uint16_t*)0xb8000; // The video memory is the same for all GPUs for now. It doesn't matter if your PC has a flashy brand-new RTX or an ancient Voodoo. NanamiOS treats both cards equally.
+    static uint16_t* VideoMemory = (uint16_t*)0xb8000;
 
     VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0x0F00) << 4
                         | (VideoMemory[80*y+x] & 0xF000) >> 4
@@ -142,7 +193,7 @@ public:
     if(x < 0) x = 0;
     if(x >= 80) x = 79;
 
-    y += yoffset; // Can we patch an inverted y-axis with minimal code?
+    y += yoffset;
     if(y < 0) y = 0;
     if(y >= 25) y = 24;
 
@@ -167,12 +218,28 @@ void TestTask2()
 
 void cmdVersion()
 {
-  printf(" OpenSteel/OS version 0.22.38 \"Hakurei\"\n");
+  printf(" OpenSteel/OS version 0.22.39 \"Hakurei\"\n");
 }
 
 void cmdTest()
 {
   printf("Test command. If you see this, then hello!");
+}
+
+void panic()
+{
+  printf(" >_<   systempanic\n");
+
+  printf(" OpenSteel/OS version 0.22.39");
+  printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
+  printf(" Trigger: NULL"); // "NULL" is to be replaced with legitimate reasons, such as a memory leak or a buffer overflow.
+  printf("                                                                                ");
+  printf(" A problem has occurred and OpenSteel/OS needs to shut down or restart. Any     ");
+  printf(" unsaved work has been lost and we apologise for the inconvenience. If you see  ");
+  printf(" this message multiple times, it may be a potential hardware failure or malware ");
+  printf(" may be present on your system. For help, contact steelsofliquid@hotmail.com    ");
+
+  while(1); // use this in the kernel to try to stop someone from continuing to use an unstable system.
 }
 
 typedef void (*constructor)();
@@ -186,21 +253,48 @@ extern "C" void callConstructors()
 
 extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 {
+  /*
+    So, to give you the rundown on what this is, most of the kernel code is the boot process. PCI, interrupts, drivers and whatnot
+    are mostly handled in their own worlds or don't have proper function otherwise as there isn't a shell. And you don't need too
+    much power from a task manager or a memory manager just to type, which is literally all you can currently do with this OS.
 
-  /* r_nanamitsukasa at 13:08 toronto on 2024 july 2:
-  I'm going to try something new, that being to add a number of printf things at the top to refresh the screen.*/
+    But, to put it simply, the boot process goes a little like this:
 
-  // printf("                                                                                ");
+      1. GRUB does its thing (for now, because I would like to make my own bootloader, even if basic or a fork of GRUB I can pack with the OS)
 
-  // Version headers have to be replaced manually. This hopefully shouldn't be too much!
+      2. loader.s calls the constructors and then kernelMain (this huge ahh void function)
+
+      3. OpenSteel/OS logo and version/copyright info is spat onto the screen
+
+      4. GDT is invoked, the memory heap is spat and so is allocated memory once it is allocated
+
+      5. Any tasks left unpinned are "registered"
+
+      6. Interrupts invoked
+
+      7. Drivers are initialized
+
+      8. PCI devices detected, spat onto screen and initialized
+
+      9. Drivers and interrupts activated proper
+
+      10. System online.
+    
+    A shell would then be loaded and whatnot and then you'd use the system.
+  */
+  
+  // Start of boot process v
+
   printf("  ___                                                                           ");
-  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.38 \"Hakurei\"                  ");
+  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.39 \"Hakurei\"                  ");
   printf(" \\__\\    By SteelsOfLiquid, based on WYOOS. Licensed under GNU-GPL 3.0          ");
   printf("  \\  \\   steelsofliquid@hotmail.com ~ https://steelsofliquid.neocities.org/     ");
-  printf("  /__/                                                                          ");
+  printf("  /__/     Video Memory and PrintF Modifications Test - Stability Warning       ");
   printf("                                                                                ");
 
   GlobalDescriptorTable gdt;
+
+  // Get memory heap, allocate ram, etc. v
 
   uint32_t* memupper = (uint32_t*)(((size_t)multiboot_structure) + 8);
   size_t heap = 10*1024*1024;
@@ -222,6 +316,8 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   
   printf("\n");
 
+  // register tasks v
+
   TaskManager taskManager;
   Task task1(&gdt, TestTask1);
   Task task2(&gdt, TestTask2);
@@ -230,24 +326,20 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // taskManager.AddTask(&task1);
   // taskManager.AddTask(&task2);
 
+  // interrupts and drivers v
+
   InterruptManager interrupts(0x20, &gdt, &taskManager);
 
   DriverManager drvManager;
     printf("[msg] A boot sequence has been initiated.\n[msg] Starting drivers...");
 
     PrintfKeyboardEventHandler kbhandler;
-    KeyboardDriver keyboard(&interrupts, &kbhandler); // Oopsies! I forgot a semicolon! >_< (a bit back)
+    KeyboardDriver keyboard(&interrupts, &kbhandler);
     drvManager.AddDriver(&keyboard);
 
     MouseToConsole mousehandler;
     MouseDriver mouse(&interrupts, &mousehandler); // drivers loading
     drvManager.AddDriver(&mouse);
-    // printf("[DRV] Mouse Driver  "); // Oops... I did it again... * tapping chin/mouth *
-    // That comment was a reference to the Windows 7 anime commercial, where Nanami Madobe forgot a screw in the PC
-    // she built, causing the front panel to fall forward onto her desk. Do I know what she actually said there? No.
-    // Do I have an idea of what she said? Maybe. I forgot a semi-colon here...
-
-    // gotta keep that one in here despite the project re-organization
 
     Speaker speaker;
 
@@ -262,16 +354,20 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   interrupts.Activate();
 
+  // booting is at the home stretch ^v
+
   sleep(1);
   speaker.beep();
-  printf("\n[msg] System online.\n");
+  printf("\n[msg] System online. System may be unstable.\n"); // Denotes end of booting process <
+
   /* vga.SetMode(320, 200, 8);
   for(int32_t y = 0; y < 200; y++)
     for(int32_t x = 0; x < 320; x++)
       vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
     */
 
-  while(1); // Nothing happens! ...For now.
+  while(1);
   
 }
 
+// honestly half of this code is documentation or disabled code
