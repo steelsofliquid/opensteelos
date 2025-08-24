@@ -129,23 +129,21 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x3B: 
             {
                 printf("\n");
-                printf(" KB MS                                Help               ----/--/-- --:--       ");
                 printf("                                                                                ");
                 printf(" Welcome to OpenSteel/OS!                                                       ");
                 printf(" There is currently no shell, so how you are seeing this is through hardcoded   ");
                 printf(" implementations in the keyboard driver. For support/assistance, please contact ");
-                printf(" this e-mail, shown on the left. Keys include:   /--------------------------\\   ");
-                printf(" [F1] Help   [F2] About                          |steelsofliquid@hotmail.com|   ");
-                printf("                                                 \\__________________________/   ");
+                printf(" this e-mail, shown on the left. Keys include:                                  ");
+                printf(" [F1] Help   [F2] About                           steelsofliquid@hotmail.com    ");
+                printf("                                                                                ");
                 break;
                 }
             //     ^- This should point to the F1 key. It does.
             case 0x3C:
             {
                 printf("\n");
-                printf(" KB MS                               About               ----/--/-- --:--       ");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version 0.22 Build 38 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" OpenSteel/OS (Version 0.22 Build 39 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
                 printf("This is free software, and you are welcome to                                   ");
