@@ -20,6 +20,7 @@ objects = object/loader.o \
  object/kernel.o
 
 object/%.o: src/%.cpp
+	@echo "Is this PoS even working"
 	mkdir -p $(@D)
 	g++ $(GPPPARAMS) -o $@ -c $<
 	
@@ -43,7 +44,7 @@ OpenSteelOS.iso: opensteelcore.bin
 	echo 'set timeout=5' > iso/boot/grub/grub.cfg
 	echo 'set default=5' >> iso/boot/grub/grub.cfg
 	echo '' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "OpenSteel/OS 0.22.37 [2025 March 5th]" {' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "OpenSteel/OS 0.22.39 [2025 August 23rd]" {' >> iso/boot/grub/grub.cfg
 	echo '  multiboot /boot/opensteelcore.bin' >> iso/boot/grub/grub.cfg
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
