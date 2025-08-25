@@ -1,5 +1,5 @@
 # OpenSteel/OS
-OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's basically Nanami/OS on steroids, but that is subject to change in the future.
+OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's basically Nanami/OS on steroids, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future.
 
 ## *What's new in OpenSteel/OS (as of 2025-08-24)*
  - Organization of code (directories, yo)
@@ -41,7 +41,7 @@ A pre-built copy is provided, so if this seems too intimidating or you just want
  - Backspace will not work when trying to backspace onto the previous line.
  - PCI will detect all devices after one is found as the first found and known device.
  - When video memory scrolls up a line, it also takes the mouse cursor with it, creating some unpleasant spaghetti effect.
- - *The mouse cursor itself is just very problematic, so if you compile yourself then maybe turn it off with some good ol' comment making.
+ - *The mouse cursor itself is just very problematic, so if you compile it yourself then maybe turn it off with some good ol' comment making.
 
 ## *Questions and Answers*
  - *Why did you rename the project from Nanami/OS to OpenSteel/OS?* I am no longer chronically obsessed with Nanami Madobe, and felt the project's name and theme was too exotic. And that's why it's not Neisa/OS: I may be obsessed with Neisa (Sapphira-Aera) but not to the point of turning her into a de facto OS-tan (of which her age would make her an oddball, as most OS-tans are children or adolescents while Neisa is an adult). Mind you, this is **ALREADY** the second time I've renamed the project! It was first called KitsuneOS, then NanamiOS, later stylised as Nanami/OS, and now it's OpenSteel/OS. There's a slash because that naming convention makes it sound cool and professional.
