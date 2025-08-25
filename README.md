@@ -1,5 +1,6 @@
 # OpenSteel/OS
-OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's basically Nanami/OS on steroids, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future.
+OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's basically Nanami/OS on steroids, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future.  
+![OpenSteel/OS 0.22 Build 39 after booting up in VirtualBox.]
 
 ## *What's new in OpenSteel/OS (as of 2025-08-24)*
  - Organization of code (directories, yo)
