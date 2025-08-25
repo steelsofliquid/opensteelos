@@ -13,16 +13,17 @@ Right now, it's quite basic. If I do get into college (sorry to any admissions d
   
 But, I do have some stuff to learn from the tutorial still, so, for the provisional future, here's some stuff:  
  - Disabling the mediocre mouse driver by default (OpenSteel/OS will be a text-based OS for now, but it'll get a beautiful GUI in the future if I ever get that far)
+ - Adding basic C/C++ library functions (namely for strings and memory)
  - Network card drivers
  - HDD support
  - System calls
  - Networking (such as TCP and UDP)
  - Filesystem Support
- - Some GUI elements (won't be loaded by default)
+ - Including a shell (i.e. command line)
 
 ## *System Requirements*
  - Processor: x86 or x86-64, preferably something Super Socket 7 or later
- - Memory: At least 16 megabytes
+ - Memory: At least 32 megabytes
  - Video Memory: 9 Megabytes
  - Hard Disk: Optional
  - Optical Drive: Required
