@@ -3,6 +3,8 @@ GPPPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti 
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
+TIMESTAMP = $(shell date +"%Y-%m-%d %H:%M:%S")
+
 objects = object/loader.o \
  object/gdt.o \
  object/drivers/driver.o \
@@ -20,23 +22,31 @@ objects = object/loader.o \
  object/kernel.o
 
 object/%.o: src/%.cpp
-	@echo "Is this PoS even working"
+	@echo "Initiating object compilation from C++ file: $@"
 	mkdir -p $(@D)
 	g++ $(GPPPARAMS) -o $@ -c $<
+	echo 'Compile Attempt: $@ object file from $< - Time of Compile: $(TIMESTAMP) - Parameters: $(GPPPARAMS)' >> buildlog.txt
 	
 object/%.o: src/%.s
+	@echo "Initiating object compilation from assembly file: $@"
 	mkdir -p $(@D)
 	as $(ASPARAMS) -o $@ $< 
+	echo 'Compile Attempt: $@ object file from $< - Time of Compile: $(TIMESTAMP) - Parameters: $(ASPARAMS)' >> buildlog.txt
 	
 opensteelcore.bin: linker.ld $(objects)
+	@echo "Initiating binary compilation using linker file: $@"
 	ld $(LDPARAMS) -T $< -o $@ $(objects)
+	echo 'Compile Attempt: $@ binary file linked with $< - Time of Compile: $(TIMESTAMP) - Parameters: $(LDPARAMS)' >> buildlog.txt
 
 
 install: opensteelcore.bin
+	@echo "Using the makefile to install OpenSteel/OS through: $<"
 	sudo cp $< /boot/opensteelcore.bin
+	echo 'Install Attempt: $@ binary file - Time of Install: $(TIMESTAMP)' >> buildlog.txt
 
 
 OpenSteelOS.iso: opensteelcore.bin
+	@echo "Creating bootable OpenSteel/OS media..."
 	mkdir iso
 	mkdir iso/boot
 	mkdir iso/boot/grub
@@ -44,12 +54,13 @@ OpenSteelOS.iso: opensteelcore.bin
 	echo 'set timeout=5' > iso/boot/grub/grub.cfg
 	echo 'set default=5' >> iso/boot/grub/grub.cfg
 	echo '' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "OpenSteel/OS 0.22.39 [2025 August 23rd]" {' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "OpenSteel/OS 0.22.40 [Build Date TBD] or 0.22.39 [2025-08-23]" {' >> iso/boot/grub/grub.cfg
 	echo '  multiboot /boot/opensteelcore.bin' >> iso/boot/grub/grub.cfg
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
 	grub-mkrescue --output=$@ iso
 	rm -rf iso
+	echo 'Compile Attempt: $@ disc image from $< - Time of Compile: $(TIMESTAMP)' >> buildlog.txt
 
 
 .PHONY: clean
