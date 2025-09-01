@@ -37,8 +37,8 @@ A pre-built copy is provided, so if this seems too intimidating or you just want
   
 **If the makefile mentions "PoS" (Piece of Shit), read the short story right above this line. I'd like to automate sending compilation results to a text file, but that's for another time.*
 
-## *Branches*
-There are, as of 2025 August 27, two major branches. main is for the current release code, and will be updated by build (this number is incremented with each compile by me). The provisional branch is for the work-in-progress code for the next build, and so may be incomplete and/or riddled with errors. **If you're contributing directly to the source code, don't merge this branch with main unless the *next* build is complete!**
+## ~~*Branches*~~ No longer of importance as of 2025 September 1st.
+~~There are, as of 2025 August 27, two major branches. main is for the current release code, and will be updated by build (this number is incremented with each compile by me). The provisional branch is for the work-in-progress code for the next build, and so may be incomplete and/or riddled with errors. **If you're contributing directly to the source code, don't merge this branch with main unless the *next* build is complete!**~~
 
 ## *Major Issues*
  - Interrupts may freak out on USB mice.
