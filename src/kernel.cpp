@@ -45,7 +45,7 @@ using namespace osos::hwcom;
 
 uint32_t VersionMajor = 0;
 uint32_t VersionMinor = 22;
-uint32_t VersionBuild = 39;
+uint32_t VersionBuild = 40;
 
 void printf(char* str) // the main screen output function.
 {
@@ -91,6 +91,13 @@ void printf(char* str) // the main screen output function.
         }
         VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
         break;
+      
+      case '\a':
+        for (y = 0; y < 25; y++)
+          for (x = 0; x < 80; x++)
+            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
+        x = 0;
+        y = 0;
 
       default:
         VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i];
@@ -218,7 +225,7 @@ void TestTask2()
 
 void cmdVersion()
 {
-  printf(" OpenSteel/OS version 0.22.39 \"Hakurei\"\n");
+  printf(" OpenSteel/OS version 0.22.40 \"Hakurei\"\n");
 }
 
 void cmdTest()
@@ -230,7 +237,7 @@ void panic()
 {
   printf(" >_<   systempanic\n");
 
-  printf(" OpenSteel/OS version 0.22.39");
+  printf(" OpenSteel/OS version 0.22.40");
   printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
   printf(" Trigger: NULL"); // "NULL" is to be replaced with legitimate reasons, such as a memory leak or a buffer overflow.
   printf("                                                                                ");
@@ -286,10 +293,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // Start of boot process v
 
   printf("  ___                                                                           ");
-  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.39 \"Hakurei\"                  ");
+  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.40 \"Hakurei\"                  ");
   printf(" \\__\\    By SteelsOfLiquid, based on WYOOS. Licensed under GNU-GPL 3.0          ");
   printf("  \\  \\   steelsofliquid@hotmail.com ~ https://steelsofliquid.neocities.org/     ");
-  printf("  /__/     Video Memory and PrintF Modifications Test - Stability Warning       ");
+  printf("  /__/                                                                          ");
   printf("                                                                                ");
 
   GlobalDescriptorTable gdt;
@@ -337,13 +344,15 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     KeyboardDriver keyboard(&interrupts, &kbhandler);
     drvManager.AddDriver(&keyboard);
 
-    MouseToConsole mousehandler;
-    MouseDriver mouse(&interrupts, &mousehandler); // drivers loading
-    drvManager.AddDriver(&mouse);
+    // MouseToConsole mousehandler;
+    // MouseDriver mouse(&interrupts, &mousehandler); // drivers loading
+    // drvManager.AddDriver(&mouse);
+
+    // ^ mouse driver sucked. let's not use it, if possible.
 
     Speaker speaker;
 
-    printf("\n[msg] Drivers started. Obtaining PCI info...\n");
+    printf("\n[msg] Drivers started. Obtaining PCI info...");
 
     PCIController PCIController;
     PCIController.SelectDrivers(&drvManager, &interrupts);
@@ -358,7 +367,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   sleep(1);
   speaker.beep();
-  printf("\n[msg] System online. System may be unstable.\n"); // Denotes end of booting process <
+  printf("\n[msg] System online.\n"); // Denotes end of booting process <
 
   /* vga.SetMode(320, 200, 8);
   for(int32_t y = 0; y < 200; y++)
