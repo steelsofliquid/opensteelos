@@ -17,6 +17,8 @@ objects = object/loader.o \
  object/drivers/pit.o \
  object/drivers/speaker.o \
  object/drivers/vga.o \
+ object/lib/libmem.o \
+ object/lib/libstr.o \
  object/dmm.o \
  object/multitasking.o \
  object/kernel.o
@@ -54,7 +56,7 @@ OpenSteelOS.iso: opensteelcore.bin
 	echo 'set timeout=5' > iso/boot/grub/grub.cfg
 	echo 'set default=5' >> iso/boot/grub/grub.cfg
 	echo '' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "OpenSteel/OS 0.22.40 [Build Date TBD] or 0.22.39 [2025-08-23]" {' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "OpenSteel/OS 0.22.40 [2025-09-04]" {' >> iso/boot/grub/grub.cfg
 	echo '  multiboot /boot/opensteelcore.bin' >> iso/boot/grub/grub.cfg
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
