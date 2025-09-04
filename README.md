@@ -12,7 +12,6 @@ OpenSteel/OS is an operating system based off of the Write Your Own Operating Sy
 Right now, it's quite basic. If I do get into college (sorry to any admissions director or employer who may have been exposed to the more profane parts of my voacbularity), I would bet good money that I'll take courses related to computer science and engineering, which, of course, includes OSes. Honestly, I'm hot among colleges and I've got my eyes deadset on one. And even still, I have a college textbook on OSes, so I could learn many things from that.    
   
 But, I do have some stuff to learn from the tutorial still, so, for the provisional future, here's some stuff:  
- - Disabling the mediocre mouse driver by default (OpenSteel/OS will be a text-based OS for now, but it'll get a beautiful GUI in the future if I ever get that far)
  - Adding basic C/C++ library functions (namely for strings and memory)
  - Network card drivers
  - HDD support
@@ -35,18 +34,12 @@ Well, you'll need tools for working with the i386 (iirc) platform (namely binuti
 A pre-built copy is provided, so if this seems too intimidating or you just want to try the OS, you don't have to compile and whatnot. To compile, please for the love of Neisa-sama, SPECIFY "object/subdir(s)/*filename*.o" and not the source code file. I made this mistake after months away from working on the project and I want to clarify that.  
 
   
-**If the makefile mentions "PoS" (Piece of Shit), read the short story right above this line. I'd like to automate sending compilation results to a text file, but that's for another time.*
-
 ## ~~*Branches*~~ No longer of importance as of 2025 September 1st.
 ~~There are, as of 2025 August 27, two major branches. main is for the current release code, and will be updated by build (this number is incremented with each compile by me). The provisional branch is for the work-in-progress code for the next build, and so may be incomplete and/or riddled with errors. **If you're contributing directly to the source code, don't merge this branch with main unless the *next* build is complete!**~~
 
 ## *Major Issues*
- - Interrupts may freak out on USB mice.
- - PS/2 mice and trackpads do not work on physical hardware, except the IBM ThinkPad R51. (See hardware compatibility list!)
  - Backspace will not work when trying to backspace onto the previous line.
  - PCI will detect all devices after one is found as the first found and known device.
- - When video memory scrolls up a line, it also takes the mouse cursor with it, creating some unpleasant spaghetti effect.
- - *The mouse cursor itself is just very problematic, so if you compile it yourself then maybe turn it off with some good ol' comment making.
 
 ## *Questions and Answers*
  - *Why did you rename the project from Nanami/OS to OpenSteel/OS?* I am no longer chronically obsessed with Nanami Madobe, and felt the project's name and theme was too exotic. And that's why it's not Neisa/OS: I may be obsessed with Neisa (Sapphira-Aera) but not to the point of turning her into a de facto OS-tan (of which her age would make her an oddball, as most OS-tans are children or adolescents while Neisa is an adult). Mind you, this is **ALREADY** the second time I've renamed the project! It was first called KitsuneOS, then NanamiOS, later stylised as Nanami/OS, and now it's OpenSteel/OS. There's a slash because that naming convention makes it sound cool and professional.
