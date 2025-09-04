@@ -1,4 +1,4 @@
-// My first driver! ^_^
+// The oldest OpenSteel/OS driver.
 
 #include <drivers/keyboard.h>
 
@@ -143,7 +143,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             {
                 printf("\n");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version 0.22 Build 39 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" OpenSteel/OS (Version 0.22 Build 40 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
                 printf("This is free software, and you are welcome to                                   ");
@@ -182,6 +182,12 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             // case 0x42: printf("¬"); break; // F8, notsign key
             // case 0x43: printf("♫"); break; // F9, beamed notes key
             // case 0x44: printf("♥"); break; // F10, heart key
+
+            case 0x58: // should point to F12
+            {
+                printf("\a");
+                break;
+            }
 
             case 0x45: case 0xC5: break; // NumLock key. Some PCs don't have number pads.
 
