@@ -15,17 +15,17 @@
             StringLibrary();
             ~StringLibrary();
 
-            osos::common::size_t strlen(const osos::common::uint8_t* string);
-            osos::common::int32_t strcmp(const osos::common::uint8_t* string1, const osos::common::uint8_t* string2);
-            osos::common::int32_t strncmp(const osos::common::uint8_t* string1, const osos::common::uint8_t* string2, osos::common::size_t n);
+            osos::common::size_t strlen(const char* string);
+            osos::common::int32_t strcmp(const char* string1, const char* string2);
+            osos::common::int32_t strncmp(const char* string1, const char* string2, osos::common::size_t n);
 
-            osos::common::uint8_t* strcpy(osos::common::uint8_t* destination, const osos::common::uint8_t* source);
-            osos::common::uint8_t* strncpy(osos::common::uint8_t* destination, const osos::common::uint8_t* source, osos::common::size_t n);
-            osos::common::uint8_t* strcat(osos::common::uint8_t* destination, const osos::common::uint8_t* source);
+            osos::common::int8_t* strcpy(char* destination, const char* source);
+            osos::common::int8_t* strncpy(char* destination, const char* source, osos::common::size_t n);
+            osos::common::int8_t* strcat(char* destination, const char* source);
 
-            osos::common::uint8_t* strchr(const osos::common::uint8_t* string, osos::common::uint32_t character);
-            osos::common::uint8_t* strrchr(const osos::common::uint8_t* string, osos::common::uint32_t character);
-            osos::common::uint8_t* strstr(const osos::common::uint8_t* haystack, const osos::common::uint8_t* needle);
+            osos::common::int8_t* strchr(const char* string, osos::common::int32_t character);
+            osos::common::int8_t* strrchr(const char* string, osos::common::int32_t character);
+            osos::common::int8_t* strstr(const char* haystack, const char* needle);
             };
         }
     }
