@@ -5,6 +5,20 @@ using namespace osos::common;
 using namespace osos::libs;
 // me on my way to dump the most inspiring and influential quotes in my comments
 
+/*
+This is the new 0.22.41 libstr. In 0.22.40, when libstr was first written, it used
+uint8_ts all over and that caused problems when first trying to write a demo program.
+As it turns out, a large majority of strings written in C and C++ are not based off
+of unsigned chars. For context, in C, a string is an array of chars, practically.
+
+In order to utilise the library, you need to write the following code early in the
+file's execution:
+StringLibrary StringLibrary;
+
+Also, you should likely write it as, for example, if you want to use strlen:
+StringLibrary.strlen(LoremIpsum);
+*/
+
 
 
 StringLibrary::StringLibrary()
@@ -16,7 +30,7 @@ StringLibrary::~StringLibrary()
 }
 
 
-size_t StringLibrary::strlen(const uint8_t* string)
+size_t StringLibrary::strlen(const char* string)
 {
     size_t len = 0;
     while (string[len])
@@ -25,12 +39,12 @@ size_t StringLibrary::strlen(const uint8_t* string)
     return len;
 }
 
-int32_t StringLibrary::strcmp(const uint8_t* string1, const uint8_t* string2)
+int32_t StringLibrary::strcmp(const char* string1, const char* string2)
 {
     // Built my interpretation off of the glibc manual. So does this make this GNU/OpenSteel/OS, GNU + OpenSteel/OS or is still just OpenSteel/OS?
 
-    const uint8_t* a = (const uint8_t*) string1;
-    const uint8_t* b = (const uint8_t*) string2;
+    const int8_t* a = (const int8_t*) string1;
+    const int8_t* b = (const int8_t*) string2;
 
     size_t i = 0;
 
@@ -47,10 +61,10 @@ int32_t StringLibrary::strcmp(const uint8_t* string1, const uint8_t* string2)
     return 0; // According to the glibc manual, if the strings are equal, strcmp returns 0.
 }
 
-int32_t StringLibrary::strncmp(const uint8_t* string1, const uint8_t* string2, size_t n)
+int32_t StringLibrary::strncmp(const char* string1, const char* string2, size_t n)
 {
-    const uint8_t* a = (const uint8_t*) string1;
-    const uint8_t* b = (const uint8_t*) string2;
+    const int8_t* a = (const int8_t*) string1;
+    const int8_t* b = (const int8_t*) string2;
 
     for (size_t i = 0; i < n; i++)
     {
@@ -64,12 +78,12 @@ int32_t StringLibrary::strncmp(const uint8_t* string1, const uint8_t* string2, s
 }
 
 
-uint8_t* StringLibrary::strcpy(uint8_t* destination, const uint8_t* source)
+int8_t* StringLibrary::strcpy(char* destination, const char* source)
 {
     // don't you love a derivative of memcpy? well go look at libmem.cpp and compare strcpy with memcpy!
     
-    uint8_t* dest = (uint8_t*) destination;
-    const uint8_t* sourc = (const uint8_t*) source;
+    int8_t* dest = (int8_t*) destination;
+    const int8_t* sourc = (const int8_t*) source;
 
     size_t i = 0;
 
@@ -80,10 +94,10 @@ uint8_t* StringLibrary::strcpy(uint8_t* destination, const uint8_t* source)
     return destination;
 }
 
-uint8_t* StringLibrary::strncpy(uint8_t* destination, const uint8_t* source, size_t n)
+int8_t* StringLibrary::strncpy(char* destination, const char* source, size_t n)
 {
-    uint8_t* dest = (uint8_t*) destination;
-    const uint8_t* sourc = (const uint8_t*) source;
+    int8_t* dest = (int8_t*) destination;
+    const int8_t* sourc = (const int8_t*) source;
 
     for (size_t i = 0; i < n; i++)
         dest[i] = sourc[i];
@@ -91,13 +105,13 @@ uint8_t* StringLibrary::strncpy(uint8_t* destination, const uint8_t* source, siz
     return destination;
 }
 
-uint8_t* StringLibrary::strcat(uint8_t* destination, const uint8_t* source)
+int8_t* StringLibrary::strcat(char* destination, const char* source)
 {
     // this should be a tinge like strcpy, but presumably just appending the string.
     // actually, by doing field research, it's not appending a string.
 
-    uint8_t* dest = (uint8_t*) destination;
-    const uint8_t* sourc = (const uint8_t*) source;
+    int8_t* dest = (int8_t*) destination;
+    const int8_t* sourc = (const int8_t*) source;
 
     size_t i = strlen(dest); // hopefully this doesn't make g++ spontaneouly combust, probably won't since dmm.cpp uses its own functions and it's fine
     size_t j = 0;
@@ -113,11 +127,11 @@ uint8_t* StringLibrary::strcat(uint8_t* destination, const uint8_t* source)
 }
 
 
-uint8_t* StringLibrary::strchr(const uint8_t* string, uint32_t character)
+int8_t* StringLibrary::strchr(const char* string, int32_t character)
 {
-    const uint8_t* str = (const uint8_t*) string;
-    uint32_t charac = (uint32_t) character;
-    uint8_t* result; // We give this at the end as it seems simple
+    const int8_t* str = (const int8_t*) string;
+    int32_t charac = (int32_t) character;
+    int8_t* result; // We give this at the end as it seems simple
 
     size_t i = 0; // for str[i]
     size_t j = 0; // for result[j]
@@ -140,7 +154,7 @@ uint8_t* StringLibrary::strchr(const uint8_t* string, uint32_t character)
     return result;
 }
 
-uint8_t* StringLibrary::strrchr(const uint8_t* string, uint32_t character)
+int8_t* StringLibrary::strrchr(const char* string, int32_t character)
 {
     // strchr, but in reverse! dear neisa-sama...
 
@@ -157,9 +171,9 @@ uint8_t* StringLibrary::strrchr(const uint8_t* string, uint32_t character)
      4. Return with result.
     */
 
-    const uint8_t* str = (const uint8_t*) string;
-    uint32_t charac = (uint32_t) character;
-    uint8_t* result;
+    const int8_t* str = (const int8_t*) string;
+    int32_t charac = (int32_t) character;
+    int8_t* result;
 
     size_t i = 0;
     size_t j = 0;
@@ -187,13 +201,13 @@ uint8_t* StringLibrary::strrchr(const uint8_t* string, uint32_t character)
     return result;
 }
 
-uint8_t* StringLibrary::strstr(const uint8_t* haystack, const uint8_t* needle)
+int8_t* StringLibrary::strstr(const char* haystack, const char* needle)
 {
     // This is honestly a bit broken right now, apologies. Will be changed as needed once an executable can be made to demonstrate these functions
 
-    const uint8_t* hays = (const uint8_t*) haystack; // [insert f1 movie joke here]
-    const uint8_t* need = (const uint8_t*) needle;
-    uint8_t* result;
+    const int8_t* hays = (const int8_t*) haystack; // [insert f1 movie joke here]
+    const int8_t* need = (const int8_t*) needle;
+    int8_t* result;
 
     size_t i = 0;
     size_t j = 0;
