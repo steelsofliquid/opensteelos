@@ -38,6 +38,13 @@ int8_t* DemoMaterialB = "Neisa is the most beautiful woman of the land";
 int8_t* DemoMaterialC = "Hello World!";
 int8_t* DemoMaterialD = "Linus Torvalds";
 
+int8_t* DemoResultA;
+int8_t* DemoResultB;
+int8_t* DemoResultC;
+int8_t* DemoResultD;
+int8_t* DemoResultE;
+int8_t* DemoResultF;
+
 void ExStringDemoProgramMain()
 {
     StringLibrary StringLibrary;
@@ -67,7 +74,7 @@ void ExStringDemoProgramMain()
     printf(" The demo should start momentarily...                                           ");
     sleep(10);
 
-    printf("\aThese will be the following strings used as demonstration material:           ");
+    printf("\a These will be the following strings used as demonstration material:         \n");
     sleep(1);
     printf("Demo String A: ");
     printf(DemoMaterialA); // doubles as testing the use of printf with non-quotation things
@@ -79,10 +86,24 @@ void ExStringDemoProgramMain()
     printf(DemoMaterialD);
     printf("\n\n*Some addiional quick sample materials will also be used.");
 
-    sleep(4);
+    sleep(30);
 
-    StringLibrary.strcmp(DemoMaterialA, "balls");
-    StringLibrary.strlen(DemoMaterialA);
+    printf("\a Demonstration 1. String Copying");
+    sleep(1);
+    printf("\nThis demo features strcpy and strncpy, and uses strings A and B.");
+    sleep(2);
+
+    DemoResultA = StringLibrary.strcpy(DemoMaterialC, DemoMaterialD);
+    printf("\n\nResult of strcpy with strings C and D: \n");
+    printf(DemoResultA);
+
+    DemoResultB = StringLibrary.strncpy(DemoMaterialC, DemoMaterialD, 4);
+    printf("\nResult of strncpy with first five of string D: \n");
+    printf(DemoResultB);
+
+    sleep(15);
+
+    printf("\a Demonstration 2. String Concatenation");
 
     printf("STOP! StringDemoProgramMain() in strndemo.cpp ends at line 86 (v) and has no    ");
     printf("way to continue. It is of my upmost apology >_<                                 ");
