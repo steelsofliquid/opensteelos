@@ -44,10 +44,15 @@ int8_t* DemoResultC;
 int8_t* DemoResultD;
 int8_t* DemoResultE;
 int8_t* DemoResultF;
+int8_t* DemoResultG;
+int8_t* DemoResultH;
+int8_t* DemoResultI;
 
-void ExStringDemoProgramMain()
+extern "C" void ExStringDemoProgramMain()
 {
     StringLibrary StringLibrary;
+
+    printf("\a\b");
 
     // Startup screen
     printf("   OpenSteel/OS API and Libraries Demonstration Program: String Manipulation   *");
@@ -90,7 +95,7 @@ void ExStringDemoProgramMain()
 
     printf("\a Demonstration 1. String Copying");
     sleep(1);
-    printf("\nThis demo features strcpy and strncpy, and uses strings A and B.");
+    printf("\nThis demo features strcpy and strncpy, and uses strings C and D.");
     sleep(2);
 
     DemoResultA = StringLibrary.strcpy(DemoMaterialC, DemoMaterialD);
@@ -104,8 +109,34 @@ void ExStringDemoProgramMain()
     sleep(15);
 
     printf("\a Demonstration 2. String Concatenation");
+    sleep(1);
+    printf("\nThis demo features strcat, and uses string A, B and C.\n");
+    sleep(2);
 
-    printf("STOP! StringDemoProgramMain() in strndemo.cpp ends at line 86 (v) and has no    ");
+    DemoResultC = StringLibrary.strcat(DemoMaterialB, ", isn\'t she?");
+    DemoResultD = StringLibrary.strcat(DemoMaterialA, ", consectetur adipiscing elit...");
+    DemoResultE = StringLibrary.strcat(DemoMaterialD, " is the creator and lead developer of the Linux kernel.");
+
+    printf("\n"); printf(DemoResultC);
+    printf("\n"); printf(DemoResultD);
+    printf("\n"); printf(DemoResultE);
+
+    sleep(15);
+
+    printf("\a Demonstration 3. Seeking Content");
+    sleep(1);
+    printf("\nThis demo features strchr, strrchr, and strstr. It may contain bugs.");
+    sleep(2);
+
+    DemoResultF = StringLibrary.strchr(DemoMaterialC, 'W');
+    DemoResultG = StringLibrary.strrchr(DemoMaterialD, 'T');
+    DemoResultH = StringLibrary.strstr(DemoMaterialB, "Neisa");
+
+    printf(DemoResultF);
+    printf(DemoResultG);
+    printf(DemoResultH);
+
+    printf("STOP! StringDemoProgramMain() in strndemo.cpp ends at line 123 (v) and has no   ");
     printf("way to continue. It is of my upmost apology >_<                                 ");
 
 }
