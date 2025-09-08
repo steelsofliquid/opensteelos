@@ -1,5 +1,5 @@
 # OpenSteel/OS
-OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's basically Nanami/OS on steroids, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future.  
+OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's as if it was Nanami/OS on steroids, which is in turn a dumbed down WYOOS, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future.  
 ![OpenSteel/OS 0.22 Build 39 after booting up in VirtualBox.](https://github.com/steelsofliquid/opensteelos/blob/main/VirtualBoxVM_20250825-150659437.png "OpenSteel/OS 0.22 Build 39 after booting up in VirtualBox.")
 
 ## *What's new in OpenSteel/OS (as of 2025-08-24)*
@@ -12,13 +12,16 @@ OpenSteel/OS is an operating system based off of the Write Your Own Operating Sy
 Right now, it's quite basic. If I do get into college (sorry to any admissions director or employer who may have been exposed to the more profane parts of my voacbularity), I would bet good money that I'll take courses related to computer science and engineering, which, of course, includes OSes. Honestly, I'm hot among colleges and I've got my eyes deadset on one. And even still, I have a college textbook on OSes, so I could learn many things from that.    
   
 But, I do have some stuff to learn from the tutorial still, so, for the provisional future, here's some stuff:  
- - Adding basic C/C++ library functions (namely for strings and memory)
+ - Adding basic C/C++ library functions (namely for strings and memory) (in progress)
  - Network card drivers
  - HDD support
  - System calls
  - Networking (such as TCP and UDP)
  - Filesystem Support
  - Including a shell (i.e. command line)
+
+## *Code Conventions*
+The code used, while predominantly C++, uses a lot of C-style syntax instead of C++ syntax. When working on this project, whether a direct contribution or on your own, if you want to add things I'd recommend retaining the C-style syntax as it's quite simple and easy to understand. (the virgin std::cout versus the chad printf)
 
 ## *System Requirements*
  - Processor: x86 or x86-64, preferably something Super Socket 7 or later
@@ -34,9 +37,6 @@ Well, you'll need tools for working with the i386 (iirc) platform (namely binuti
 A pre-built copy is provided, so if this seems too intimidating or you just want to try the OS, you don't have to compile and whatnot. To compile, please for the love of Neisa-sama, SPECIFY "object/subdir(s)/*filename*.o" and not the source code file. I made this mistake after months away from working on the project and I want to clarify that.  
 
   
-## ~~*Branches*~~ No longer of importance as of 2025 September 1st.
-~~There are, as of 2025 August 27, two major branches. main is for the current release code, and will be updated by build (this number is incremented with each compile by me). The provisional branch is for the work-in-progress code for the next build, and so may be incomplete and/or riddled with errors. **If you're contributing directly to the source code, don't merge this branch with main unless the *next* build is complete!**~~
-
 ## *Major Issues*
  - Backspace will not work when trying to backspace onto the previous line.
  - PCI will detect all devices after one is found as the first found and known device.
@@ -52,6 +52,7 @@ A pre-built copy is provided, so if this seems too intimidating or you just want
 ## *OS Sources*
 - Write Your Own Operating System
 - OSDev.org Wiki
+- GNU C Library documentation
 - The PIT and speaker drivers are relatively similar to those found in osakaOS, though built on top off code from the OSDev.org wiki.
 - Some small bits of code written entirely myself, such as the backspace function
 - Some code based off of the results of artificial insmelligence, but fuck vibe coding so don't expect any blatant "ohh this was vibe coded" signs. You should try to experiment with it (not in pronounced ways), even if you dislike it (like me). And still, I won't vibe code as ChatGPT's adaptation of the existing printf function felt like it gave me an aneurysm, though I may as well be a bit incompetent right now.  
