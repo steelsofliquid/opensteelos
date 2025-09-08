@@ -45,7 +45,7 @@ using namespace osos::hwcom;
 
 uint32_t VersionMajor = 0;
 uint32_t VersionMinor = 22;
-uint32_t VersionBuild = 40;
+uint32_t VersionBuild = 41;
 
 void printf(char* str) // the main screen output function.
 {
@@ -225,7 +225,7 @@ void TestTask2()
 
 void cmdVersion()
 {
-  printf(" OpenSteel/OS version 0.22.40 \"Hakurei\"\n");
+  printf(" OpenSteel/OS version 0.22.41 \"Hakurei\"\n");
 }
 
 void cmdTest()
@@ -237,7 +237,7 @@ void panic()
 {
   printf(" >_<   systempanic\n");
 
-  printf(" OpenSteel/OS version 0.22.40");
+  printf(" OpenSteel/OS version 0.22.41");
   printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
   printf(" Trigger: NULL"); // "NULL" is to be replaced with legitimate reasons, such as a memory leak or a buffer overflow.
   printf("                                                                                ");
@@ -293,7 +293,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // Start of boot process v
 
   printf("  ___                                                                           ");
-  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.40 \"Hakurei\"                  ");
+  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.41 \"Hakurei\"                  ");
   printf(" \\__\\    By SteelsOfLiquid, based on WYOOS. Licensed under GNU-GPL 3.0          ");
   printf("  \\  \\   steelsofliquid@hotmail.com ~ https://steelsofliquid.neocities.org/     ");
   printf("  /__/                                                                          ");
@@ -374,6 +374,8 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     for(int32_t x = 0; x < 320; x++)
       vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
     */
+
+  sleep(5);
 
   while(1);
   
