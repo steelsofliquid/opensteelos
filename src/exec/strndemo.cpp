@@ -47,6 +47,9 @@ int8_t* DemoResultF;
 int8_t* DemoResultG;
 int8_t* DemoResultH;
 int8_t* DemoResultI;
+int8_t* DemoResultJ;
+int8_t* DemoResultK;
+int8_t* DemoResultL;
 
 extern "C" void ExStringDemoProgramMain()
 {
@@ -136,7 +139,106 @@ extern "C" void ExStringDemoProgramMain()
     printf(DemoResultG);
     printf(DemoResultH);
 
-    printf("STOP! StringDemoProgramMain() in strndemo.cpp ends at line 123 (v) and has no   ");
-    printf("way to continue. It is of my upmost apology >_<                                 ");
+    sleep(15);
+
+    printf("\a Demonstration 4. String Length and Comparison");
+    sleep(1);
+    printf("\nThis demo features string comparison based off of if-then loops. There is no    ");
+    printf("integer to string convertor yet, and so the output is only a rough estimate. This ");
+    printf("demo uses strings A\n");
+    sleep(2);
+
+    if (StringLibrary.strlen(DemoMaterialA) == 26)
+    {
+        printf("\nString A has a length of 26.");
+        DemoResultI = "EQUALS 26";
+    }
+    else
+    {
+        if (StringLibrary.strlen(DemoMaterialA) > 26)
+        {
+            printf("\nString A has a length greater than 26.");
+            DemoResultI = "GREATER THAN 26";
+        }
+        else
+        {
+            printf("\nString A has a length less than 26.");
+            DemoResultI = "LESS THAN 26";
+        }
+    }
+
+    if (StringLibrary.strlen(DemoMaterialD) == 26)
+    {
+        printf("\nString D has a length of 26.");
+        DemoResultJ = "EQUALS 26";
+    }
+    else
+    {
+        if (StringLibrary.strlen(DemoMaterialD) > 26)
+        {
+            printf("\nString D has a length greater than 26.");
+            DemoResultJ = "GREATER THAN 26";
+        }
+        else
+        {
+            printf("\nString D has a length less than 26.");
+            DemoResultJ = "LESS THAN 26";
+        }
+    }
+
+    sleep(1);
+
+    if (StringLibrary.strcmp(DemoMaterialC, "Hello World!") == 0)
+    {
+        printf("\nString C is equal to the string \"Hello World!\".");
+        DemoResultK = "EQUAL";
+    }
+    else
+    {
+        printf("String C is not equal to the string \"Hello World!\".");
+        DemoResultK = "NOT EQUAL";
+    }
+
+    sleep(1);
+
+    if (StringLibrary.strncmp(DemoMaterialB, "Neisa", 4) == 0)
+    {
+        printf("\nThe first 5 characters of String B are equal to \"Neisa\".");
+        DemoResultL = "EQUAL TO \"Neisa\"";
+    }
+    else
+    {
+        printf("The first 5 characters of String B are not equal to the string \"Neisa\".");
+        DemoResultL = "NOT EQUAL TO \"Neisa\"";
+    }
+
+    sleep(15);
+
+    printf("\a Summary\n");
+    sleep(1);
+    printf("\nThis demo focused on on string functions. Please notify steelsofliquid of any   ");
+    printf("anomalies on GitHub at steelsofliquid/opensteelos.\n");
+    sleep(1);
+    printf("Test Results:");
+
+    sleep(2);
+
+    printf("\nA | "); printf(DemoResultA);
+    printf("\nB | "); printf(DemoResultB);
+    printf("\nC | "); printf(DemoResultC);
+    printf("\nD | "); printf(DemoResultD);
+    printf("\nE | "); printf(DemoResultE);
+    printf("\nF | "); printf(DemoResultF);
+    printf("\nG | "); printf(DemoResultG);
+    printf("\nH | "); printf(DemoResultH);
+    printf("\nI | "); printf(DemoResultI);
+    printf("\nJ | "); printf(DemoResultJ);
+    printf("\nK | "); printf(DemoResultK);
+    printf("\nL | "); printf(DemoResultL);
+
+    sleep(30);
+
+    printf("\a\bThe demo is now over. You can continue to mess around with the OS, but you can  ");
+    printf("now manually power down your system.\n\n");
 
 }
