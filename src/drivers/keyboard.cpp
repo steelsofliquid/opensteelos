@@ -134,7 +134,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 printf(" There is currently no shell, so how you are seeing this is through hardcoded   ");
                 printf(" implementations in the keyboard driver. For support/assistance, please contact ");
                 printf(" this e-mail, shown on the left. Keys include:                                  ");
-                printf(" [F1] Help   [F2] About                           steelsofliquid@hotmail.com    ");
+                printf(" [F1] Help   [F2] About [F12] Clear Screen        steelsofliquid@hotmail.com    ");
                 printf("                                                                                ");
                 break;
                 }
@@ -143,7 +143,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             {
                 printf("\n");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version 0.22 Build 40 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" OpenSteel/OS (Version 0.22 Build 41 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
                 printf("This is free software, and you are welcome to                                   ");
