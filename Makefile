@@ -36,7 +36,7 @@ object/%.o: src/%.s
 	as $(ASPARAMS) -o $@ $< 
 	echo 'Compile Attempt: $@ object file from $< - Time of Compile: $(TIMESTAMP) - Parameters: $(ASPARAMS)' >> buildlog.txt
 	
-opensteelcore.bin: linker.ld $(objects)
+opensteelcore.bin: linker/linker.ld $(objects)
 	@echo "Initiating binary compilation using linker file: $@"
 	ld $(LDPARAMS) -T $< -o $@ $(objects)
 	echo 'Compile Attempt: $@ binary file linked with $< - Time of Compile: $(TIMESTAMP) - Parameters: $(LDPARAMS)' >> buildlog.txt

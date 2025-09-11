@@ -1,0 +1,4 @@
+*.iso
+*.bin
+object/
+buildlog.txt
