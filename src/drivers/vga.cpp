@@ -1,4 +1,4 @@
-// r_nanamitsukasa says on the 2nd of july 2024 at 01:05 toronto: crt means "cathode ray tube".
+// crt means "cathode ray tube".
 
 #include <drivers/vga.h>
 // this was file management hell.
@@ -31,17 +31,14 @@ VideoGraphicsArray::~VideoGraphicsArray()
 
 void VideoGraphicsArray::WriteRegisters(uint8_t* registers)
 {
-    // for the miscellaneous port
-    MiscPort.Write(*(registers++)); // r_nanamitsukasa at 00:56 est on 2024-07-02 ~ wow i'm tired and stuff... almost implemented this the wrong way
+    MiscPort.Write(*(registers++)); // almost implemented this the wrong way
     
-    // for the sequencer ports
     for(uint8_t i = 0; i < 5; i++)
     {
         SequencerIndexPort.Write(i);
         SequencerDataPort.Write(*(registers++));
     }
 
-    // for the crt controller ports
     CRTCIndexPort.Write(0x03);
     CRTCDataPort.Write(CRTCDataPort.Read() | 0x80);
     CRTCIndexPort.Write(0x11);
@@ -56,14 +53,12 @@ void VideoGraphicsArray::WriteRegisters(uint8_t* registers)
         CRTCDataPort.Write(*(registers++));
     }
 
-    // for the graphics controller ports
     for(uint8_t i = 0; i < 9; i++)
     {
         GCIndexPort.Write(i);
         GCDataPort.Write(*(registers++));
     }
 
-    // for the attribute controller ports
     for(uint8_t i = 0; i < 21; i++)
     {
         ACResetPort.Read();

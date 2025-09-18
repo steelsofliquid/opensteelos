@@ -10,27 +10,22 @@ void printf(char*);
 
 MouseEventHandler::MouseEventHandler()
 {
-    //
 }
 
 void MouseEventHandler::OnActivate()
 {
-    //
 }
 
 void MouseEventHandler::OnMouseDown(uint8_t button)
 {
-    //
 }
 
 void MouseEventHandler::OnMouseUp(uint8_t button)
 {
-    //
 }
 
 void MouseEventHandler::OnMouseMove(int x, int y)
 {
-    //
 }
 
 
@@ -45,7 +40,6 @@ commandport(0x64)
 
 MouseDriver::~MouseDriver()
 {
-    //
 }
 
 void MouseDriver::Activate()
@@ -67,9 +61,6 @@ void MouseDriver::Activate()
     dataport.Write(0xF4);
     dataport.Read();
 }
-
-// void printf(char*);
-// ^^-- Is this the problem? It might be...
 
 uint32_t MouseDriver::HandleInterrupt(uint32_t esp)
 {
