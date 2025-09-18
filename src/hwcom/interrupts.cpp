@@ -1,5 +1,5 @@
 
-#include <hwcom/interrupts.h> // This OS' source code is so dependent on its files, it'd be dependency hell if I didn't provide all of the OS' code! ^_^
+#include <hwcom/interrupts.h>
 using namespace osos;
 using namespace osos::common;
 using namespace osos::hwcom;
@@ -49,13 +49,13 @@ void InterruptManager::SetInterruptDescriptorTableEntry(
 // Note 2024-10-31 i add something i frogot and then nanami-sama makes my project into the most erroneous shit. this file currently has literally 100 fucking errors lmaooooo
 
 InterruptManager::InterruptManager(uint16_t HardwareInterruptOffset, GlobalDescriptorTable* gdt, TaskManager* taskManager)
-: picMasterCommand(0x20), // Placed a semicolon here, but realized it's supposed to be a normal colon. Silly me! | .|
-  picMasterData(0x21), // placed colons separately here. could tell before the guy in the tutorial because vs code (what i'm using to code the entire os) colored the first one of these four different from the rest
-  picSlaveCommand(0xA0),
-  picSlaveData(0xA1) // This doesn't get a colon. That created an error >_<
+: picLeadCommand(0x20), // Placed a semicolon here, but realized it's supposed to be a normal colon. Silly me! | .|
+  picLeadData(0x21), // placed colons separately here. could tell before the guy in the tutorial because vs code (what i'm using to code the entire os) coloured the first one of these four different from the rest
+  picFollowCommand(0xA0),
+  picFollowData(0xA1) 
 {
     this->taskManager = taskManager;
-//    this->hardwareInterruptOffset = hardwareInterruptOffset;
+//    this->hardwareInterruptOffset = hardwareInterruptOffset; this might be of note someday, i don't think so.
     uint16_t CodeSegment = gdt->CodeSegmentSelector();
     
     const uint8_t IDT_INTERRUPT_GATE = 0xE;
@@ -65,7 +65,7 @@ InterruptManager::InterruptManager(uint16_t HardwareInterruptOffset, GlobalDescr
         SetInterruptDescriptorTableEntry(i, CodeSegment, &IgnoreInterruptRequest, 0, IDT_INTERRUPT_GATE);
     }
 
-    // There might be an ungodly amount of code to go here, idk, i hope not >_<
+    // HandleException0x?? wouldn't compile.
 
 /*
     SetInterruptDescriptorTableEntry(0x00, CodeSegment, &HandleException0x00, 0, IDT_INTERRUPT_GATE);
@@ -107,20 +107,20 @@ InterruptManager::InterruptManager(uint16_t HardwareInterruptOffset, GlobalDescr
     SetInterruptDescriptorTableEntry(0x2E, CodeSegment, &HandleInterruptRequest0x0E, 0, IDT_INTERRUPT_GATE);
     SetInterruptDescriptorTableEntry(0x2F, CodeSegment, &HandleInterruptRequest0x0F, 0, IDT_INTERRUPT_GATE);
 
-    picMasterCommand.Write(0x11);
-    picSlaveCommand.Write(0x11);
+    picLeadCommand.Write(0x11);
+    picFollowCommand.Write(0x11);
 
-    picMasterData.Write(0x20);
-    picSlaveData.Write(0x28);
+    picLeadData.Write(0x20);
+    picFollowData.Write(0x28);
 
-    picMasterData.Write(0x04);
-    picSlaveData.Write(0x02);
+    picLeadData.Write(0x04);
+    picFollowData.Write(0x02);
 
-    picMasterData.Write(0x01);
-    picSlaveData.Write(0x01);
+    picLeadData.Write(0x01);
+    picFollowData.Write(0x01);
 
-    picMasterData.Write(0x00);
-    picSlaveData.Write(0x00);
+    picLeadData.Write(0x00);
+    picFollowData.Write(0x00);
 
     interruptDescriptorTablePointer idt;
     idt.size = 256 * sizeof(GateDescriptor) - 1;
@@ -129,9 +129,9 @@ InterruptManager::InterruptManager(uint16_t HardwareInterruptOffset, GlobalDescr
 
 }
 
-InterruptManager::~InterruptManager() // Made a goofy mistake over and over by leaving a semicolon here. Interrupts are hard >_<
+InterruptManager::~InterruptManager() // I'm leaving this in, the comment said "oops i forgot a semicolon". This became such a fixation I rarely do that now.
+// *Builds nuclear reactor software* "oops i forgot a semicolon and it compiled anyway" *world devastation*
 {
-    //
 }
 
 void InterruptManager::Activate()
@@ -155,7 +155,8 @@ uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp
 {
     if(ActiveInterruptManager != 0)
         return ActiveInterruptManager->DoHandleInterrupt(interruptNumber, esp);
-    // Interrupts are planned to be used as worst-case scenarios as of Build 11.
+    // Originally, interrupts were viewed as a "worst-case" scenario in pre-Neisa OpenSteel/OS (i.e. NanamiOS).
+    // This isn't REALLY true, interrupts are, in this case, being hardware comm, integral to the OS.
     return esp;
 
 }
@@ -165,15 +166,14 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     if(handlers[interruptNumber] != 0)
     {
         esp = handlers[interruptNumber]->HandleInterrupt(esp);
-        //
     }
-    else if(interruptNumber != 0x20) // If it's not a timer interrupt
+    else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
     {
-        char* foo = "\nGenIntrpt0x00 (Unhandled)";
+        char* foo = "\n[msg] Generic Unhandled Interrupt, Please write an entry for: 0x00";
         char* hex = "0123456789ABCDEF";
         foo[41] = hex[(interruptNumber >> 4) & 0x0F];
-        foo[42] = hex[interruptNumber & 0x0F]; // Restored from 1.00.20
-        printf(foo); // Linux style! XD... I meant the "char* foo". T_T
+        foo[42] = hex[interruptNumber & 0x0F];
+        printf(foo);
     }
 
     if(interruptNumber == 0x20)
@@ -183,11 +183,9 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
 
     if(0x20 <= interruptNumber && interruptNumber < 0x30)
     {
-        // This code wasn't originally in NanamiOS 1.00 Build 11x, I forgot to archive that build as it was >_<
-        picMasterCommand.Write(0x20);
+        picLeadCommand.Write(0x20);
         if(0x28 <= interruptNumber)
-            picSlaveCommand.Write(0x20);
-        //
+            picFollowCommand.Write(0x20);
     }
 
     return esp;
