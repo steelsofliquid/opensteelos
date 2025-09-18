@@ -10,17 +10,14 @@ using namespace osos::hwcom;
 
 KeyboardEventHandler::KeyboardEventHandler()
 {
-    //
 }
         
 void KeyboardEventHandler::OnKeyDown(char)
 {
-    //
 }
 
 void KeyboardEventHandler::OnKeyUp(char)
 {
-    //
 }
 
 
@@ -34,7 +31,6 @@ commandport(0x64)
 
 KeyboardDriver::~KeyboardDriver()
 {
-    //
 }
 
 void KeyboardDriver::Activate()
@@ -61,6 +57,9 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
         return esp;
 
     static bool Shift = false;
+    static bool Control = false;
+    static bool Alt = false;
+    static bool CapsLock = false;
 
         switch(key)
         {
@@ -82,49 +81,67 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 
             case 0x0E: handler->OnKeyDown('\b'); break; // backspace.
 
-            case 0x0F: printf("     "); break; // Tab key. Also, the only surviving "printf" system as my compiler gave me a warning that it may cause an overflow.
-            case 0x10: if(Shift) handler->OnKeyDown('Q'); else handler->OnKeyDown('q'); break;
-            case 0x11: if(Shift) handler->OnKeyDown('W'); else handler->OnKeyDown('w'); break;
-            case 0x12: if(Shift) handler->OnKeyDown('E'); else handler->OnKeyDown('e'); break;
-            case 0x13: if(Shift) handler->OnKeyDown('R'); else handler->OnKeyDown('r'); break;
-            case 0x14: if(Shift) handler->OnKeyDown('T'); else handler->OnKeyDown('t'); break;
-            case 0x15: if(Shift) handler->OnKeyDown('Y'); else handler->OnKeyDown('y'); break;
-            case 0x16: if(Shift) handler->OnKeyDown('U'); else handler->OnKeyDown('u'); break;
-            case 0x17: if(Shift) handler->OnKeyDown('I'); else handler->OnKeyDown('i'); break;
-            case 0x18: if(Shift) handler->OnKeyDown('O'); else handler->OnKeyDown('o'); break;
-            case 0x19: if(Shift) handler->OnKeyDown('P'); else handler->OnKeyDown('p'); break;
+            case 0x0F: printf("     "); break; // tab
+            case 0x10: if(Shift || CapsLock) handler->OnKeyDown('Q'); else handler->OnKeyDown('q'); break;
+            case 0x11: if(Shift || CapsLock) handler->OnKeyDown('W'); else handler->OnKeyDown('w'); break;
+            case 0x12: if(Shift || CapsLock) handler->OnKeyDown('E'); else handler->OnKeyDown('e'); break;
+            case 0x13: if(Shift || CapsLock) handler->OnKeyDown('R'); else handler->OnKeyDown('r'); break;
+            case 0x14: if(Shift || CapsLock) handler->OnKeyDown('T'); else handler->OnKeyDown('t'); break;
+            case 0x15: if(Shift || CapsLock) handler->OnKeyDown('Y'); else handler->OnKeyDown('y'); break;
+            case 0x16: if(Shift || CapsLock) handler->OnKeyDown('U'); else handler->OnKeyDown('u'); break;
+            case 0x17: if(Shift || CapsLock) handler->OnKeyDown('I'); else handler->OnKeyDown('i'); break;
+            case 0x18: if(Shift || CapsLock) handler->OnKeyDown('O'); else handler->OnKeyDown('o'); break;
+            case 0x19: if(Shift || CapsLock) handler->OnKeyDown('P'); else handler->OnKeyDown('p'); break;
             case 0x1A: if(Shift) handler->OnKeyDown('{'); else handler->OnKeyDown('['); break;
             case 0x1B: if(Shift) handler->OnKeyDown('}'); else handler->OnKeyDown(']'); break;
-            case 0x2B: if(Shift) handler->OnKeyDown('|'); else handler->OnKeyDown('\\'); break; // A second backslash is deployed, because purely one backslah will just break the code.
+            case 0x2B: if(Shift) handler->OnKeyDown('|'); else handler->OnKeyDown('\\'); break;
 
-            case 0x1E: if(Shift) handler->OnKeyDown('A'); else handler->OnKeyDown('a'); break; // Original code stated "this key (a) is assigned to hex 0x1E". I watched the video, and it turns out, that's the A key! So, that's a start!
-            case 0x1F: if(Shift) handler->OnKeyDown('S'); else handler->OnKeyDown('s'); break;
-            case 0x20: if(Shift) handler->OnKeyDown('D'); else handler->OnKeyDown('d'); break;
-            case 0x21: if(Shift) handler->OnKeyDown('F'); else handler->OnKeyDown('f'); break;
-            case 0x22: if(Shift) handler->OnKeyDown('G'); else handler->OnKeyDown('g'); break;
-            case 0x23: if(Shift) handler->OnKeyDown('H'); else handler->OnKeyDown('h'); break;
-            // case 0x17: printf("I"); break; NOT SUPPOSED TO BE IN THIS ROW!!! >_<
-            case 0x24: if(Shift) handler->OnKeyDown('J'); else handler->OnKeyDown('j'); break;
-            case 0x25: if(Shift) handler->OnKeyDown('K'); else handler->OnKeyDown('k'); break;
-            case 0x26: if(Shift) handler->OnKeyDown('L'); else handler->OnKeyDown('l'); break;
+            case 0x1E: if(Shift || CapsLock) handler->OnKeyDown('A'); else handler->OnKeyDown('a'); break;
+            case 0x1F: if(Shift || CapsLock) handler->OnKeyDown('S'); else handler->OnKeyDown('s'); break;
+            case 0x20: if(Shift || CapsLock) handler->OnKeyDown('D'); else handler->OnKeyDown('d'); break;
+            case 0x21: if(Shift || CapsLock) handler->OnKeyDown('F'); else handler->OnKeyDown('f'); break;
+            case 0x22: if(Shift || CapsLock) handler->OnKeyDown('G'); else handler->OnKeyDown('g'); break;
+            case 0x23: if(Shift || CapsLock) handler->OnKeyDown('H'); else handler->OnKeyDown('h'); break;
+            case 0x24: if(Shift || CapsLock) handler->OnKeyDown('J'); else handler->OnKeyDown('j'); break;
+            case 0x25: if(Shift || CapsLock) handler->OnKeyDown('K'); else handler->OnKeyDown('k'); break;
+            case 0x26: if(Shift || CapsLock) handler->OnKeyDown('L'); else handler->OnKeyDown('l'); break;
             case 0x27: if(Shift) handler->OnKeyDown(':'); else handler->OnKeyDown(';'); break;
             case 0x28: if(Shift) handler->OnKeyDown('\"'); else handler->OnKeyDown('\''); break;
 
-            case 0x2C: if(Shift) handler->OnKeyDown('Z'); else handler->OnKeyDown('z'); break;
-            case 0x2D: if(Shift) handler->OnKeyDown('X'); else handler->OnKeyDown('x'); break;
-            case 0x2E: if(Shift) handler->OnKeyDown('C'); else handler->OnKeyDown('c'); break; // Odd. My notes said C pointed to 0x28...
-            case 0x2F: if(Shift) handler->OnKeyDown('V'); else handler->OnKeyDown('v'); break;
-            case 0x30: if(Shift) handler->OnKeyDown('B'); else handler->OnKeyDown('b'); break;
-            case 0x31: if(Shift) handler->OnKeyDown('N'); else handler->OnKeyDown('n'); break;
-            case 0x32: if(Shift) handler->OnKeyDown('M'); else handler->OnKeyDown('m'); break;
+            case 0x2C: if(Shift || CapsLock) handler->OnKeyDown('Z'); else handler->OnKeyDown('z'); break;
+            case 0x2D: if(Shift || CapsLock) handler->OnKeyDown('X'); else handler->OnKeyDown('x'); break;
+            case 0x2E: if(Shift || CapsLock) handler->OnKeyDown('C'); else handler->OnKeyDown('c'); break;
+            case 0x2F: if(Shift || CapsLock) handler->OnKeyDown('V'); else handler->OnKeyDown('v'); break;
+            case 0x30: if(Shift || CapsLock) handler->OnKeyDown('B'); else handler->OnKeyDown('b'); break;
+            case 0x31: if(Shift || CapsLock) handler->OnKeyDown('N'); else handler->OnKeyDown('n'); break;
+            case 0x32: if(Shift || CapsLock) handler->OnKeyDown('M'); else handler->OnKeyDown('m'); break;
             case 0x33: if(Shift) handler->OnKeyDown('<'); else handler->OnKeyDown(','); break;
             case 0x34: if(Shift) handler->OnKeyDown('>'); else handler->OnKeyDown('.'); break;
             case 0x35: if(Shift) handler->OnKeyDown('?'); else handler->OnKeyDown('/'); break;
 
             case 0x1C: handler->OnKeyDown('\n'); break; // Enter key
             case 0x39: handler->OnKeyDown(' '); break; // Space key
+
             case 0x2A: case 0x36: Shift = true; break;
             case 0xAA: case 0x86: Shift = false; break;
+            case 0x1D: Control = true; break;
+            case 0x9D: Control = false; break;
+            case 0x38: Alt = true; break;
+            case 0xB8: Alt = false; break;
+
+            case 0x3A:
+            {
+                if (CapsLock == false)
+                {
+                    CapsLock = true;
+                    break;
+                }
+                else
+                {
+                    CapsLock = false;
+                    break;
+                }
+            }
 
             case 0x3B: 
             {
@@ -138,12 +155,12 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 printf("                                                                                ");
                 break;
                 }
-            //     ^- This should point to the F1 key. It does.
+            // Formula 1
             case 0x3C:
             {
                 printf("\n");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version 0.22 Build 41 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" OpenSteel/OS (Version 0.22 Build 42 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
                 printf("This is free software, and you are welcome to                                   ");
@@ -152,15 +169,18 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 printf(" *** LICENSE NOT INCLUDED DUE TO LACK OF FILESYSTEM                             ");
                 break;
             }
-            //     ^- This should point to F2.
-            // ughh, a 580-column line, with a missing semicolon... >_<
-
+            // Formula 2
             case 0x3D: break;
-            //     ^- Should point to F3.
+            // Formula 3.
 
-            case 0x3E: break;
+            case 0x3E:
+            {
+                if (Alt == true)
+                    printf("Heh. I see what you did there. If only there was userspace...");
+                break;
+            } // Formula 4
 
-            case 0x3F: // F5 iirc
+            case 0x3F: // Formula 5
             {
                 break;
             }
@@ -172,24 +192,23 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             }
 
 
-            case 0x41:  // This should point to F7...
+            case 0x41:  // Formula 7
             {
-                // printf("command►");
                 break;
             
             }
 
-            // case 0x42: printf("¬"); break; // F8, notsign key
-            // case 0x43: printf("♫"); break; // F9, beamed notes key
-            // case 0x44: printf("♥"); break; // F10, heart key
+            // case 0x42: printf("¬"); break; // Formula 8
+            // case 0x43: printf("♫"); break; // Formula 9
+            // case 0x44: printf("♥"); break; // Formula 10
 
-            case 0x58: // should point to F12
+            case 0x58: // Formula 12
             {
                 printf("\a");
                 break;
             }
 
-            case 0x45: case 0xC5: break; // NumLock key. Some PCs don't have number pads.
+            case 0x45: case 0xC5: break; // NumLock key. Some PCs don't have number pads. My ThinkPad doesn't have one.
 
             default:
             {
