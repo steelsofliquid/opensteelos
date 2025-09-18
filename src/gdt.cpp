@@ -13,15 +13,11 @@ dataSegmentSelector(0,64*1024*1024, 0x92)
     i[1] = (uint32_t)this;  // DO NOT SWAP THESE TWO VALUES. IT WILL BREAK THE OS!!
     i[0] = sizeof(GlobalDescriptorTable) << 16;
 
-// Swapped the 0 and 1, got a glitch, and swapped them back. Let's see how that works!
-// Okay, so this is how it's supposed to actually look like
-
     asm volatile("lgdt (%0)": :"p" (((uint8_t *) i)+2));
 }
 
-GlobalDescriptorTable::~GlobalDescriptorTable() // just realized here there's supposed to be a () i'm such a baka
+GlobalDescriptorTable::~GlobalDescriptorTable()
 {
-    // nothing to report here... for now.
 }
 
 uint16_t GlobalDescriptorTable::DataSegmentSelector()
@@ -67,10 +63,8 @@ GlobalDescriptorTable::SegmentDescriptor::SegmentDescriptor(uint32_t base, uint3
 
 uint32_t GlobalDescriptorTable::SegmentDescriptor::Base()
 {
-    // well, there is stuf that goes here! the video didn't show it at first!
-    
     uint8_t* target = (uint8_t*)this;
-    uint32_t result = target[7]; // Pretty sure this isn't supposed to be a Nanami Madobe/Windows 7 reference. Because it's not.
+    uint32_t result = target[7]; // Pretty sure this isn't supposed to be a Nanami Madobe/Windows 7 reference. Because it's not. For your understanding, OpenSteel/OS was previously called Nanami/OS in reference to Nanami Madobe. Now you know why it's OpenSteel/OS.
     result = (result << 8) + target[4];
     result = (result << 8) + target[3];
     result = (result << 8) + target[2];
@@ -81,7 +75,7 @@ uint32_t GlobalDescriptorTable::SegmentDescriptor::Base()
 uint32_t GlobalDescriptorTable::SegmentDescriptor::Limit()
 {
     uint8_t* target = (uint8_t*)this;
-    uint32_t result = target[6] & 0xF; // "MUTSUMI MADOBE IN NANAMI MADOBE OS!?!?!?!?!?!!?!?!?!?111/??" O_O lol, couldn't help it ^_^
+    uint32_t result = target[6] & 0xF;
     result = (result << 8) + target[1];
     result = (result << 8) + target[0];
 
