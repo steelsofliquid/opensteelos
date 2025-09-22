@@ -2,6 +2,8 @@
 OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's as if it was Nanami/OS on steroids, which is in turn a dumbed down WYOOS, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future.  
 ![OpenSteel/OS 0.22 Build 39 after booting up in VirtualBox.](https://github.com/steelsofliquid/opensteelos/blob/main/VirtualBoxVM_20250825-150659437.png "OpenSteel/OS 0.22 Build 39 after booting up in VirtualBox.")
 
+To see my thoughts and whatnot on the current situation of the project, check out my log repo, https://github.com/steelsofliquid/steelsofliqud_log. *This repo also contains my thoughts and whatnot on my other projects.
+
 ## *What's new in OpenSteel/OS (as of 2025-08-24)*
  - Organization of code (directories, yo)
  - A more lenient roadmap (like below!)
