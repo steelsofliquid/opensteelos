@@ -50,6 +50,7 @@ A pre-built copy is provided, so if this seems too intimidating or you just want
  - *What led you to an interest in OS dev?* I was interested as early as before I even made my YouTube channel (both SteelsOfLiquid and naterenaud303), but didn't know where to start. After being recommended a video on osakaOS, which mentioned the WYOOS tutorial, it got me interested.
  - *Why not make a Linux distro?* While it would be theoretically easier, my end goal is my own project, with my own desktop environment and under-the-hood components (even though OpenSteel/OS is based off of a tutorial). I do respect Linux and the work of Linus Torvalds, just that I want to create a project with its own kernel.
  - *What hardware are you using to develop this?* a Lenovo ThinkPad T480 running Kubuntu. I've always found Ubuntu and its derivatives the most trustworthy when making these live CDs. ;)
+ - *I've been looking and it seems you haven't updated this in [x] amount of time. Why?* First, I prefer to have the main branch of the repo to be in a working, less buggy state, and so that means not updating *it* until after my latest build contains the desired functionality. Second, I do have a life outside of software development, and mind you, a life outside of software development that can get really *busy*. Kyaa, the way I'm wording this makes me sound like a mediocre incompetent person.
 
 ## *OS Sources*
 - Write Your Own Operating System
