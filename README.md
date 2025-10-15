@@ -4,6 +4,9 @@ OpenSteel/OS is an operating system based off of the Write Your Own Operating Sy
 
 To see my thoughts and whatnot on the current situation of the project, check out my log repo, https://github.com/steelsofliquid/steelsofliqud_log. *This repo also contains my thoughts and whatnot on my other projects.
 
+## Project On Hold (for now)
+My life is currently very, very busy. I have to do a lot of school work in multiple classes, I'm trying to restore a normal sleep schedule and there's also YouTube stuff and things I *want* to do (although that can include software dev, but mainly consists of idea-planning, YouTube and gaming). Furthermore, the school I go to blocked GitHub and I have yet to figure out a VPN or proxy solution (preferably something FOSS), and so I can't even access GitHub right now. I honestly want to jab at the school now, because I do not like it, but for the sake of my own digital footprint, I'm not going to. I don't want this point to dominate this section, and so I should mention that I do have some interesting ideas. Of course the whole Serotonin project, but also I want to develop a desktop environment for Linux that is very Windows-esque (but stays true to the good ol' days of Windows 2000, XP and 7). I don't know. I'll likely upload my progress to an additional branch and merge said branch into here.
+
 ## *What's new in OpenSteel/OS (as of 2025-08-24)*
  - Organization of code (directories, yo)
  - A more lenient roadmap (like below!)
