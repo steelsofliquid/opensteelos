@@ -5,7 +5,7 @@
 
 This project is currently in a bit of a development freeze until the state of my life can improve. That does not mean discontinuation; at the latest this project may resume development in May or June of 2026 when I am done attending my current school, and the school I desire attending afterwards has a school of engineering and computer science, and so, assuming my academic life is more stable there, it may continue to see development even after my first days/weeks there. But I digress.
 
-OpenSteel/OS is a free and open source operating system that aims to be different than its Unix-y colleagues (i.e. Linux and BSD) and proprietary competitors and their open-source equivalents. The second and more "formal" iteration of my operating system (based off of the *Write Your Own Operating System* tutorial - [GitHub]() [YouTube]() ), it is the direct successor to the earlier Nanami/OS (well, with all of the anime themed OS wannabe stripped out of it, but a lot of that was stripped from later Nanami/OS builds), and builds off of its foundation. It is currently written in C++ with C headers and C-style syntax, as well as an object-oriented approach, but I want to transition the OS to being written in pure C. It began development proper in March 2025, and a lot of its development has been the result of short bursts of major progress. In June of 2025, the long-long-term plans had a GUI in them as OpenSteelEnvy's aim was absorbed into this project, but GUI development will not start for a fair bit of time. The current version in development is 0.22 "Hakurei", in development block "Denver". This system will be explained shortly.
+OpenSteel/OS is a free and open source operating system that aims to be different than its Unix-y colleagues (i.e. Linux and BSD) and proprietary competitors and their open-source equivalents. The second and more "formal" iteration of my operating system (based off of the *Write Your Own Operating System* tutorial - [GitHub](https://github.com/AlgorithMan-de/wyoos) [YouTube](https://www.youtube.com/@writeyourownoperatingsystem) ), it is the direct successor to the earlier Nanami/OS (well, with all of the anime themed OS wannabe stripped out of it, but a lot of that was stripped from later Nanami/OS builds), and builds off of its foundation. It is currently written in C++ with C headers and C-style syntax, as well as an object-oriented approach, but I want to transition the OS to being written in pure C. It began development proper in March 2025, and a lot of its development has been the result of short bursts of major progress. In June of 2025, the long-long-term plans had a GUI in them as OpenSteelEnvy's aim was absorbed into this project, but GUI development will not start for a fair bit of time. The current version in development is 0.22 "Hakurei", in development block "Denver". This system will be explained shortly.
 
 This document aims to provide a general overview of OpenSteel/OS technically.
 
@@ -47,11 +47,13 @@ TL;DR - There'a bunch of reasons why you could have 0.22 "Hakurei", 0.23 - 0.24 
 ---
 
 
-The way OpenSteel/OS is organised is fairly simple, in theory. There are a set of base directories: `include/`, `docs/`, `build/`, `src/` and `_archive`. A sixth directory, `linkers/`, may be added in the future if the complexity of the language increases, but there's five for now.
+> As of the 20th of October, 2025, this directory structure has yet to be implemented, due to issues with the current codebase in relation to the PIT driver and possibly interrupt manager.
+
+The way OpenSteel/OS is organised is fairly simple, in theory. There are a set of base directories: `include/`, `docs/`, `object/`, `src/` and `_archive`. A sixth directory, `linkers/`, may be added in the future if the complexity of the language increases, but there's five for now.
  - `include/` contains all of the header files. It has practically exclusive reign of the `common/` subdir and namespace.
  - `src/` contains the source code for everything, including the kernel, bootloader, drivers, and other components.
  - `docs/` contains all of the technical documentation.
- - `build/` contains compiled content for those who don't want to compile OpenSteel/OS themselves.
+ - `object/` contains compiled content for those who don't want to compile OpenSteel/OS themselves.
  - `_archive/` contains materials no longer used in OpenSteel/OS by default, including experimental content.
 
 The `include/` and `src/` directories contain relatively similar subdirectories:
