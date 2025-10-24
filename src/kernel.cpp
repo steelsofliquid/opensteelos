@@ -20,6 +20,7 @@
 */
 
 #include <common/types.h>
+#include <globalfuncs.h>
 #include <gdt.h>
 #include <dmm.h>
 #include <hwcom/interrupts.h>
@@ -28,7 +29,7 @@
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/pit.h>
-#include <drivers/speaker.h>
+#include <drivers/snd/speaker.h>
 #include <drivers/vga.h>
 #include <multitasking.h>
 
@@ -45,9 +46,11 @@ using namespace osos::hwcom;
 
 uint32_t VersionMajor = 0;
 uint32_t VersionMinor = 22;
-uint32_t VersionBuild = 41;
+uint32_t VersionBuild = 44;
 
-void printf(char* str) // the main screen output function.
+extern volatile uint32_t tickcount;
+
+void printf(char* str, ...) // the main screen output function.
 {
   static uint16_t* VideoMemory = (uint16_t*)0xb8000;
   
@@ -138,21 +141,6 @@ void printf(char* str) // the main screen output function.
   }
 }
 
-void sleep(uint32_t interval)
-{
-  ProgrammableIntervalTimer ProgrammableIntervalTimer;
-
-  for (uint32_t i = 0; i < interval; i++)
-  {
-    ProgrammableIntervalTimer.SetPITCount(1193182 / 1000);
-    uint32_t timing = ProgrammableIntervalTimer.ReadPIT();
-
-    while ((timing - ProgrammableIntervalTimer.ReadPIT()) < 1000)
-    {
-    }
-  }
-}
-
 void printfHex(uint8_t key)
 {
   char* foo = "00";
@@ -213,14 +201,23 @@ public:
 
 void TestTask1()
 {
-  while(true)
-    printf("[i] This is a testing task. It will display this message continously. (TestTask1");
+    while(true)
+        printf("A");
 }
 
 void TestTask2()
 {
   while(true)
-    printf("[i] This is a testing task. It will display this message continously. (TestTask2");
+    printf("TT2B");
+}
+
+void TestTask3()
+{
+  while(true)
+  {
+    printf("n3isa");
+    taskManager.sleep(3000);
+  }
 }
 
 void cmdVersion()
@@ -237,7 +234,7 @@ void panic()
 {
   printf(" >_<   systempanic\n");
 
-  printf(" OpenSteel/OS version 0.22.41");
+  printf(" OpenSteel/OS version 0.22.42");
   printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
   printf(" Trigger: NULL"); // "NULL" is to be replaced with legitimate reasons, such as a memory leak or a buffer overflow.
   printf("                                                                                ");
@@ -257,6 +254,8 @@ extern "C" void callConstructors()
   for(constructor* i = &start_ctors; i != &end_ctors; i++)
     (*i)();
 }
+
+// extern "C" void ExStringDemoProgramMain(); // register exec for testing
 
 extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 {
@@ -292,12 +291,16 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   
   // Start of boot process v
 
-  printf("  ___                                                                           ");
-  printf(" /  /    SteelsOfLiquid OpenSteel/OS version 0.22.41 \"Hakurei\"                  ");
-  printf(" \\__\\    By SteelsOfLiquid, based on WYOOS. Licensed under GNU-GPL 3.0          ");
-  printf("  \\  \\   steelsofliquid@hotmail.com ~ https://steelsofliquid.neocities.org/     ");
-  printf("  /__/                                                                          ");
+  // bootsplash header (ASCII)
+  printf("  ___                _ ___ __   _ _  __ __   _ _ ________________________ 0.22  ");
+  printf(" /  /                                         __ _ _   _ ____ _ _______________ ");
+  printf(" \\__\\     steelsofliquid                                  _ _   ___ _ _________ ");
+  printf("  \\  \\       OpenSteel/OS                                           _  __ _____ ");
+  printf("  /__/                                                                     ____ ");
   printf("                                                                                ");
+
+  // sysagent header
+  printf(" SteelsOfLiquid OpenSteel/OS 0.22denv \"Hakurei\" devbloc \"Denver\"\n");
 
   GlobalDescriptorTable gdt;
 
@@ -307,7 +310,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   size_t heap = 10*1024*1024;
   MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
-  printf("[dmm] Memory Heap: 0x");
+  printf("memory heap: 0x");
   printfHex((heap >> 24) & 0xFF);
   printfHex((heap >> 16) & 0xFF);
   printfHex((heap >> 8 ) & 0xFF);
@@ -315,44 +318,64 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   void* allocated = MemoryManager.malloc(1024);
   
-  printf(" - Allocated: 0x");
+  printf(", 0x");
   printfHex(((size_t)allocated >> 24) & 0xFF);
   printfHex(((size_t)allocated >> 16) & 0xFF);
   printfHex(((size_t)allocated >> 8 ) & 0xFF);
   printfHex(((size_t)allocated      ) & 0xFF);
+  printf(" allocated by dmm");
   
   printf("\n");
 
   // register tasks v
 
-  TaskManager taskManager;
   Task task1(&gdt, TestTask1);
   Task task2(&gdt, TestTask2);
+  Task task3(&gdt, TestTask3);
   Task taskcmd1(&gdt, cmdVersion);
   Task taskcmd2(&gdt, cmdTest);
-  // taskManager.AddTask(&task1);
-  // taskManager.AddTask(&task2);
+  taskManager.AddTask(&task1);
+  taskManager.AddTask(&task2);
+  taskManager.AddTask(&task3);
 
   // interrupts and drivers v
 
   InterruptManager interrupts(0x20, &gdt, &taskManager);
 
   DriverManager drvManager;
-    printf("[msg] A boot sequence has been initiated.\n[msg] Starting drivers...");
+  // drivers loading
+    //printf("starting drivers ");
 
     PrintfKeyboardEventHandler kbhandler;
+    //printf("........."); // i want to create the illusion of loading. this is purely static and needs a proper solution
     KeyboardDriver keyboard(&interrupts, &kbhandler);
+    //printf(".........");
     drvManager.AddDriver(&keyboard);
+    //printf(".........");
 
-    // MouseToConsole mousehandler;
-    // MouseDriver mouse(&interrupts, &mousehandler); // drivers loading
-    // drvManager.AddDriver(&mouse);
+    outb(0x21, inb(0x21) & ~0x1);
+    ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
+    programmableIntervalTimer.attachToInterruptManager(&interrupts);
+    drvManager.AddDriver(&programmableIntervalTimer);
+    printf("AddDriver -> PIT");
+    //printf("..........");
+
+    MouseToConsole mousehandler;
+    MouseDriver mouse(&interrupts, &mousehandler);
+    drvManager.AddDriver(&mouse);
 
     // ^ mouse driver sucked. let's not use it, if possible.
+    // well, it's currently in use to conduct interrupts tests.
 
     Speaker speaker;
+    printf("...");
 
-    printf("\n[msg] Drivers started. Obtaining PCI info...");
+    // testing some things. this is difficult to get working. maybe it'll work now?
+    if (interrupts.handlerExists(0x20)) printf("PIT handler exists, "); else printf("PIT handler void, ");
+    if ((inb(0x21) & 0x1) == 0) printf("IRQ0 unmasked."); else printf("IRQ0 masked.");
+
+    //printf(" done!");
+    //printf("finding and selecting PCI devices and drivers...");
 
     PCIController PCIController;
     PCIController.SelectDrivers(&drvManager, &interrupts);
@@ -360,14 +383,21 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // VideoGraphicsArray vga;
 
     drvManager.ActivateAll();
+    printf("\nActivateAll");
 
   interrupts.Activate();
+  printf(" interrupts activated.\n");
 
   // booting is at the home stretch ^v
 
-  sleep(1);
-  speaker.beep();
-  printf("\n[msg] System online.\n"); // Denotes end of booting process <
+  // programmableIntervalTimer.HardSleep(30);
+  // speaker.beep();
+  // printf("\nGood day, and welcome to OpenSteel/OS. Strike [F1] for help.\n"); // Denotes end of booting process <
+
+  if (interrupts.interruptsEnabled()) printf("Interrupt Flag Enabled. "); else printf("Interrupt Flag Disabled. ");
+  uint8_t leadMask = inb(0x21);
+  if ((leadMask & 0x1) == 0) printf("PIC IRQ0 unmasked, "); else printf("PIC IRQ0 masked, ");
+  interrupts.CheckIDTVector(0x20);
 
   /* vga.SetMode(320, 200, 8);
   for(int32_t y = 0; y < 200; y++)
@@ -375,7 +405,9 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
       vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
     */
 
-  sleep(5);
+  printf("\nConducting PIT ticks test...");
+  for (volatile int i = 0; i < 2000000; i++) asm volatile ("nop");
+  if (tickcount > 0) printf(" from this test, ticks are working."); else printf(" from this test, ticks are not working.");
 
   while(1);
   
