@@ -4,7 +4,7 @@ using namespace osos;
 using namespace osos::common;
 using namespace osos::hwcom;
 
-void printf(char* str);
+void printf(char* str, ...);
 void printfHex(uint8_t);
 
 
@@ -12,17 +12,32 @@ InterruptHandler::InterruptHandler(InterruptManager* interruptManager, uint8_t i
 {
     this->interruptNumber = interruptNumber;
     this->interruptManager = interruptManager;
-    interruptManager->handlers[interruptNumber] = this;
+
+    if (this->interruptManager) // safeguard
+        this->interruptManager->handlers[interruptNumber] = this;
 }
+
 InterruptHandler::~InterruptHandler()
 {
     if(interruptManager->handlers[interruptNumber] == this)
         interruptManager->handlers[interruptNumber] = 0;
 }
+
 uint32_t InterruptHandler::HandleInterrupt(uint32_t esp)
 {
     return esp;
 }
+
+void InterruptHandler::attachToInterruptManager(InterruptManager* interruptManager)
+{
+    // carried over from InterruptHandler
+    this->interruptManager = interruptManager;
+
+    if (this->interruptManager)
+        this->interruptManager->handlers[interruptNumber] = this;
+}
+
+
 
 InterruptManager::GateDescriptor InterruptManager::interruptDescriptorTable[256];
 InterruptManager* InterruptManager::ActiveInterruptManager = 0;
@@ -134,12 +149,54 @@ InterruptManager::~InterruptManager() // I'm leaving this in, the comment said "
 {
 }
 
+
+bool InterruptManager::handlerExists(osos::common::uint8_t interruptNumber)
+{
+    return handlers[interruptNumber] != nullptr;
+}
+
+bool InterruptManager::interruptsEnabled()
+{
+    uint64_t flags;
+    asm volatile
+    (
+        "pushf\n\t"
+        "pop %0"
+        : "=g" (flags)
+    );
+
+    return flags & (1 << 9);
+}
+
+void InterruptManager::CheckIDTVector(uint8_t vector)
+{
+    idtR idtr;
+    asm volatile ("sidt %0" : "=m"(idtr));
+
+    uint8_t *idt = (uint8_t*) (uintptr_t) idtr.base;
+    uint8_t *entry = idt + (vector * 8);
+
+    uint16_t offset_low  = *(uint16_t*)(entry + 0);
+    uint16_t selector    = *(uint16_t*)(entry + 2);
+    uint8_t  typeattr    = *(uint8_t*)(entry + 5);
+    uint16_t offset_high = *(uint16_t*)(entry + 6);
+
+    uint32_t offset = ((uint32_t)offset_high << 16) | offset_low;
+
+    if (offset == 0)
+        printf("No IDT entry!");
+    else
+        printf("IDT entry OK!");
+}
+
 void InterruptManager::Activate()
 {
     if(ActiveInterruptManager != 0)
         ActiveInterruptManager->Deactivate();
     ActiveInterruptManager = this;
     asm("sti");
+
+    printf(" asm-sti ");
 }
 
 void InterruptManager::Deactivate()
@@ -163,16 +220,17 @@ uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp
 
 uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
+    printf(" [HndlIntrpt] ");
     if(handlers[interruptNumber] != 0)
     {
-        esp = handlers[interruptNumber]->HandleInterrupt(esp);
+        esp = handlers[interruptNumber]->HandleInterrupt(esp); // should call the appropriate function per driver.
     }
     else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
     {
-        char* foo = "\n[msg] Generic Unhandled Interrupt, Please write an entry for: 0x00";
+        char* foo = "\nAn unhandled interrupt has been made. Please write an entry for: 0x00";
         char* hex = "0123456789ABCDEF";
-        foo[41] = hex[(interruptNumber >> 4) & 0x0F];
-        foo[42] = hex[interruptNumber & 0x0F];
+        foo[70] = hex[(interruptNumber >> 4) & 0x0F];
+        foo[71] = hex[interruptNumber & 0x0F];
         printf(foo);
     }
 
@@ -183,9 +241,10 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
 
     if(0x20 <= interruptNumber && interruptNumber < 0x30)
     {
-        picLeadCommand.Write(0x20);
+        // let's try long-term to see if this layout is *better*. feels counter-intuitive.
         if(0x28 <= interruptNumber)
             picFollowCommand.Write(0x20);
+        picLeadCommand.Write(0x20);
     }
 
     return esp;
