@@ -1,5 +1,5 @@
 
-GPPPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+GPPPARAMS = -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
@@ -15,13 +15,14 @@ objects = object/loader.o \
  object/drivers/keyboard.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
- object/drivers/speaker.o \
+ object/drivers/snd/speaker.o \
  object/drivers/vga.o \
  object/lib/libmem.o \
  object/lib/libstr.o \
- object/exec/strndemo.o \
+ object/globalfuncs.o \
  object/dmm.o \
  object/multitasking.o \
+ object/testing_tasks.o \
  object/kernel.o
 
 object/%.o: src/%.cpp
@@ -54,10 +55,10 @@ OpenSteelOS.iso: opensteelcore.bin
 	mkdir iso/boot
 	mkdir iso/boot/grub
 	cp $< iso/boot/
-	echo 'set timeout=5' > iso/boot/grub/grub.cfg
-	echo 'set default=5' >> iso/boot/grub/grub.cfg
+	echo 'set timeout=0' > iso/boot/grub/grub.cfg
+	echo 'set default=0' >> iso/boot/grub/grub.cfg
 	echo '' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "OpenSteel/OS 0.22.41 [2025-09-08]" {' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "OpenSteel/OS 0.22denv Debugging Tests [2025-09-24]" {' >> iso/boot/grub/grub.cfg
 	echo '  multiboot /boot/opensteelcore.bin' >> iso/boot/grub/grub.cfg
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
