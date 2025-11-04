@@ -189,6 +189,28 @@ void InterruptManager::CheckIDTVector(uint8_t vector)
         printf("IDT entry OK!");
 }
 
+void InterruptManager::CheckIDTAttribAndSlctr(uint8_t vector)
+{
+    idtR idtr;
+    asm volatile ("sidt %0" : "=m"(idtr));
+
+    uint8_t *idt = (uint8_t*) (uintptr_t) idtr.base;
+    uint8_t *entry = idt + (vector * 8);
+    uint16_t selector    = *(uint16_t*)(entry + 2);
+    uint8_t  typeattr    = *(uint8_t*)(entry + 5);
+
+    if (typeattr == 0x8E) printf(" The IDT attribute is OK. "); else printf(" The IDT attribute failed. ");
+    if (selector == 0x08) printf("The IDT selector is OK. "); else printf("The IDT selector failed. ");
+}
+/*
+void InterruptManager::DebugStage5()
+{
+    uint8_t lea = inb(0x21);
+    uint8_t fol = inb(0xA1);
+
+    if ((lea & 1) == 0) printf("");
+}
+*/
 void InterruptManager::Activate()
 {
     if(ActiveInterruptManager != 0)
@@ -220,7 +242,6 @@ uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp
 
 uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
-    printf(" [HndlIntrpt] ");
     if(handlers[interruptNumber] != 0)
     {
         esp = handlers[interruptNumber]->HandleInterrupt(esp); // should call the appropriate function per driver.
@@ -232,11 +253,6 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
         foo[70] = hex[(interruptNumber >> 4) & 0x0F];
         foo[71] = hex[interruptNumber & 0x0F];
         printf(foo);
-    }
-
-    if(interruptNumber == 0x20)
-    {
-        esp = (uint32_t)taskManager->Schedule((CPUState*)esp);
     }
 
     if(0x20 <= interruptNumber && interruptNumber < 0x30)
