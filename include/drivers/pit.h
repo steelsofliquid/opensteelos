@@ -20,6 +20,7 @@
 				osos::hwcom::Port8Bit Channel1;
 				osos::hwcom::Port8Bit Channel2;
 				osos::hwcom::Port8Bit PITComPort; // PIT Command Port
+				osos::hwcom::Port8Bit ProgIC;
 				
 			public:
 				ProgrammableIntervalTimer(osos::hwcom::InterruptManager* manager);
