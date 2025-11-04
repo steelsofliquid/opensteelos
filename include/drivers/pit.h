@@ -6,24 +6,32 @@
 	#include <common/types.h>
 	#include <drivers/driver.h>
 	#include <hwcom/port.h>
+	#include <hwcom/interrupts.h>
 	
 	namespace osos
 	{
+		// volatile osos::common::uint32_t tickcount;
+		
 		namespace drivers
 		{
-			class ProgrammableIntervalTimer : public Driver
+			class ProgrammableIntervalTimer : public Driver, public hwcom::InterruptHandler
 			{
 				osos::hwcom::Port8Bit Channel0;
 				osos::hwcom::Port8Bit Channel1;
 				osos::hwcom::Port8Bit Channel2;
-				osos::hwcom::Port8Bit PITComPort;
+				osos::hwcom::Port8Bit PITComPort; // PIT Command Port
+				osos::hwcom::Port8Bit ProgIC;
 				
 			public:
-				ProgrammableIntervalTimer();
+				ProgrammableIntervalTimer(osos::hwcom::InterruptManager* manager);
 				~ProgrammableIntervalTimer();
 				
 				osos::common::uint32_t ReadPIT();
 				void SetPITCount(osos::common::uint32_t count);
+				// void HardSleep(osos::common::uint32_t interval);
+
+				virtual void Activate();
+				virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
 			}; // initially forgot a semicolon (almost said semilion for some reason) -▿-
 		}
 	}
