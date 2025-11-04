@@ -24,11 +24,12 @@ bool IsExactlySecond;
         */
 
         ProgrammableIntervalTimer::ProgrammableIntervalTimer(InterruptManager* manager) :
+            InterruptHandler(manager, 0x20),
             Channel0(0x40),
             Channel1(0x41),
             Channel2(0x42),
             PITComPort(0x43),
-            InterruptHandler(manager, 0x20)
+            ProgIC(0x20)
         {
         }
 
@@ -99,6 +100,7 @@ bool IsExactlySecond;
 
         uint32_t ProgrammableIntervalTimer::HandleInterrupt(uint32_t esp)
         {
+            //ProgIC.Write(0x20);
             /* So, I have a confession to make... When I first added the PIT driver to OpenSteel/OS
                during the days of its Nanami/OS guise, I added it assuming I wouldn't need to add
                either Activate() or HandleInterrupt(uint32_t esp). It was a fairly reasonable thing
@@ -113,7 +115,6 @@ bool IsExactlySecond;
             */
 
             tickcount++;
-            printf("T");
 
             if (tickcount % 100 == 0)
             {
@@ -126,8 +127,8 @@ bool IsExactlySecond;
             {
                 IsExactlySecond = false;
             }
+            esp = (uint32_t)taskManager.Schedule((CPUState*)esp);
             taskManager.WakeTask(tickcount);
-            // we do not need outb(0x20, 0x20). I bring this up as I've been using AI to help guide me to some degree, and I was right that it was being, for a non-derogatory term, incompetent.
             return esp;
         }
 
