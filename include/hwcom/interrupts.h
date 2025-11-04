@@ -6,6 +6,7 @@
 #include <hwcom/port.h>
 #include <multitasking.h>
 #include <gdt.h>
+// #include <globalfuncs.h>
 
 
 namespace osos
@@ -26,6 +27,7 @@ namespace osos
 
         public:
             virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
+            void attachToInterruptManager(InterruptManager* interruptManager);
 
         };
 
@@ -112,16 +114,34 @@ namespace osos
             static osos::common::uint32_t handleInterrupt(osos::common::uint8_t interruptNumber, osos::common::uint32_t esp);
             osos::common::uint32_t DoHandleInterrupt(osos::common::uint8_t interruptNumber, osos::common::uint32_t esp);
 
-            osos::hwcom::Port8BitSlow picMasterCommand; // "Good morning, master! Is there anything I can do for you today?" - Touko. Me: "Cosplay Nanami Madobe AGAIN." Lol. Get it? 'cuz I'm such a "rebel" in the eyes of Microsoft and use Windows 10 instead of Windows 10 Autism (aka Windows 11)?
-            osos::hwcom::Port8BitSlow picMasterData;
-            osos::hwcom::Port8BitSlow picSlaveCommand; // You think this is slavery? Kyahahahaha! Iie! (No!) This is part of the Master/Slave System that usually gets called something else these days!
-            osos::hwcom::Port8BitSlow picSlaveData;
+            /*
+            Up until 2025-06-27, "Lead" was called "Master"; Follow was called "Slave" but people weren't as aware of the games they played in 1904 or so,
+            and I know well enough from the history videos I watch that the historical terms here are just messed up. Shouldn't be too hard to rename each
+            use in the code.
+            */
+
+            osos::hwcom::Port8BitSlow picLeadCommand;
+            osos::hwcom::Port8BitSlow picLeadData;
+            osos::hwcom::Port8BitSlow picFollowCommand;
+            osos::hwcom::Port8BitSlow picFollowData;
 
 
         public:
             InterruptManager(osos::common::uint16_t HardwareInterruptOffset, GlobalDescriptorTable* gdt, TaskManager* taskManager);
             ~InterruptManager();
             osos::common::uint16_t HardwareInterruptOffset();
+
+            bool handlerExists(osos::common::uint8_t interruptNumber);
+            static bool interruptsEnabled();
+            static void CheckIDTVector(osos::common::uint8_t vector);
+            static void CheckIDTAttribAndSlctr(osos::common::uint8_t vector);
+            //static void DebugStage5();
+
+            struct idtR
+            {
+                osos::common::uint16_t limit;
+                osos::common::uint32_t base;
+            } __attribute__((packed));
 
             void Activate();
             void Deactivate();

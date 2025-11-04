@@ -1,11 +1,11 @@
-#include <drivers/speaker.h>
+#include <globalfuncs.h>
+#include <drivers/snd/speaker.h>
+#include <drivers/pit.h>
 
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
-
-void sleep(uint32_t interval);
 
 Speaker::Speaker()
  : PITChannel2(0x42),
@@ -46,7 +46,11 @@ void Speaker::nosound()
 
 void Speaker::beep()
 {
+	// this feels bound for a clunky ass disaster in the future, how can i make the above line all-encompassing how can i make the above line all-encompassing how can i make the above line all-encompassing how can i make the above line all-encomp-
+
     play_sound(1000);
-	sleep(10);
+	HardSleep(10);
 	nosound();
 }
+
+// a

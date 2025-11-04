@@ -1,5 +1,5 @@
-#ifndef __OSOS__DRIVERS__SPEAKER_H
-#define __OSOS__DRIVERS__SPEAKER_H
+#ifndef __OSOS__DRIVERS__SND__SPEAKER_H
+#define __OSOS__DRIVERS__SND__SPEAKER_H
 
 #include <common/types.h>
 #include <drivers/driver.h>

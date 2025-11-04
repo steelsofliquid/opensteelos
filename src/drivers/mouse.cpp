@@ -6,7 +6,7 @@ using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
 
-void printf(char*);
+void printf(char*, ...);
 
 MouseEventHandler::MouseEventHandler()
 {

@@ -8,13 +8,6 @@
     {
         namespace libs
         {
-            class StringLibrary
-            {
-
-            public:
-            StringLibrary();
-            ~StringLibrary();
-
             osos::common::size_t strlen(const char* string);
             osos::common::int32_t strcmp(const char* string1, const char* string2);
             osos::common::int32_t strncmp(const char* string1, const char* string2, osos::common::size_t n);
@@ -26,7 +19,6 @@
             osos::common::int8_t* strchr(const char* string, osos::common::int32_t character);
             osos::common::int8_t* strrchr(const char* string, osos::common::int32_t character);
             osos::common::int8_t* strstr(const char* haystack, const char* needle);
-            };
         }
     }
 

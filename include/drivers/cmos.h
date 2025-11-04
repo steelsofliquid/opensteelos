@@ -1,3 +1,5 @@
+// This is a work-in-progress at the moment, and isn't necessarily complete.
+
 #ifndef __OSOS__DRIVERS__CMOS_H
 #define __OSOS__DRIVERS__CMOS_H
 
@@ -22,6 +24,11 @@
                     osos::common::uint8_t month;
                     osos::common::uint32_t year;
                 };
+
+                private:
+                void GetIndex(osos::common::uint8_t register);
+                void ReadData();
+                void WriteData(osos::common::uint8_t value);
 
                 public:
                 osos::hwcom::Port8Bit portAddressCMOS;

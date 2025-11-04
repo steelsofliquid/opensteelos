@@ -59,7 +59,7 @@ bool PCIController::DeviceHasFunctions(uint16_t bus, uint16_t device) // device 
     return PCIRead(bus, device, 0, 0x0E) & (1<<7);
 }
 
-void printf(char* str);
+void printf(char* str, ...);
 void printfHex(uint8_t);
 
 void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager* interrupts)
@@ -87,6 +87,7 @@ void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager
                         driverManager->AddDriver(driver);
                 }
 
+                /*
                 printf("\n[pci] bus ");
                 printfHex(bus & 0xFF);
 
@@ -102,7 +103,7 @@ void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager
                 printf(" devid ");
                 printfHex((dev.device_id & 0xFF00) >> 8);
                 printfHex(dev.device_id & 0xFF);
-
+*/
                 // "//" the printf(s) if your verbose-phobic or just insist everything must be understandable to the end user. Verbose boot shit should either
                 // awe the end user or give them a reason for you to explain the inner workings.
             }

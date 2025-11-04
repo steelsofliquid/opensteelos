@@ -18,6 +18,7 @@ namespace osos
 
         typedef const char* string;
         typedef uint32_t size_t;
+        typedef uint32_t uintptr_t;
     }
 }
 

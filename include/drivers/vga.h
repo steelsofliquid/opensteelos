@@ -1,17 +1,9 @@
-// This builds off of the mouse driver's base first xx lines as a framework.
-
-#ifndef __OSOS__DRIVERS__VGA_H // Using the keyboard driver as a template
+#ifndef __OSOS__DRIVERS__VGA_H
 #define __OSOS__DRIVERS__VGA_H
 
     #include <common/types.h>
     #include <drivers/driver.h>
     #include <hwcom/port.h>
-    // No need for interrupts.h here... I think.
-
-    // Kyahahahaha!!!
-    // Ah-lalalalalalalala!!
-
-    // It's gonna be eleven-port madness!!
 
     namespace osos
     {
@@ -20,8 +12,6 @@
             class VideoGraphicsArray
             {
             protected:
-            // Kyaaa!! So many ports!! >.^
-            // How da hail do you portray >_< and ^.^ in the same ASCII emoticon?
                 osos::hwcom::Port8Bit MiscPort; // MP
                 osos::hwcom::Port8Bit CRTCIndexPort; // CTRCIP
                 osos::hwcom::Port8Bit CRTCDataPort; // CTRCDP
