@@ -48,6 +48,9 @@ uint32_t VersionMajor = 0;
 uint32_t VersionMinor = 22;
 uint32_t VersionBuild = 44;
 
+uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
+uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
+
 extern volatile uint32_t tickcount;
 
 void printf(char* str, ...) // the main screen output function.
@@ -217,6 +220,8 @@ void TestTask3()
   {
     printf("n3isa");
     taskManager.sleep(3000);
+    printf(" TCC");
+    taskManager.sleep(50);
   }
 }
 
@@ -300,7 +305,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf(" SteelsOfLiquid OpenSteel/OS 0.22denv \"Hakurei\" devbloc \"Denver\"\n");
+  printf(" SteelsOfLiquid OpenSteel/OS 0.22.43 \"Denver\" Circuit 3\n");
 
   GlobalDescriptorTable gdt;
 
@@ -334,13 +339,17 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   Task task3(&gdt, TestTask3);
   Task taskcmd1(&gdt, cmdVersion);
   Task taskcmd2(&gdt, cmdTest);
-  taskManager.AddTask(&task1);
-  taskManager.AddTask(&task2);
-  taskManager.AddTask(&task3);
+  //taskManager.AddTask(&task1);
+  //taskManager.AddTask(&task2);
+  //taskManager.AddTask(&task3);
 
   // interrupts and drivers v
 
   InterruptManager interrupts(0x20, &gdt, &taskManager);
+
+  //outb(0x22, 0x70);
+  //outb(0x23, 0x00);
+  //printf("Just wrote to the IMCR.");
 
   DriverManager drvManager;
   // drivers loading
@@ -353,11 +362,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     drvManager.AddDriver(&keyboard);
     //printf(".........");
 
-    outb(0x21, inb(0x21) & ~0x1);
+    //outb(0x21, inb(0x21) & ~0x1);
     ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
     programmableIntervalTimer.attachToInterruptManager(&interrupts);
-    drvManager.AddDriver(&programmableIntervalTimer);
-    printf("AddDriver -> PIT");
+    //drvManager.AddDriver(&programmableIntervalTimer);
     //printf("..........");
 
     MouseToConsole mousehandler;
@@ -365,17 +373,12 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     drvManager.AddDriver(&mouse);
 
     // ^ mouse driver sucked. let's not use it, if possible.
-    // well, it's currently in use to conduct interrupts tests.
 
-    Speaker speaker;
+    //Speaker speaker;
     printf("...");
 
-    // testing some things. this is difficult to get working. maybe it'll work now?
-    if (interrupts.handlerExists(0x20)) printf("PIT handler exists, "); else printf("PIT handler void, ");
-    if ((inb(0x21) & 0x1) == 0) printf("IRQ0 unmasked."); else printf("IRQ0 masked.");
-
-    //printf(" done!");
-    //printf("finding and selecting PCI devices and drivers...");
+    printf(" done!");
+    printf("finding and selecting PCI devices and drivers...");
 
     PCIController PCIController;
     PCIController.SelectDrivers(&drvManager, &interrupts);
@@ -383,31 +386,27 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // VideoGraphicsArray vga;
 
     drvManager.ActivateAll();
-    printf("\nActivateAll");
 
   interrupts.Activate();
-  printf(" interrupts activated.\n");
 
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
   // speaker.beep();
-  // printf("\nGood day, and welcome to OpenSteel/OS. Strike [F1] for help.\n"); // Denotes end of booting process <
+  printf("\nGood day, and welcome to OpenSteel/OS. Strike [F1] for help.\n"); // Denotes end of booting process <
 
-  if (interrupts.interruptsEnabled()) printf("Interrupt Flag Enabled. "); else printf("Interrupt Flag Disabled. ");
-  uint8_t leadMask = inb(0x21);
-  if ((leadMask & 0x1) == 0) printf("PIC IRQ0 unmasked, "); else printf("PIC IRQ0 masked, ");
-  interrupts.CheckIDTVector(0x20);
+  /*
+  uint32_t cr0;
+  printf("Conducting test to determine if we\'re in realmode, will crash if so...");
+  asm volatile("cli");
+  asm volatile("mov %%cr0, %0" : "=r"(cr0));
+  asm volatile("sti");*/
 
   /* vga.SetMode(320, 200, 8);
   for(int32_t y = 0; y < 200; y++)
     for(int32_t x = 0; x < 320; x++)
       vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
     */
-
-  printf("\nConducting PIT ticks test...");
-  for (volatile int i = 0; i < 2000000; i++) asm volatile ("nop");
-  if (tickcount > 0) printf(" from this test, ticks are working."); else printf(" from this test, ticks are not working.");
 
   while(1);
   

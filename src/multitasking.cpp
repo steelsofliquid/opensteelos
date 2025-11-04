@@ -83,7 +83,7 @@ bool TaskManager::AddTask(Task* task)
 
 CPUState* TaskManager::Schedule(CPUState* cpustate)
 {
-    // printf("\nScheduling a task...");
+    //printf("\nScheduling a task...");
     if(numTasks <= 0)
         return cpustate;
 
@@ -99,7 +99,7 @@ CPUState* TaskManager::Schedule(CPUState* cpustate)
             return tasks[currentTask] -> cpustate;
     }
 
-    // printf(" done!");
+    //printf(" done!");
     
     return cpustate;
 }
@@ -113,8 +113,6 @@ void TaskManager::sleep(uint32_t interval)
     Task* TaskToSleep = tasks[currentTask];
     TaskToSleep->IsAsleep = true;
     TaskToSleep->WakeTick = tickcount + intervalInTicks;
-
-    Schedule(TaskToSleep->cpustate);
 }
 
 void TaskManager::WakeTask(uint32_t ticks)
