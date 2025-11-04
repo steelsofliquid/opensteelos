@@ -6,6 +6,7 @@
 #include <hwcom/port.h>
 #include <multitasking.h>
 #include <gdt.h>
+// #include <globalfuncs.h>
 
 
 namespace osos
@@ -133,6 +134,8 @@ namespace osos
             bool handlerExists(osos::common::uint8_t interruptNumber);
             static bool interruptsEnabled();
             static void CheckIDTVector(osos::common::uint8_t vector);
+            static void CheckIDTAttribAndSlctr(osos::common::uint8_t vector);
+            //static void DebugStage5();
 
             struct idtR
             {
