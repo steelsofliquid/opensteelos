@@ -248,16 +248,18 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     }
     else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
     {
-        char* foo = "\nAn unhandled interrupt has been made. Please write an entry for: 0x00";
+        // this semi-legacy code needs to some reworking. the original if statement was deleted, since it's contents were
+        // transferred to pit.cpp. should be as simple as an if statement, but i'm not going to test my luck right now.
+
+        char* foo = "\nUnhandled interrupt. Please write an entry for: 0x00";
         char* hex = "0123456789ABCDEF";
-        foo[70] = hex[(interruptNumber >> 4) & 0x0F];
-        foo[71] = hex[interruptNumber & 0x0F];
+        foo[51] = hex[(interruptNumber >> 4) & 0x0F];
+        foo[52] = hex[interruptNumber & 0x0F];
         printf(foo);
     }
 
     if(0x20 <= interruptNumber && interruptNumber < 0x30)
     {
-        // let's try long-term to see if this layout is *better*. feels counter-intuitive.
         if(0x28 <= interruptNumber)
             picFollowCommand.Write(0x20);
         picLeadCommand.Write(0x20);
