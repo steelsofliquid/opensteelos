@@ -160,8 +160,8 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             {
                 printf("\n");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version 0.22 Build 45 \"Hakurei\")                                 "); // For exact 0.21.33 code just remove the two spaces at the end
-                printf(" Development Build, Block 0.22.45-5 \"Denver\"                                    ");
+                printf(" OpenSteel/OS (Version 0.22 Build 44 \"Denver\")                                  "); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" Development Build, Circuit 3                                                     ");
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("                                                                                ");
                 printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
@@ -178,7 +178,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x3E:
             {
                 if (Alt == true)
-                    printf("Heh. I see what you did there. If only there was userspace...");
+                    printf("Heh. I see what you did there. If only there was userspace..."); // I suppose you found the ALT+F4 easter egg. Nice.
                 break;
             } // Formula 4
 
