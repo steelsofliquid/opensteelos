@@ -15,13 +15,6 @@ volatile uint32_t tickcount = 0; // global variable
 uint32_t ticksecs = 0;
 uint32_t prevSecTick = 0;
 bool IsExactlySecond;
-        
-        /* TODO: Fix the entire damn driver!!
-         - Add control word
-         - Add end of interrupt shit ??
-         - volatiles done
-         - is pit being registered more than once?
-        */
 
         ProgrammableIntervalTimer::ProgrammableIntervalTimer(InterruptManager* manager) :
             InterruptHandler(manager, 0x20),
@@ -95,12 +88,10 @@ bool IsExactlySecond;
         void ProgrammableIntervalTimer::Activate()
         {
             SetPITCount(1193180 / 100); // 100 Hz
-            //
         }
 
         uint32_t ProgrammableIntervalTimer::HandleInterrupt(uint32_t esp)
         {
-            //ProgIC.Write(0x20);
             /* So, I have a confession to make... When I first added the PIT driver to OpenSteel/OS
                during the days of its Nanami/OS guise, I added it assuming I wouldn't need to add
                either Activate() or HandleInterrupt(uint32_t esp). It was a fairly reasonable thing
