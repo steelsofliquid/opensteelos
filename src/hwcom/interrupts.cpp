@@ -217,8 +217,6 @@ void InterruptManager::Activate()
         ActiveInterruptManager->Deactivate();
     ActiveInterruptManager = this;
     asm("sti");
-
-    printf(" asm-sti ");
 }
 
 void InterruptManager::Deactivate()
