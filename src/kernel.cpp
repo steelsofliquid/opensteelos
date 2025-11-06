@@ -46,10 +46,10 @@ using namespace osos::hwcom;
 
 uint32_t VersionMajor = 0;
 uint32_t VersionMinor = 22;
-uint32_t VersionBuild = 44;
+uint32_t VersionBuild = 43;
 
-uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
-uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
+//uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
+//uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
 
 extern volatile uint32_t tickcount;
 
@@ -305,7 +305,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf(" SteelsOfLiquid OpenSteel/OS 0.22.43 \"Denver\" Circuit 3\n");
+  printf(" SteelsOfLiquid OpenSteel/OS 0.22.43 \"Denver\" Beta 2 Circuit 3\n");
 
   GlobalDescriptorTable gdt;
 
@@ -332,6 +332,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   
   printf("\n");
 
+  // since a thing with this build is scheduler refinement, feel free to play around with my infinite-looping commands.
   // register tasks v
 
   Task task1(&gdt, TestTask1);
@@ -347,37 +348,28 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   InterruptManager interrupts(0x20, &gdt, &taskManager);
 
-  //outb(0x22, 0x70);
-  //outb(0x23, 0x00);
-  //printf("Just wrote to the IMCR.");
 
   DriverManager drvManager;
   // drivers loading
-    //printf("starting drivers ");
+    printf("starting drivers...");
 
     PrintfKeyboardEventHandler kbhandler;
-    //printf("........."); // i want to create the illusion of loading. this is purely static and needs a proper solution
     KeyboardDriver keyboard(&interrupts, &kbhandler);
-    //printf(".........");
     drvManager.AddDriver(&keyboard);
-    //printf(".........");
 
-    //outb(0x21, inb(0x21) & ~0x1);
     ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
     programmableIntervalTimer.attachToInterruptManager(&interrupts);
-    //drvManager.AddDriver(&programmableIntervalTimer);
-    //printf("..........");
 
-    MouseToConsole mousehandler;
-    MouseDriver mouse(&interrupts, &mousehandler);
-    drvManager.AddDriver(&mouse);
+    //MouseToConsole mousehandler;
+    //MouseDriver mouse(&interrupts, &mousehandler);
+    //drvManager.AddDriver(&mouse);
 
     // ^ mouse driver sucked. let's not use it, if possible.
 
+    // some things need to be addressed before this can be brought back.
     //Speaker speaker;
-    printf("...");
 
-    printf(" done!");
+    printf(" done!\n");
     printf("finding and selecting PCI devices and drivers...");
 
     PCIController PCIController;
@@ -395,6 +387,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // speaker.beep();
   printf("\nGood day, and welcome to OpenSteel/OS. Strike [F1] for help.\n"); // Denotes end of booting process <
 
+  // the code below is supposed to try to determine if the OS is in real mode or not. spoiler: it's not.
   /*
   uint32_t cr0;
   printf("Conducting test to determine if we\'re in realmode, will crash if so...");
@@ -402,6 +395,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   asm volatile("mov %%cr0, %0" : "=r"(cr0));
   asm volatile("sti");*/
 
+  // this code is for those who are using the VGA driver.
   /* vga.SetMode(320, 200, 8);
   for(int32_t y = 0; y < 200; y++)
     for(int32_t x = 0; x < 320; x++)
