@@ -46,7 +46,7 @@ using namespace osos::hwcom;
 
 uint32_t VersionMajor = 0;
 uint32_t VersionMinor = 22;
-uint32_t VersionBuild = 43;
+uint32_t VersionBuild = 44;
 
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
@@ -227,7 +227,7 @@ void TestTask3()
 
 void cmdVersion()
 {
-  printf(" OpenSteel/OS version 0.22.41 \"Hakurei\"\n");
+  printf(" OpenSteel/OS version 0.22.44 \"Denver\"\n");
 }
 
 void cmdTest()
@@ -239,7 +239,7 @@ void panic()
 {
   printf(" >_<   systempanic\n");
 
-  printf(" OpenSteel/OS version 0.22.42");
+  printf(" OpenSteel/OS version 0.22.44");
   printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
   printf(" Trigger: NULL"); // "NULL" is to be replaced with legitimate reasons, such as a memory leak or a buffer overflow.
   printf("                                                                                ");
@@ -305,7 +305,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf(" SteelsOfLiquid OpenSteel/OS 0.22.43 \"Denver\" Beta 2 Circuit 3\n");
+  printf(" SteelsOfLiquid OpenSteel/OS 0.22.44 \"Denver\" Beta 2 Circuit 3\n");
 
   GlobalDescriptorTable gdt;
 
