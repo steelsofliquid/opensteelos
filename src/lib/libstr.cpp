@@ -240,6 +240,51 @@ namespace osos{
 
             return result;
         }
+
+
+
+        int8_t* itoa(int32_t value, char* string, int32_t base)
+        {
+            // based off of a mix of multiple interpretations of itoa.
+
+            char* temp1 = string;
+            char* temp2 = string;
+            int8_t tchar;
+            int32_t tval;
+            uint32_t v;
+
+            
+                int sign = (base == 10 && value < 0);
+                if (sign)
+                {
+                    *temp1++ = '-';
+                    v = -value;
+                }
+                else
+                {
+                    v = (uint32_t)value;
+                }
+
+                do
+                {
+                    tval = v % base;
+                    *temp1++ = "0123456789ABCDEF"[tval];
+                    v /= base;
+                } while (v > 0);
+
+                *temp1 = '\0';
+                temp1--;
+
+                if (*temp2 == '-') temp1++;
+                while (temp2 < temp1)
+                {
+                    tchar = *temp1;
+                    *temp1-- = *temp2;
+                    *temp2++ = tchar;
+                }
+            
+            return string;
+        }
         
     }
 
