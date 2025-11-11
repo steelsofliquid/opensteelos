@@ -1,15 +1,11 @@
 # OpenSteel/OS
-OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with a few extra things added in. It's as if it was Nanami/OS on steroids, which is in turn a dumbed down WYOOS, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future. The displayed screenshot is of a developer build.  
+OpenSteel/OS is an operating system based off of the Write Your Own Operating System tutorial with my own additions and whatnot. It's as if it was Nanami/OS on steroids, which is in turn a dumbed down WYOOS, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future. The displayed screenshot is of a developer build.  
 ![OpenSteel/OS 0.22 Denver Block after booting up in VirtualBox.](https://github.com/steelsofliquid/opensteelos/blob/main/screenshot.png "OpenSteel/OS 0.22 Denver Block after booting up in VirtualBox.")
 
 To see my thoughts and whatnot on the current situation of the project, check out my log repo, https://github.com/steelsofliquid/steelsofliqud_log. *This repo also contains my thoughts and whatnot on my other projects.
-This is the pain branch. It includes all of the PIT driver and interrupt bugs shit that has been plaguing this project for the past month and a half
-
-## Project On Hold (for now)
-My life is currently very, very busy. I have to do a lot of school work in multiple classes, I'm trying to restore a normal sleep schedule and there's also YouTube stuff and things I *want* to do (although that can include software dev, but mainly consists of idea-planning, YouTube and gaming). Furthermore, the school I go to blocked GitHub and I have yet to figure out a VPN or proxy solution (preferably something FOSS), and so I can't even access GitHub right now. I honestly want to jab at the school now, because I do not like it, but for the sake of my own digital footprint, I'm not going to. I don't want this point to dominate this section, and so I should mention that I do have some interesting ideas. Of course the whole Serotonin project, but also I want to develop a desktop environment for Linux that is very Windows-esque (but stays true to the good ol' days of Windows 2000, XP and 7). I don't know. I'll likely upload my progress to an additional branch and merge said branch into here.
 
 ## *What's new in OpenSteel/OS (as of 2025-08-24)*
- - Organization of code (directories, yo)
+ - Organisation of code (directories, yo)
  - A more lenient roadmap (like below!)
  - Some of the structure of the OS' appearance
  - Changes to video memory functions
@@ -39,12 +35,11 @@ The code used, while predominantly C++, uses a lot of C-style syntax instead of 
 
 ## *Compiling on your own*
 It is advised you use the makefile provided. You will need Linux, which you're likely already using. Great! ^_^  
-Well, you'll need tools for working with the i386 (iirc) platform (namely binutils and libc6-dev-i386), the G++ compiler (that's what the turorial said), and a copy of GRUB with a specific folder, at least from my experience as Debian wouldn't compile the ISO correctly while Ubuntu could. I'm unsure. Meh.  
+Well, you'll need tools for working with the i386 (iirc) platform (namely binutils and libc6-dev-i386), the G++ compiler (that's what the turorial said, it is a part of gcc and so you very likely already have it), and a copy of GRUB with a specific folder, at least from my experience as Debian wouldn't compile the ISO correctly while Ubuntu could. I'm unsure. Meh. If you want to compile OpenSteel/OS on a low-power system, please figure out a resources limiter or compile each file by hand. The latter may be tedious, but I'd rather you not inflict thermal damage on your system.  
 A pre-built copy is provided, so if this seems too intimidating or you just want to try the OS, you don't have to compile and whatnot. To compile, please for the love of Neisa-sama, SPECIFY "object/subdir(s)/*filename*.o" and not the source code file. I made this mistake after months away from working on the project and I want to clarify that.  
 
   
 ## *Major Issues*
- - Backspace will not work when trying to backspace onto the previous line.
  - PCI will detect all devices after one is found as the first found and known device.
 
 ## *Questions and Answers*
@@ -61,7 +56,6 @@ A pre-built copy is provided, so if this seems too intimidating or you just want
 - OSDev.org Wiki
 - GNU C Library documentation
 - The PIT and speaker drivers are relatively similar to those found in osakaOS, though built on top off code from the OSDev.org wiki.
-- Some small bits of code written entirely myself, such as the backspace function
 - Some code based off of the results of artificial insmelligence, but fuck vibe coding so don't expect any blatant "ohh this was vibe coded" signs. You should try to experiment with it (not in pronounced ways), even if you dislike it (like me). And still, I won't vibe code as ChatGPT's adaptation of the existing printf function felt like it gave me an aneurysm, though I may as well be a bit incompetent right now.  
   
 OpenSteel/OS Copyright 2023-2025 SteelsOfLiquid.
