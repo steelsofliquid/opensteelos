@@ -19,6 +19,7 @@
   my rules, even if it's mostly tutorial code I didn't write, damnit!
 */
 
+// OpenSteel/OS headers
 #include <common/types.h>
 #include <globalfuncs.h>
 #include <gdt.h>
@@ -31,12 +32,18 @@
 #include <drivers/pit.h>
 #include <drivers/snd/speaker.h>
 #include <drivers/vga.h>
+#include <lib/libmem.h>
+#include <lib/libstr.h>
 #include <multitasking.h>
+
+// GCC headers
+#include <stdarg.h>
 
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
+using namespace osos::libs;
 // using namespace osos::gui;
 
 /*
@@ -44,9 +51,15 @@ using namespace osos::hwcom;
   They are essentially useless at the moment as no function can properly use them.
 */
 
-uint32_t VersionMajor = 0;
-uint32_t VersionMinor = 22;
-uint32_t VersionBuild = 44;
+int32_t VersionMajor = 0;
+int32_t VersionMinor = 22;
+int32_t VersionBuild = 54;
+
+int32_t TestInteger1 = 5;
+int32_t TestInteger2 = 15;
+int32_t TestInteger3 = 327;
+int32_t TestInteger4 = 7629;
+int32_t TestInteger5 = 0;
 
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
@@ -55,8 +68,10 @@ extern volatile uint32_t tickcount;
 
 void printf(char* str, ...) // the main screen output function.
 {
+  va_list params;
+  va_start (params, str);
+
   static uint16_t* VideoMemory = (uint16_t*)0xb8000;
-  
   static uint8_t x = 0 , y = 0;
 
   for(int i = 0; str[i] != '\0'; ++i)
@@ -71,6 +86,8 @@ void printf(char* str, ...) // the main screen output function.
          - \n means new line. That is the case for most languages.
 
          - \b means backspace. I wrote this bit myself as I had to figure it out one morning in government class (what does an operating system have to do with politics T_T)
+
+         - \a means "clear the screen". There's something around that is messing with it and including a bullet point, though.
 
          - Anything else on the keyboard placed in printf() will just input an ordinary IBM Code Page 437 character.
           - Use \' or \" if you need to insert an apostrophe or quotation mark as you'll break it otherwise!
@@ -104,6 +121,54 @@ void printf(char* str, ...) // the main screen output function.
             VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
         x = 0;
         y = 0;
+        break;
+
+      case '%':
+        i++;
+        switch (str[i])
+        {
+          case 'd':
+          {
+            // TODO: int32_t
+            int intval = va_arg(params, int);
+            char buffer[12];
+
+            itoa(intval, buffer, 10);
+
+            for (int j = 0; buffer[j] != '\0'; j++)
+            {
+              VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | buffer[j];
+              x++;
+            }
+
+            break;
+          }
+
+          case 'x':
+          {
+            uint8_t key = va_arg(params, int);
+
+            char* foo = "00";
+            char* hex = "0123456789ABCDEF";
+            foo[0] = hex[(key >> 4) & 0xF];
+            foo[1] = hex[key & 0xF];
+            
+            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | foo[0]; x++;
+            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | foo[1]; x++;
+
+            break;
+          }
+
+          default:
+          {
+            i--;
+            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i];
+            x++;
+            break;
+          }
+        }
+
+        continue;
 
       default:
         VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i];
@@ -142,6 +207,8 @@ void printf(char* str, ...) // the main screen output function.
       y = 24;
     }
   }
+
+  va_end(params);
 }
 
 void printfHex(uint8_t key)
@@ -297,7 +364,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // Start of boot process v
 
   // bootsplash header (ASCII)
-  printf("  ___                _ ___ __   _ _  __ __   _ _ ________________________ 0.22  ");
+  printf("  ___                _ ___ __   _ _  __ __   _ _ _____________________ 0.22.54  ");
   printf(" /  /                                         __ _ _   _ ____ _ _______________ ");
   printf(" \\__\\     steelsofliquid                                  _ _   ___ _ _________ ");
   printf("  \\  \\       OpenSteel/OS                                           _  __ _____ ");
@@ -305,7 +372,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf(" SteelsOfLiquid OpenSteel/OS 0.22.44 \"Denver\" Beta 2 Circuit 3\n");
+  printf(" SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", VersionMajor, VersionMinor, VersionBuild);
 
   GlobalDescriptorTable gdt;
 
@@ -321,14 +388,27 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printfHex((heap >> 8 ) & 0xFF);
   printfHex((heap      ) & 0xFF);
 
+  printf(" (in normal printf: %x%x%x%x)",
+    ((heap >> 24) & 0xFF),
+    ((heap >> 16) & 0xFF),
+    ((heap >> 8 ) & 0xFF),
+    ((heap      ) & 0xFF)
+  );
   void* allocated = MemoryManager.malloc(1024);
   
-  printf(", 0x");
+  printf(".\n 0x");
   printfHex(((size_t)allocated >> 24) & 0xFF);
   printfHex(((size_t)allocated >> 16) & 0xFF);
   printfHex(((size_t)allocated >> 8 ) & 0xFF);
   printfHex(((size_t)allocated      ) & 0xFF);
   printf(" allocated by dmm");
+
+  printf(" (in normal printf: %x%x%x%x)",
+    (((size_t)allocated >> 24) & 0xFF),
+    (((size_t)allocated >> 16) & 0xFF),
+    (((size_t)allocated >> 8 ) & 0xFF),
+    (((size_t)allocated      ) & 0xFF)
+  );
   
   printf("\n");
 
@@ -401,6 +481,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     for(int32_t x = 0; x < 320; x++)
       vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
     */
+
+
+  printf("Integer and printf Output Test _________________________________________________");
+  printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", TestInteger1, TestInteger2, TestInteger3, TestInteger4, TestInteger5);
 
   while(1);
   
