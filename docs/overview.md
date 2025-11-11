@@ -49,12 +49,16 @@ TL;DR - There'a bunch of reasons why you could have 0.22 "Hakurei", 0.23 - 0.24 
 
 > As of the 20th of October, 2025, this directory structure has yet to be implemented, due to issues with the current codebase in relation to the PIT driver and possibly interrupt manager.
 
-The way OpenSteel/OS is organised is fairly simple, in theory. There are a set of base directories: `include/`, `docs/`, `object/`, `src/` and `_archive`. A sixth directory, `linkers/`, may be added in the future if the complexity of the language increases, but there's five for now.
+The way OpenSteel/OS is organised is fairly simple, in theory. There are a set of base directories: `include/`, `docs/`, ~~`object/`~~, `src/` and ~~`_archive`~~. A sixth directory, `linkers/`, may be added in the future if the complexity of the language increases, but there's five for now.
  - `include/` contains all of the header files. It has practically exclusive reign of the `common/` subdir and namespace.
  - `src/` contains the source code for everything, including the kernel, bootloader, drivers, and other components.
  - `docs/` contains all of the technical documentation.
- - `object/` contains compiled content for those who don't want to compile OpenSteel/OS themselves.
- - `_archive/` contains materials no longer used in OpenSteel/OS by default, including experimental content.
+
+   
+ ~~- `object/` contains compiled content for those who don't want to compile OpenSteel/OS themselves.~~ Not needed here.
+
+
+ ~~- `_archive/` contains materials no longer used in OpenSteel/OS by default, including experimental content.~~ Not needed here.
 
 The `include/` and `src/` directories contain relatively similar subdirectories:
  - `drivers/` contains driver source code, including network, graphics, HIDs, and chip drivers.
