@@ -8,6 +8,10 @@ using namespace osos::drivers;
 using namespace osos::hwcom;
 
 
+extern int32_t VersionMajor;
+extern int32_t VersionMinor;
+extern int32_t VersionBuild;
+
 KeyboardEventHandler::KeyboardEventHandler()
 {
 }
@@ -123,7 +127,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x39: handler->OnKeyDown(' '); break; // Space key
 
             case 0x2A: case 0x36: Shift = true; break;
-            case 0xAA: case 0x86: Shift = false; break;
+            case 0xAA: case 0xB6: Shift = false; break;
             case 0x1D: Control = true; break;
             case 0x9D: Control = false; break;
             case 0x38: Alt = true; break;
@@ -160,8 +164,8 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             {
                 printf("\n");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version 0.22 Build 44 \"Denver\")                                  "); // For exact 0.21.33 code just remove the two spaces at the end
-                printf(" Development Build, Circuit 3                                                     ");
+                printf(" OpenSteel/OS (Version %d.%d Build %d \"Denver\") \n", VersionMajor, VersionMinor, VersionBuild); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" Development Build, Circuit 4                                                     ");
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("                                                                                ");
                 printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
