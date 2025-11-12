@@ -53,7 +53,7 @@ using namespace osos::libs;
 
 int32_t VersionMajor = 0;
 int32_t VersionMinor = 22;
-int32_t VersionBuild = 54;
+int32_t VersionBuild = 56;
 
 int32_t TestInteger1 = 5;
 int32_t TestInteger2 = 15;
@@ -364,7 +364,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // Start of boot process v
 
   // bootsplash header (ASCII)
-  printf("  ___                _ ___ __   _ _  __ __   _ _ _____________________ 0.22.54  ");
+  printf("  ___                _ ___ __   _ _  __ __   _ _ ________________________ 0.22  ");
   printf(" /  /                                         __ _ _   _ ____ _ _______________ ");
   printf(" \\__\\     steelsofliquid                                  _ _   ___ _ _________ ");
   printf("  \\  \\       OpenSteel/OS                                           _  __ _____ ");
