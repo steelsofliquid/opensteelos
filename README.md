@@ -11,16 +11,17 @@ To see my thoughts and whatnot on the current situation of the project, check ou
  - Changes to video memory functions
 
 ## *Current Roadmap*
-Right now, it's quite basic. If I do get into college (sorry to any admissions director or employer who may have been exposed to the more profane parts of my voacbularity), I would bet good money that I'll take courses related to computer science and engineering, which, of course, includes OSes. Honestly, I'm hot among colleges and I've got my eyes deadset on one. And even still, I have a college textbook on OSes, so I could learn many things from that.    
+Right now, it's quite basic. If I do get into college (sorry to any admissions director, employer, professor or boss who may have been exposed to the more profane parts of my vocabularity and my semi-unhinged commentary; *I do try to be concious on what I say and I like to have fun in my code comments ^_^*), I would bet good money that I'll take courses related to computer science and engineering, which, of course, includes OSes. Honestly, I'm hot among colleges and I've got my eyes deadset on one. And even still, I have a college textbook on OSes, so I could learn many things from that.    
   
 But, I do have some stuff to learn from the tutorial still, so, for the provisional future, here's some stuff:  
- - Adding basic C/C++ library functions (namely for strings and memory) (in progress)
- - Network card drivers
- - HDD support
- - System calls
- - Networking (such as TCP and UDP)
- - Filesystem Support
- - Including a shell (i.e. command line)
+ - Paging (0.22 "Denver")
+ - Basic APIC support (maybe a bit overkill; 0.22 "Denver")
+ - HDD support (0.22 "Denver" for ATA)
+ - System calls (0.22 "Denver")
+ - Filesystem Support (FAT in 0.22 "Denver")
+ - Including userland and a shell with Unix-style command names (i.e. shell = command line, commands like echo, cat, grep and mkdir, development expected for 0.22 "Denver")
+ - Network card drivers (0.29 "TBD" or later)
+ - Networking (such as TCP and UDP) (0.33 "TBD" or later)
 
 ## *Code Conventions*
 The code used, while predominantly C++, uses a lot of C-style syntax instead of C++ syntax. When working on this project, whether a direct contribution or on your own, if you want to add things I'd recommend retaining the C-style syntax as it's quite simple and easy to understand. (the virgin std::cout versus the chad printf)
