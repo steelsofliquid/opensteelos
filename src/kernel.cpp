@@ -53,7 +53,7 @@ using namespace osos::libs;
 
 int32_t VersionMajor = 0;
 int32_t VersionMinor = 22;
-int32_t VersionBuild = 56;
+int32_t VersionBuild = 64;
 
 int32_t TestInteger1 = 5;
 int32_t TestInteger2 = 15;
@@ -382,13 +382,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   size_t heap = 10*1024*1024;
   MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
-  printf("memory heap: 0x");
-  printfHex((heap >> 24) & 0xFF);
-  printfHex((heap >> 16) & 0xFF);
-  printfHex((heap >> 8 ) & 0xFF);
-  printfHex((heap      ) & 0xFF);
-
-  printf(" (in normal printf: %x%x%x%x)",
+  printf("memory heap: 0x%x%x%x%x, ",
     ((heap >> 24) & 0xFF),
     ((heap >> 16) & 0xFF),
     ((heap >> 8 ) & 0xFF),
@@ -396,14 +390,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   );
   void* allocated = MemoryManager.malloc(1024);
   
-  printf(".\n 0x");
-  printfHex(((size_t)allocated >> 24) & 0xFF);
-  printfHex(((size_t)allocated >> 16) & 0xFF);
-  printfHex(((size_t)allocated >> 8 ) & 0xFF);
-  printfHex(((size_t)allocated      ) & 0xFF);
-  printf(" allocated by dmm");
-
-  printf(" (in normal printf: %x%x%x%x)",
+  printf("0x%x%x%x%x allocated by dmm.",
     (((size_t)allocated >> 24) & 0xFF),
     (((size_t)allocated >> 16) & 0xFF),
     (((size_t)allocated >> 8 ) & 0xFF),
@@ -446,8 +433,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     // ^ mouse driver sucked. let's not use it, if possible.
 
-    // some things need to be addressed before this can be brought back.
-    //Speaker speaker;
+    Speaker speaker;
 
     printf(" done!\n");
     printf("finding and selecting PCI devices and drivers...");
@@ -464,7 +450,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
-  // speaker.beep();
+  speaker.LifeChime();
   printf("\nGood day, and welcome to OpenSteel/OS. Strike [F1] for help.\n"); // Denotes end of booting process <
 
   // the code below is supposed to try to determine if the OS is in real mode or not. spoiler: it's not.
