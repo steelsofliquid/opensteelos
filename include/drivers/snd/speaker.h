@@ -20,10 +20,20 @@ namespace osos
                 Speaker();
                 ~Speaker();
 
+                struct meledy
+                {
+                    osos::common::uint32_t frequency;
+                    osos::common::uint32_t length;
+                };
+                
+                // hardware functions
                 void play_sound(osos::common::uint32_t nFrequence);
                 void nosound();
-                void beep();
 
+                // system sounds (might be transferred to their own object in the future)
+                void BeepVariable(osos::common::uint32_t frequency, osos::common::uint32_t interval);
+                void BeepBasic();
+                void LifeChime();
         };
     }
 }
