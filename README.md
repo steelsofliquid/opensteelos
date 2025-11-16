@@ -1,14 +1,18 @@
 # OpenSteel/OS
-OpenSteel/OS is an operating system building heavily on top of the Write Your Own Operating System tutorial using my own additions and whatnot. It's as if it was Nanami/OS on steroids, which is in turn a dumbed down WYOOS, but that's because it's built on the Nanami/OS codebase, and that is subject to change in the future. The displayed screenshot is of a developer build.  
+OpenSteel/OS is an x86 operating system building heavily on top of the Write Your Own Operating System tutorial using my own additions and revisions. The project started as an independent "fork" of Nanami/OS, which was discontinued on the spot for its horribly organised/managed repository (*by providing source code for every build at once, linker script makes up 1.2% of the repo's code!*), its repository's improper licensing, and rather silly theme of being dedicated to an anime girl that already represents another OS. The displayed screenshot is of a developer build.  
 ![OpenSteel/OS 0.22 Denver Block after booting up in VirtualBox.](https://github.com/steelsofliquid/opensteelos/blob/main/screenshot.png "OpenSteel/OS 0.22 Denver Block after booting up in VirtualBox.")
 
 To see my thoughts and whatnot on the current situation of the project, check out my log repo, https://github.com/steelsofliquid/steelsofliqud_log. *This repo also contains my thoughts and whatnot on my other projects.
 
-## *What's new in OpenSteel/OS (as of 2025-08-24)*
- - Organisation of code (directories, yo)
- - A more lenient roadmap (like below!)
- - Some of the structure of the OS' appearance
- - Changes to video memory functions
+This repository was designed to be more clear and concise compared to major open source projects, such as Linux and particularly LibreOffice. Anyone interested should be able to work on open source, and so for those who either (a) want to start their own OS project wanting insight into how they should organise their project, (b) those who are trying to find the source code, (c) those who want to help out or develop a fork of OpenSteel/OS, and/or (d) not too familiar with coding and wish to see simpler layouts, you're welcome. Anywhere I think it's not as clear, I'll provide a readme with context so that it's more understandable.
+
+## *What's new in OpenSteel/OS (as of 2025-11-16)*
+ - PIT driver heavily reworked
+ - Better organisation
+ - Modified experience (startup sound, bootscreen, etc.)
+ - Changes to video memory functions (addition of screen clearing and integer printing)
+ - Inclusion of function libraries
+ - Starting to add documentation
 
 ## *Current Roadmap*
 Right now, it's quite basic. If I do get into college (sorry to any admissions director, employer, professor or boss who may have been exposed to the more profane parts of my vocabularity and my semi-unhinged commentary; *I do try to be concious on what I say and I like to have fun in my code comments ^_^*), I would bet good money that I'll take courses related to computer science and engineering, which, of course, includes OSes. Honestly, I'm hot among colleges and I've got my eyes deadset on one. And even still, I have a college textbook on OSes, so I could learn many things from that.    
@@ -56,7 +60,6 @@ A pre-built copy is provided, so if this seems too intimidating or you just want
 - Write Your Own Operating System
 - OSDev.org Wiki
 - GNU C Library documentation
-- The PIT and speaker drivers are relatively similar to those found in osakaOS, though built on top off code from the OSDev.org wiki.
 - Some code based off of the results of artificial insmelligence, but fuck vibe coding so don't expect any blatant "ohh this was vibe coded" signs. You should try to experiment with it (not in pronounced ways), even if you dislike it (like me). And still, I won't vibe code as ChatGPT's adaptation of the existing printf function felt like it gave me an aneurysm, though I may as well be a bit incompetent right now.  
   
 OpenSteel/OS Copyright 2023-2025 SteelsOfLiquid.
