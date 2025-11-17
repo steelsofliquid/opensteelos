@@ -32,8 +32,8 @@ void MouseEventHandler::OnMouseMove(int x, int y)
 
 MouseDriver::MouseDriver(InterruptManager* manager, MouseEventHandler* handler)
 : InterruptHandler(manager, 0x2C),
-dataport(0x60),
-commandport(0x64)
+dataPort(0x60),
+commandPort(0x64)
 {
     this->handler = handler;
 }
@@ -51,25 +51,25 @@ void MouseDriver::Activate()
     if(handler != 0)
         handler->OnActivate();
 
-    commandport.Write(0xA8); // Activate interrupts
-    commandport.Write(0x20); // Get current state
-    uint8_t status = dataport.Read() | 2;
-    commandport.Write(0x60); // Set the state
-    dataport.Write(status);
+    commandPort.Write(0xA8); // Activate interrupts
+    commandPort.Write(0x20); // Get current state
+    uint8_t status = dataPort.Read() | 2;
+    commandPort.Write(0x60); // Set the state
+    dataPort.Write(status);
 
-    commandport.Write(0xD4);
-    dataport.Write(0xF4);
-    dataport.Read();
+    commandPort.Write(0xD4);
+    dataPort.Write(0xF4);
+    dataPort.Read();
 }
 
 uint32_t MouseDriver::HandleInterrupt(uint32_t esp)
 {
-    uint8_t status = commandport.Read();
+    uint8_t status = commandPort.Read();
     if(!(status & 0x20))
         return esp;
 
 
-    buffer[offset] = dataport.Read();
+    buffer[offset] = dataPort.Read();
 
     if(handler == 0)
         return esp;

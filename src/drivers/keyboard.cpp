@@ -8,9 +8,9 @@ using namespace osos::drivers;
 using namespace osos::hwcom;
 
 
-extern int32_t VersionMajor;
-extern int32_t VersionMinor;
-extern int32_t VersionBuild;
+extern int32_t verMajor;
+extern int32_t verMinor;
+extern int32_t verBuild;
 
 KeyboardEventHandler::KeyboardEventHandler()
 {
@@ -27,8 +27,8 @@ void KeyboardEventHandler::OnKeyUp(char)
 
 KeyboardDriver::KeyboardDriver(InterruptManager* manager, KeyboardEventHandler *handler)
 : InterruptHandler(manager, 0x21),
-dataport(0x60),
-commandport(0x64)
+dataPort(0x60),
+commandPort(0x64)
 {
     this->handler = handler;
 }
@@ -39,15 +39,15 @@ KeyboardDriver::~KeyboardDriver()
 
 void KeyboardDriver::Activate()
 {
-    while(commandport.Read() & 0x1)
-        dataport.Read();
-    commandport.Write(0xAE); // Activate interrupts
-    commandport.Write(0x20); // Get current state
-    uint8_t status = (dataport.Read() | 1) & ~0x10;
-    commandport.Write(0x60); // Set the state
-    dataport.Write(status);
+    while(commandPort.Read() & 0x1)
+        dataPort.Read();
+    commandPort.Write(0xAE); // Activate interrupts
+    commandPort.Write(0x20); // Get current state
+    uint8_t status = (dataPort.Read() | 1) & ~0x10;
+    commandPort.Write(0x60); // Set the state
+    dataPort.Write(status);
 
-    dataport.Write(0xF4);
+    dataPort.Write(0xF4);
 }
 
 void printf(char*, ...);
@@ -55,7 +55,7 @@ void printfHex(uint8_t);
 
 uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 {
-    uint8_t key = dataport.Read();
+    uint8_t key = dataPort.Read();
 
     if(handler == 0)
         return esp;
@@ -63,10 +63,32 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
     static bool Shift = false;
     static bool Control = false;
     static bool Alt = false;
-    static bool CapsLock = false;
+    static bool capsLock = false;
 
         switch(key)
         {
+            /*
+                This function is currently designed for Canadian English QWERTY keyboards, also
+                used in the United States of America. Not the CMS (Canadian Mutlilingual Standard)
+                or Canadien French layouts, or QWERTZ, British QWERTY, AZERTY, Dvorak or other
+                layouts.
+
+                As such, this function will be revised in the future to do the following:
+                 (1) Automatically send a couple of keyboard interrupts to determine which keys make
+                     up a given selection (i.e. where keys QWERTY, ASDF, and ZXCV are) of scancodes.
+                 (2) Calibrate the driver to the keyboard layout.
+                 (3) Assign OnKeyDown('[key]'); based off of a map from the calibrated result.
+                
+                This will likely result in these functions:
+                 - ScanKeyboardLayout();
+                 - CalibrateKeyboardLayout();
+                 - keymap[]; (array)
+                
+                But this isn't even close to happening. I'd need to likely buy a Dvorak keyboard and
+                import QWERTZ and AZERTY keyboards from Germany and France. I do need to buy a lot of
+                additional hardware to use to further driver development - Not just keyboards, but also
+                printers, networking cards, sound cards, graphics cards, mice, trackpads and more laptops.
+            */
             case 0xFA: break;
 
             case 0x29: if(Shift) handler->OnKeyDown('~'); else handler->OnKeyDown('`'); break;
@@ -86,39 +108,39 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x0E: handler->OnKeyDown('\b'); break; // backspace.
 
             case 0x0F: printf("     "); break; // tab
-            case 0x10: if(Shift || CapsLock) handler->OnKeyDown('Q'); else handler->OnKeyDown('q'); break;
-            case 0x11: if(Shift || CapsLock) handler->OnKeyDown('W'); else handler->OnKeyDown('w'); break;
-            case 0x12: if(Shift || CapsLock) handler->OnKeyDown('E'); else handler->OnKeyDown('e'); break;
-            case 0x13: if(Shift || CapsLock) handler->OnKeyDown('R'); else handler->OnKeyDown('r'); break;
-            case 0x14: if(Shift || CapsLock) handler->OnKeyDown('T'); else handler->OnKeyDown('t'); break;
-            case 0x15: if(Shift || CapsLock) handler->OnKeyDown('Y'); else handler->OnKeyDown('y'); break;
-            case 0x16: if(Shift || CapsLock) handler->OnKeyDown('U'); else handler->OnKeyDown('u'); break;
-            case 0x17: if(Shift || CapsLock) handler->OnKeyDown('I'); else handler->OnKeyDown('i'); break;
-            case 0x18: if(Shift || CapsLock) handler->OnKeyDown('O'); else handler->OnKeyDown('o'); break;
-            case 0x19: if(Shift || CapsLock) handler->OnKeyDown('P'); else handler->OnKeyDown('p'); break;
+            case 0x10: if (Shift ^ capsLock) handler->OnKeyDown('Q'); else handler->OnKeyDown('q'); break;
+            case 0x11: if (Shift ^ capsLock) handler->OnKeyDown('W'); else handler->OnKeyDown('w'); break;
+            case 0x12: if (Shift ^ capsLock) handler->OnKeyDown('E'); else handler->OnKeyDown('e'); break;
+            case 0x13: if (Shift ^ capsLock) handler->OnKeyDown('R'); else handler->OnKeyDown('r'); break;
+            case 0x14: if (Shift ^ capsLock) handler->OnKeyDown('T'); else handler->OnKeyDown('t'); break;
+            case 0x15: if (Shift ^ capsLock) handler->OnKeyDown('Y'); else handler->OnKeyDown('y'); break;
+            case 0x16: if (Shift ^ capsLock) handler->OnKeyDown('U'); else handler->OnKeyDown('u'); break;
+            case 0x17: if (Shift ^ capsLock) handler->OnKeyDown('I'); else handler->OnKeyDown('i'); break;
+            case 0x18: if (Shift ^ capsLock) handler->OnKeyDown('O'); else handler->OnKeyDown('o'); break;
+            case 0x19: if (Shift ^ capsLock) handler->OnKeyDown('P'); else handler->OnKeyDown('p'); break;
             case 0x1A: if(Shift) handler->OnKeyDown('{'); else handler->OnKeyDown('['); break;
             case 0x1B: if(Shift) handler->OnKeyDown('}'); else handler->OnKeyDown(']'); break;
             case 0x2B: if(Shift) handler->OnKeyDown('|'); else handler->OnKeyDown('\\'); break;
 
-            case 0x1E: if(Shift || CapsLock) handler->OnKeyDown('A'); else handler->OnKeyDown('a'); break;
-            case 0x1F: if(Shift || CapsLock) handler->OnKeyDown('S'); else handler->OnKeyDown('s'); break;
-            case 0x20: if(Shift || CapsLock) handler->OnKeyDown('D'); else handler->OnKeyDown('d'); break;
-            case 0x21: if(Shift || CapsLock) handler->OnKeyDown('F'); else handler->OnKeyDown('f'); break;
-            case 0x22: if(Shift || CapsLock) handler->OnKeyDown('G'); else handler->OnKeyDown('g'); break;
-            case 0x23: if(Shift || CapsLock) handler->OnKeyDown('H'); else handler->OnKeyDown('h'); break;
-            case 0x24: if(Shift || CapsLock) handler->OnKeyDown('J'); else handler->OnKeyDown('j'); break;
-            case 0x25: if(Shift || CapsLock) handler->OnKeyDown('K'); else handler->OnKeyDown('k'); break;
-            case 0x26: if(Shift || CapsLock) handler->OnKeyDown('L'); else handler->OnKeyDown('l'); break;
+            case 0x1E: if (Shift ^ capsLock) handler->OnKeyDown('A'); else handler->OnKeyDown('a'); break;
+            case 0x1F: if (Shift ^ capsLock) handler->OnKeyDown('S'); else handler->OnKeyDown('s'); break;
+            case 0x20: if (Shift ^ capsLock) handler->OnKeyDown('D'); else handler->OnKeyDown('d'); break;
+            case 0x21: if (Shift ^ capsLock) handler->OnKeyDown('F'); else handler->OnKeyDown('f'); break;
+            case 0x22: if (Shift ^ capsLock) handler->OnKeyDown('G'); else handler->OnKeyDown('g'); break;
+            case 0x23: if (Shift ^ capsLock) handler->OnKeyDown('H'); else handler->OnKeyDown('h'); break;
+            case 0x24: if (Shift ^ capsLock) handler->OnKeyDown('J'); else handler->OnKeyDown('j'); break;
+            case 0x25: if (Shift ^ capsLock) handler->OnKeyDown('K'); else handler->OnKeyDown('k'); break;
+            case 0x26: if (Shift ^ capsLock) handler->OnKeyDown('L'); else handler->OnKeyDown('l'); break;
             case 0x27: if(Shift) handler->OnKeyDown(':'); else handler->OnKeyDown(';'); break;
             case 0x28: if(Shift) handler->OnKeyDown('\"'); else handler->OnKeyDown('\''); break;
 
-            case 0x2C: if(Shift || CapsLock) handler->OnKeyDown('Z'); else handler->OnKeyDown('z'); break;
-            case 0x2D: if(Shift || CapsLock) handler->OnKeyDown('X'); else handler->OnKeyDown('x'); break;
-            case 0x2E: if(Shift || CapsLock) handler->OnKeyDown('C'); else handler->OnKeyDown('c'); break;
-            case 0x2F: if(Shift || CapsLock) handler->OnKeyDown('V'); else handler->OnKeyDown('v'); break;
-            case 0x30: if(Shift || CapsLock) handler->OnKeyDown('B'); else handler->OnKeyDown('b'); break;
-            case 0x31: if(Shift || CapsLock) handler->OnKeyDown('N'); else handler->OnKeyDown('n'); break;
-            case 0x32: if(Shift || CapsLock) handler->OnKeyDown('M'); else handler->OnKeyDown('m'); break;
+            case 0x2C: if (Shift ^ capsLock) handler->OnKeyDown('Z'); else handler->OnKeyDown('z'); break;
+            case 0x2D: if (Shift ^ capsLock) handler->OnKeyDown('X'); else handler->OnKeyDown('x'); break;
+            case 0x2E: if (Shift ^ capsLock) handler->OnKeyDown('C'); else handler->OnKeyDown('c'); break;
+            case 0x2F: if (Shift ^ capsLock) handler->OnKeyDown('V'); else handler->OnKeyDown('v'); break;
+            case 0x30: if (Shift ^ capsLock) handler->OnKeyDown('B'); else handler->OnKeyDown('b'); break;
+            case 0x31: if (Shift ^ capsLock) handler->OnKeyDown('N'); else handler->OnKeyDown('n'); break;
+            case 0x32: if (Shift ^ capsLock) handler->OnKeyDown('M'); else handler->OnKeyDown('m'); break;
             case 0x33: if(Shift) handler->OnKeyDown('<'); else handler->OnKeyDown(','); break;
             case 0x34: if(Shift) handler->OnKeyDown('>'); else handler->OnKeyDown('.'); break;
             case 0x35: if(Shift) handler->OnKeyDown('?'); else handler->OnKeyDown('/'); break;
@@ -135,14 +157,14 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 
             case 0x3A:
             {
-                if (CapsLock == false)
+                if (capsLock == false)
                 {
-                    CapsLock = true;
+                    capsLock = true;
                     break;
                 }
                 else
                 {
-                    CapsLock = false;
+                    capsLock = false;
                     break;
                 }
             }
@@ -164,7 +186,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             {
                 printf("\n");
                 printf("                                                                                ");
-                printf(" OpenSteel/OS (Version %d.%d Build %d \"Denver\") \n", VersionMajor, VersionMinor, VersionBuild); // For exact 0.21.33 code just remove the two spaces at the end
+                printf(" OpenSteel/OS (Version %d.%d Build %d \"Denver\") \n", verMajor, verMinor, verBuild); // For exact 0.21.33 code just remove the two spaces at the end
                 printf(" Development Build, Circuit 4                                                     ");
                 printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
                 printf("                                                                                ");
