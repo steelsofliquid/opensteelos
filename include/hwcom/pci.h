@@ -4,11 +4,14 @@
 // name of this system (PCI is what I'm referring to) as I want my code
 // to be rather simple)
 
-// This file focuses on getting NanamiOS to work with PCI devices.
+// This file focuses on getting OpenSteel/OS to work with PCI devices.
 
 // To learn more about PCI, you can read up on any info about it
-// on Wikipedia. Just like you can look up barebones info about Nanami Madobe
-// there, too!
+// on Wikipedia. Unlike information about Neisa Sapphira-Aera.
+
+// 2025-11-06 amendment: Shouldn't have shortened Peripheral
+// Component Interconnect to PCI. While simpler, it also would make some
+// kinda mad. Why can't we all have very simple terms?? T_T
 
 #ifndef __OSOS__HWCOM__PCI_H
 #define __OSOS__HWCOM__PCI_H
@@ -54,12 +57,12 @@ namespace osos
             osos::common::uint16_t device;
             osos::common::uint16_t function;
 
-            osos::common::uint16_t vendor_id; // Up to 65 thousand vendor IDs can be assigned.
-            osos::common::uint16_t device_id;
+            osos::common::uint16_t vendorId; // Up to 65 thousand vendor IDs can be assigned.
+            osos::common::uint16_t deviceId;
 
-            osos::common::uint8_t class_id;
-            osos::common::uint8_t subclass_id;
-            osos::common::uint8_t interface_id;
+            osos::common::uint8_t classId;
+            osos::common::uint8_t subclassId;
+            osos::common::uint8_t interfaceId;
 
             osos::common::uint8_t revision;
 
@@ -78,10 +81,10 @@ namespace osos
             PCIController();
             ~PCIController();
 
-            osos::common::uint32_t PCIRead(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint32_t registeroffset);
-            void PCIWrite(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint32_t registeroffset, 
+            osos::common::uint32_t PCIRead(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint32_t registerOffset);
+            void PCIWrite(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint32_t registerOffset, 
                 osos::common::uint32_t value);
-            bool DeviceHasFunctions(osos::common::uint16_t bus, osos::common::uint16_t device);
+            bool deviceHasFunctions(osos::common::uint16_t bus, osos::common::uint16_t device);
 
             void SelectDrivers(osos::drivers::DriverManager* driverManager, osos::hwcom::InterruptManager* interrupts);
             osos::drivers::Driver* GetDriver(PCIDevDesc dev, osos::hwcom::InterruptManager* interrupts);
