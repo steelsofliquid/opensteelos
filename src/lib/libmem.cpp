@@ -9,8 +9,10 @@ using namespace osos::common;
 using namespace osos::libs;
 
 
-namespace osos{
-    namespace libs {
+namespace osos
+{
+    namespace libs
+    {
         
         void* memcpy(void* destination, const void* source, size_t number)
         {

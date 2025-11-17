@@ -20,9 +20,10 @@ StringLibrary.strlen(LoremIpsum);
 */
 
 
-namespace osos{
-
-    namespace libs{
+namespace osos
+{
+    namespace libs
+    {
 
         size_t strlen(const char* string)
         {
