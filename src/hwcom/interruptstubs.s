@@ -7,16 +7,16 @@
 .global _ZN4osos5hwcom16InterruptManager22IgnoreInterruptRequestEv
 
 .macro HandleException num
-.global _ZN4osos5hwcom16InterruptManager16HandleException\num\()Ev
-_ZN4osos5hwcom16InterruptManager16HandleException\num\()Ev:
+.global _ZN4osos5hwcom24InterruptDescriptorTable19HandleException\num\()Ev
+_ZN4osos5hwcom24InterruptDescriptorTable19HandleException\num\()Ev:
     movb $\num, (interruptnumber)
     jmp int_bottom
 
 .endm
 
 .macro HandleInterruptRequest num
-.global _ZN4osos5hwcom16InterruptManager26HandleInterruptRequest\num\()Ev
-_ZN4osos5hwcom16InterruptManager26HandleInterruptRequest\num\()Ev:
+.global _ZN4osos5hwcom24InterruptDescriptorTable26HandleInterruptRequest\num\()Ev
+_ZN4osos5hwcom24InterruptDescriptorTable26HandleInterruptRequest\num\()Ev:
     movb $\num + IRQ_BASE, (interruptnumber)
     pushl $0
     jmp int_bottom
