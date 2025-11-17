@@ -21,37 +21,37 @@ void printf(char* str, ...);
 
 // Class Task
 
-extern volatile uint32_t tickcount;
+extern volatile uint32_t tickCount;
 
 Task::Task(GlobalDescriptorTable *gdt, void entrypoint())
 {
-    cpustate = (CPUState*)(stack + 4096 - sizeof(CPUState));
+    cpuState = (CPUState*)(stack + 4096 - sizeof(CPUState));
 
-    cpustate -> eax = 0;
-    cpustate -> ebx = 0;
-    cpustate -> ecx = 0;
-    cpustate -> edx = 0;
+    cpuState -> eax = 0;
+    cpuState -> ebx = 0;
+    cpuState -> ecx = 0;
+    cpuState -> edx = 0;
 
-    cpustate -> esi = 0;
-    cpustate -> edi = 0;
-    cpustate -> ebp = 0;
+    cpuState -> esi = 0;
+    cpuState -> edi = 0;
+    cpuState -> ebp = 0;
 
     /*
-    cpustate -> gs = 0;
-    cpustate -> fs = 0;
-    cpustate -> es = 0;
-    cpustate -> ds = 0;
+    cpuState -> gs = 0;
+    cpuState -> fs = 0;
+    cpuState -> es = 0;
+    cpuState -> ds = 0;
 
-    cpustate -> error = 0;
+    cpuState -> error = 0;
     */
-    // cpustate -> esp = 0;
-    cpustate -> eip = (uint32_t)entrypoint;
-    cpustate -> cs = gdt->CodeSegmentSelector();
-    // cpustate -> ds = 0;
-    cpustate -> eflags = 0x202;
+    // cpuState -> esp = 0;
+    cpuState -> eip = (uint32_t)entrypoint;
+    cpuState -> cs = gdt->CodeSegmentSelector();
+    // cpuState -> ds = 0;
+    cpuState -> eflags = 0x202;
 
-    IsAsleep = false;
-    WakeTick = 0;
+    isAsleep = false;
+    wakeTick = 0;
 }
 
 Task::~Task()
@@ -81,24 +81,24 @@ bool TaskManager::AddTask(Task* task)
     return true;
 }
 
-CPUState* TaskManager::Schedule(CPUState* cpustate)
+CPUState* TaskManager::Schedule(CPUState* cpuState)
 {
     if(numTasks <= 0)
-        return cpustate;
+        return cpuState;
 
     if(currentTask >= 0)
-        tasks[currentTask] -> cpustate = cpustate;
+        tasks[currentTask] -> cpuState = cpuState;
 
     for (int i = 0; i < numTasks; i++)
     {
         if(++currentTask >= numTasks)
             currentTask %= numTasks;
         
-        if(!tasks[currentTask] -> IsAsleep)
-            return tasks[currentTask] -> cpustate;
+        if(!tasks[currentTask] -> isAsleep)
+            return tasks[currentTask] -> cpuState;
     }
     
-    return cpustate;
+    return cpuState;
 }
 
 
@@ -108,16 +108,16 @@ void TaskManager::sleep(uint32_t interval)
     uint32_t intervalInTicks = interval / 10;
 
     Task* TaskToSleep = tasks[currentTask];
-    TaskToSleep->IsAsleep = true;
-    TaskToSleep->WakeTick = tickcount + intervalInTicks;
+    TaskToSleep->isAsleep = true;
+    TaskToSleep->wakeTick = tickCount + intervalInTicks;
 }
 
 void TaskManager::WakeTask(uint32_t ticks)
 {
     for (int i = 0; i < numTasks; i++)
     {
-        if (tasks[i] -> IsAsleep && ticks >= tasks[i] -> WakeTick)
-            tasks[i] -> IsAsleep = false;
+        if (tasks[i] -> isAsleep && ticks >= tasks[i] -> wakeTick)
+            tasks[i] -> isAsleep = false;
     }
 }
 

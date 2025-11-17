@@ -39,6 +39,7 @@
 // GCC headers
 #include <stdarg.h>
 
+// namespaces
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
@@ -46,32 +47,29 @@ using namespace osos::hwcom;
 using namespace osos::libs;
 // using namespace osos::gui;
 
-/*
-  The three int32_t values below denote the version number. It is some degree of "version control" or version indicator.
-  They are essentially useless at the moment as no function can properly use them.
-*/
+// The three int32_t values below denote the version number. It is some degree of "version control" or version indicator.
 
-int32_t VersionMajor = 0;
-int32_t VersionMinor = 22;
-int32_t VersionBuild = 64;
+int32_t verMajor = 0;
+int32_t verMinor = 22;
+int32_t verBuild = 70;
 
-int32_t TestInteger1 = 5;
-int32_t TestInteger2 = 15;
-int32_t TestInteger3 = 327;
-int32_t TestInteger4 = 7629;
-int32_t TestInteger5 = 0;
+int32_t testInteger1 = 5;
+int32_t testInteger2 = 15;
+int32_t testInteger3 = 327;
+int32_t testInteger4 = 7629;
+int32_t testInteger5 = 0;
 
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
 
-extern volatile uint32_t tickcount;
+extern volatile uint32_t tickCount;
 
 void printf(char* str, ...) // the main screen output function.
 {
   va_list params;
   va_start (params, str);
 
-  static uint16_t* VideoMemory = (uint16_t*)0xb8000;
+  static uint16_t* videoMemory = (uint16_t*)0xb8000;
   static uint8_t x = 0 , y = 0;
 
   for(int i = 0; str[i] != '\0'; ++i)
@@ -107,18 +105,18 @@ void printf(char* str, ...) // the main screen output function.
             y--;
             x = 79;
           }
-        } // Safeguard to ensure a negative number isn't... you know.
+        } // Safeguard to ensure a negative number isn't... you know. Oh wait, it's problematic if the number has a decimal, not a negative number. I look stupid T_T
         else
         {
           x--;
         }
-        VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
+        videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | ' ';
         break;
       
       case '\a':
         for (y = 0; y < 25; y++)
           for (x = 0; x < 80; x++)
-            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | ' ';
+            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | ' ';
         x = 0;
         y = 0;
         break;
@@ -129,7 +127,6 @@ void printf(char* str, ...) // the main screen output function.
         {
           case 'd':
           {
-            // TODO: int32_t
             int intval = va_arg(params, int);
             char buffer[12];
 
@@ -137,7 +134,7 @@ void printf(char* str, ...) // the main screen output function.
 
             for (int j = 0; buffer[j] != '\0'; j++)
             {
-              VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | buffer[j];
+              videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | buffer[j];
               x++;
             }
 
@@ -153,8 +150,8 @@ void printf(char* str, ...) // the main screen output function.
             foo[0] = hex[(key >> 4) & 0xF];
             foo[1] = hex[key & 0xF];
             
-            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | foo[0]; x++;
-            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | foo[1]; x++;
+            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | foo[0]; x++;
+            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | foo[1]; x++;
 
             break;
           }
@@ -162,7 +159,7 @@ void printf(char* str, ...) // the main screen output function.
           default:
           {
             i--;
-            VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i];
+            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | str[i];
             x++;
             break;
           }
@@ -171,7 +168,7 @@ void printf(char* str, ...) // the main screen output function.
         continue;
 
       default:
-        VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0xFF00) | str[i];
+        videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | str[i];
         x++;
         break;
     }
@@ -192,7 +189,7 @@ void printf(char* str, ...) // the main screen output function.
           }
           else
           {
-            VideoMemory[80 * (y - 1) + x] = VideoMemory[80 * y + x]; // now that i think, what the fuck did i just say about the y-integer and -1!?
+            videoMemory[80 * (y - 1) + x] = videoMemory[80 * y + x]; // now that i think, what the fuck did i just say about the y-integer and -1!?
             // i know uint8_t is a char, but it's supposed to be treated as an integer number here. simple. 25 rows, including zero, no lower than zero.
             // don't make uint8_t x and y uint32_t, the code will break and i know that without even testing it to see.
 
@@ -201,7 +198,7 @@ void printf(char* str, ...) // the main screen output function.
         }
       
       for(x = 0; x < 80; x++)
-        VideoMemory[80 * 24 + x] = (VideoMemory[80*24+x] & 0xFF00) | ' ';
+        videoMemory[80 * 24 + x] = (videoMemory[80*24+x] & 0xFF00) | ' ';
 
       x = 0;
       y = 24;
@@ -238,21 +235,21 @@ class MouseToConsole : public MouseEventHandler // This moves the sometimes very
 public:
   MouseToConsole()
   {
-    uint16_t* VideoMemory = (uint16_t*)0xB8000;
+    uint16_t* videoMemory = (uint16_t*)0xB8000;
     x = 40;
     y = 12;
-    VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0x0F00) << 4
-                        | (VideoMemory[80*y+x] & 0xF000) >> 4
-                        | (VideoMemory[80*y+x] & 0x00FF);
+    videoMemory[80*y+x] = (videoMemory[80*y+x] & 0x0F00) << 4
+                        | (videoMemory[80*y+x] & 0xF000) >> 4
+                        | (videoMemory[80*y+x] & 0x00FF);
   }
 
   void OnMouseMove(int xoffset, int yoffset)
   {
-    static uint16_t* VideoMemory = (uint16_t*)0xb8000;
+    static uint16_t* videoMemory = (uint16_t*)0xb8000;
 
-    VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0x0F00) << 4
-                        | (VideoMemory[80*y+x] & 0xF000) >> 4
-                        | (VideoMemory[80*y+x] & 0x00FF);
+    videoMemory[80*y+x] = (videoMemory[80*y+x] & 0x0F00) << 4
+                        | (videoMemory[80*y+x] & 0xF000) >> 4
+                        | (videoMemory[80*y+x] & 0x00FF);
 
     x += xoffset;
     if(x < 0) x = 0;
@@ -262,9 +259,9 @@ public:
     if(y < 0) y = 0;
     if(y >= 25) y = 24;
 
-    VideoMemory[80*y+x] = (VideoMemory[80*y+x] & 0x0F00) << 4
-                        | (VideoMemory[80*y+x] & 0xF000) >> 4
-                        | (VideoMemory[80*y+x] & 0x00FF);
+    videoMemory[80*y+x] = (videoMemory[80*y+x] & 0x0F00) << 4
+                        | (videoMemory[80*y+x] & 0xF000) >> 4
+                        | (videoMemory[80*y+x] & 0x00FF);
   }
 
 };
@@ -363,6 +360,9 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   
   // Start of boot process v
 
+  // reset video memory
+  printf("\a");
+
   // bootsplash header (ASCII)
   printf("  ___                _ ___ __   _ _  __ __   _ _ ________________________ 0.22  ");
   printf(" /  /                                         __ _ _   _ ____ _ _______________ ");
@@ -372,7 +372,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf(" SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", VersionMajor, VersionMinor, VersionBuild);
+  printf(" SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", verMajor, verMinor, verBuild);
 
   GlobalDescriptorTable gdt;
 
@@ -418,34 +418,37 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   DriverManager drvManager;
   // drivers loading
-    printf("starting drivers...");
+  printf("initialising drivers...");
 
-    PrintfKeyboardEventHandler kbhandler;
-    KeyboardDriver keyboard(&interrupts, &kbhandler);
-    drvManager.AddDriver(&keyboard);
+  PrintfKeyboardEventHandler kbhandler;
+  KeyboardDriver keyboard(&interrupts, &kbhandler);
+  drvManager.AddDriver(&keyboard);
 
-    ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
-    programmableIntervalTimer.attachToInterruptManager(&interrupts);
+  ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
+  programmableIntervalTimer.attachToInterruptManager(&interrupts);
 
-    //MouseToConsole mousehandler;
-    //MouseDriver mouse(&interrupts, &mousehandler);
-    //drvManager.AddDriver(&mouse);
+  //MouseToConsole mousehandler;
+  //MouseDriver mouse(&interrupts, &mousehandler);
+  //drvManager.AddDriver(&mouse);
 
-    // ^ mouse driver sucked. let's not use it, if possible.
+  // ^ mouse driver sucked. let's not use it, if possible.
 
-    Speaker speaker;
+  Speaker speaker;
 
-    printf(" done!\n");
-    printf("finding and selecting PCI devices and drivers...");
+  printf(" done!\n");
+  printf("finding and selecting PCI devices and drivers...");
 
-    PCIController PCIController;
-    PCIController.SelectDrivers(&drvManager, &interrupts);
+  PCIController PCIController;
+  PCIController.SelectDrivers(&drvManager, &interrupts);
+  printf(" done\n");
 
-    // VideoGraphicsArray vga;
+  // VideoGraphicsArray vga;
 
-    drvManager.ActivateAll();
+  printf("starting drivers and interrupts...");
+  drvManager.ActivateAll();
 
   interrupts.Activate();
+  printf(" done!\n");
 
   // booting is at the home stretch ^v
 
@@ -470,7 +473,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
 
   printf("Integer and printf Output Test _________________________________________________");
-  printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", TestInteger1, TestInteger2, TestInteger3, TestInteger4, TestInteger5);
+  printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
 
   while(1);
   
