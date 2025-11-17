@@ -23,8 +23,8 @@
 
             class KeyboardDriver : public osos::hwcom::InterruptHandler, public Driver
             {
-                osos::hwcom::Port8Bit dataport;
-                osos::hwcom::Port8Bit commandport;
+                osos::hwcom::Port8Bit dataPort;
+                osos::hwcom::Port8Bit commandPort;
 
                 KeyboardEventHandler* handler;
             public:

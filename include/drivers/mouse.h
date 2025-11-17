@@ -25,8 +25,8 @@
 
             class MouseDriver : public osos::hwcom::InterruptHandler, public Driver
             {
-                osos::hwcom::Port8Bit dataport;
-                osos::hwcom::Port8Bit commandport; // from keyboard driver
+                osos::hwcom::Port8Bit dataPort;
+                osos::hwcom::Port8Bit commandPort; // from keyboard driver
 
                 osos::common::uint8_t buffer[3];
                 osos::common::uint8_t offset;
