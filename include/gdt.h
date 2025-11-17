@@ -13,12 +13,12 @@ namespace osos
             class SegmentDescriptor
             {
             private:
-                osos::common::uint16_t limit_lo;
-                osos::common::uint16_t base_lo;
-                osos::common::uint8_t base_hi;
+                osos::common::uint16_t limitLow;
+                osos::common::uint16_t baseLow;
+                osos::common::uint8_t baseHigh;
                 osos::common::uint8_t type;
-                osos::common::uint8_t flags_limit_hi;
-                osos::common::uint8_t base_vhi;
+                osos::common::uint8_t flagsLimitHigh;
+                osos::common::uint8_t baseVirtualHigh;
             public:
                 SegmentDescriptor(osos::common::uint32_t base, osos::common::uint32_t limit, osos::common::uint8_t type);
                 osos::common::uint32_t Base();

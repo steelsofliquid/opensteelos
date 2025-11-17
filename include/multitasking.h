@@ -33,10 +33,10 @@ namespace osos
     friend class TaskManager;
     private:
         osos::common::uint8_t stack[4096]; // 4 KiB
-        CPUState* cpustate;
+        CPUState* cpuState;
     public:
-        bool IsAsleep;
-        osos::common::uint32_t WakeTick;
+        bool isAsleep;
+        osos::common::uint32_t wakeTick;
         Task(GlobalDescriptorTable *gdt, void entrypoint());
         ~Task();
     };
@@ -51,7 +51,7 @@ namespace osos
         TaskManager();
         ~TaskManager();
         bool AddTask(Task* task);
-        CPUState* Schedule(CPUState* cpustate);
+        CPUState* Schedule(CPUState* cpuState);
 
         void sleep(osos::common::uint32_t interval);
         void WakeTask(osos::common::uint32_t ticks);
