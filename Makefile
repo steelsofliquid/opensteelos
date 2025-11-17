@@ -10,8 +10,10 @@ objects = object/loader.o \
  object/drivers/driver.o \
  object/hwcom/port.o \
  object/hwcom/interruptstubs.o \
+ object/hwcom/idt.o \
  object/hwcom/interrupts.o \
  object/hwcom/pci.o \
+ object/hwcom/pic.o \
  object/drivers/keyboard.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
