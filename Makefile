@@ -14,6 +14,7 @@ objects = object/loader.o \
  object/hwcom/interrupts.o \
  object/hwcom/pci.o \
  object/hwcom/pic.o \
+ object/drivers/cmos.o \
  object/drivers/keyboard.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
