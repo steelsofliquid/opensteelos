@@ -26,6 +26,7 @@
 #include <dmm.h>
 #include <hwcom/interrupts.h>
 #include <hwcom/pci.h>
+#include <drivers/cmos.h>
 #include <drivers/driver.h>
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
@@ -51,7 +52,7 @@ using namespace osos::libs;
 
 int32_t verMajor = 0;
 int32_t verMinor = 22;
-int32_t verBuild = 70;
+int32_t verBuild = 85;
 
 int32_t testInteger1 = 5;
 int32_t testInteger2 = 15;
@@ -301,7 +302,7 @@ void cmdTest()
 
 void panic()
 {
-  printf(" >_<   systempanic\n");
+  printf(" <!>");
 
   printf(" OpenSteel/OS version 0.22.44");
   printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
@@ -434,6 +435,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // ^ mouse driver sucked. let's not use it, if possible.
 
   Speaker speaker;
+  ClockBatteryDriver cmos;
 
   printf(" done!\n");
   printf("finding and selecting PCI devices and drivers...");
@@ -448,6 +450,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   drvManager.ActivateAll();
 
   interrupts.Activate();
+  RealTimeClockRegisters time = cmos.ReadRTC();
   printf(" done!\n");
 
   // booting is at the home stretch ^v
@@ -472,8 +475,12 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     */
 
 
-  printf("Integer and printf Output Test _________________________________________________");
-  printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
+  //printf("Integer and printf Output Test _________________________________________________");
+  //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
+
+  // clock test
+  printf("It is the %d of month %d, year %d.", time.day, time.month, time.year);
+  printf(" It is also %d:%d:%d.", time.hour, time.minute, time.second);
 
   while(1);
   
