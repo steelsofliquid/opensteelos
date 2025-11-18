@@ -124,6 +124,12 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     {
         esp = handlers[interruptNumber]->HandleInterrupt(esp); // should call the appropriate function per driver.
     }
+    else if (interruptNumber = 0x06 || 0x0D)
+    {
+        // this is a makeshift crash handler. I need to redo the panic() function.
+        printf("\nMAKESHIFT PANIC: 0x0D 0X06 GENERAL PROTECTION FAULT\nOpenSteel/OS encountered an error and needs to shut down.");
+        while(1);
+    }
     else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
     {
         // this semi-legacy code needs to some reworking. the original if statement was deleted, since it's contents were
