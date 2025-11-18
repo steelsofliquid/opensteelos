@@ -28,7 +28,7 @@ namespace osos
         size_t strlen(const char* string)
         {
             size_t len = 0;
-            while (string[len])
+            while (string[len] != '\0')
                 len++; // very simple
             
             return len;
@@ -85,7 +85,8 @@ namespace osos
             while(dest != sourc) // now THIS mcguivered shite from 4 in the morning is SOMETHING! *passes out and wakes up at noon*
                 dest[i] = sourc[i];
                 i++;
-
+            dest[i] = '\0';
+            
             return destination;
         }
 
@@ -117,6 +118,7 @@ namespace osos
                 i++;
                 j++; // i really love using a second variable. no seriously!
             }
+            dest[i] = '\0';
 
             return destination;
         }
@@ -145,6 +147,7 @@ namespace osos
                 i++;
                 j++;
             }
+            result[i] = '\0';
 
             return result;
         }
@@ -192,6 +195,7 @@ namespace osos
                     break;
                 }
             }
+            result[i] = '\0';
 
             return result;
         }
@@ -238,6 +242,7 @@ namespace osos
                 i++;
                 k++;
             }
+            result[i] = '\0';
 
             return result;
         }
