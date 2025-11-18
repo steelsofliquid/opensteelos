@@ -3,14 +3,21 @@
 
 #include <common/types.h>
 #include <drivers/pit.h>
+#include <lib/libstr.h>
 
 namespace osos
 {
         // void InitialiseHardSleep();
 
+        // --- system APIs ---
+        // GrabSys APIs
+        osos::common::int8_t* GrabSysVer(osos::common::int8_t sector);
+
+        // hardware materials
         void HardSleep(osos::common::uint32_t interval);
 
 
+        // inline assembly carriers
         static inline void outb(osos::common::uint16_t port, osos::common::uint8_t value)
         {
              asm volatile("outb %0, %1" : : "a" (value), "Nd" (port));
