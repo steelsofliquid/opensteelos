@@ -52,7 +52,7 @@ using namespace osos::libs;
 
 int32_t verMajor = 0;
 int32_t verMinor = 22;
-int32_t verBuild = 85;
+int32_t verBuild = 128;
 
 int32_t testInteger1 = 5;
 int32_t testInteger2 = 15;
@@ -72,6 +72,7 @@ void printf(char* str, ...) // the main screen output function.
 
   static uint16_t* videoMemory = (uint16_t*)0xb8000;
   static uint8_t x = 0 , y = 0;
+  static uint8_t currentColour = 0x0F;
 
   for(int i = 0; str[i] != '\0'; ++i)
   {
@@ -101,23 +102,27 @@ void printf(char* str, ...) // the main screen output function.
       case '\b':
         if(x == 0)
         {
-          if(y != 0) // i swear to god, no, i swear to neisa-sama if you somehow get a number below zero, there's something seriously wrong with your pc. mind you, this is an int!
+          if(y != 0)
           {
             y--;
-            x = 79;
+            int backX = 79;
+            while (backX >= 0 && (videoMemory[80*y+backX] & 0x00FF) == ' ') backX--;
+            if (backX < 0) x = 0; else x = backX;
+
+            videoMemory[80*y+x] = (currentColour << 8) | ' ';
           }
-        } // Safeguard to ensure a negative number isn't... you know. Oh wait, it's problematic if the number has a decimal, not a negative number. I look stupid T_T
+        }
         else
         {
           x--;
+          videoMemory[80*y+x] = (currentColour << 8) | ' ';
         }
-        videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | ' ';
         break;
       
       case '\a':
         for (y = 0; y < 25; y++)
           for (x = 0; x < 80; x++)
-            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | ' ';
+            videoMemory[80*y+x] = (currentColour << 8) | ' ';
         x = 0;
         y = 0;
         break;
@@ -126,7 +131,7 @@ void printf(char* str, ...) // the main screen output function.
         i++;
         switch (str[i])
         {
-          case 'd':
+          case 'i': case 'd':
           {
             int intval = va_arg(params, int);
             char buffer[12];
@@ -135,7 +140,7 @@ void printf(char* str, ...) // the main screen output function.
 
             for (int j = 0; buffer[j] != '\0'; j++)
             {
-              videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | buffer[j];
+              videoMemory[80*y+x] = (currentColour << 8) | buffer[j];
               x++;
             }
 
@@ -151,16 +156,35 @@ void printf(char* str, ...) // the main screen output function.
             foo[0] = hex[(key >> 4) & 0xF];
             foo[1] = hex[key & 0xF];
             
-            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | foo[0]; x++;
-            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | foo[1]; x++;
+            videoMemory[80*y+x] = (currentColour << 8) | foo[0]; x++;
+            videoMemory[80*y+x] = (currentColour << 8) | foo[1]; x++;
 
+            break;
+          }
+
+          case 's':
+          {
+            const char* s = va_arg(params, const char*);
+            if (!s) s = "0x14_invalid";
+
+            while (*s != '\0')
+            {
+              videoMemory[80*y+x] = (currentColour << 8) | *s;
+              x++; s++;
+            }
+            break;
+          }
+
+          case 'R':
+          {
+            currentColour = (uint8_t)va_arg(params, int);
             break;
           }
 
           default:
           {
             i--;
-            videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | str[i];
+            videoMemory[80*y+x] = (currentColour << 8) | str[i];
             x++;
             break;
           }
@@ -169,7 +193,7 @@ void printf(char* str, ...) // the main screen output function.
         continue;
 
       default:
-        videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | str[i];
+        videoMemory[80*y+x] = (currentColour << 8) | str[i];
         x++;
         break;
     }
@@ -182,24 +206,22 @@ void printf(char* str, ...) // the main screen output function.
 
     if(y >= 25)
     {
-      for(y = 0; y < 25; y++)
-        for(x = 0; x < 80; x++)
+      for(int r = 1; r < 25; r++)
+        for(int c = 0; c < 80; c++)
         {
-          if(y == 0) // read the comment below
+          if(r == 0)
           {
           }
           else
           {
-            videoMemory[80 * (y - 1) + x] = videoMemory[80 * y + x]; // now that i think, what the fuck did i just say about the y-integer and -1!?
-            // i know uint8_t is a char, but it's supposed to be treated as an integer number here. simple. 25 rows, including zero, no lower than zero.
-            // don't make uint8_t x and y uint32_t, the code will break and i know that without even testing it to see.
+            videoMemory[80 * (r - 1) + c] = videoMemory[80 * r + c];
 
             // it ain't perfect (or close to, *for now*) but it works. will need to make it not print cursor spaghetti in a later build
           }
         }
       
       for(x = 0; x < 80; x++)
-        videoMemory[80 * 24 + x] = (videoMemory[80*24+x] & 0xFF00) | ' ';
+        videoMemory[80 * 24 + x] = (currentColour << 8);
 
       x = 0;
       y = 24;
@@ -267,6 +289,20 @@ public:
 
 };
 
+static const char* monthNames[12] =
+{
+  "January", "February", "March", "April",
+  "May", "June", "July", "August",
+  "September", "October", "November", "December"
+};
+
+static const char* monthAbrev[12] =
+{
+  "jan", "feb", "mar", "apr",
+  "may", "jun", "jul", "aug",
+  "sep", "oct", "nov", "dec"
+};
+
 void TestTask1()
 {
     while(true)
@@ -302,17 +338,15 @@ void cmdTest()
 
 void panic()
 {
-  printf(" <!>");
-
-  printf(" OpenSteel/OS version 0.22.44");
-  printf(" Offending Material: NULL"); // keep it simple, only tell the end user what program/process broke it and why
-  printf(" Trigger: NULL"); // "NULL" is to be replaced with legitimate reasons, such as a memory leak or a buffer overflow.
+  printf("%R\a", 0x4F);
+  printf(" <!> STOP                                                                       ");
   printf("                                                                                ");
-  printf(" A problem has occurred and OpenSteel/OS needs to shut down or restart. Any     ");
-  printf(" unsaved work has been lost and we apologise for the inconvenience. If you see  ");
-  printf(" this message multiple times, it may be a potential hardware failure or malware ");
-  printf(" may be present on your system. For help, contact steelsofliquid@hotmail.com    ");
+  printf(" OpenSteel/OS %d.%d.%d", verMajor, verMinor, verBuild);
+  printf(" Exception ID 0x??\n"); // keep it simple, only tell the end user what program/process broke it and why
+  printf("                                                                                ");
+  printf(" A problem has occurred and OpenSteel/OS has shut down.                         ");
 
+  asm volatile ("cli");
   while(1); // use this in the kernel to try to stop someone from continuing to use an unstable system.
 }
 
@@ -362,7 +396,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // Start of boot process v
 
   // reset video memory
-  printf("\a");
+  printf("%R\a", 0x1B);
 
   // bootsplash header (ASCII)
   printf("  ___                _ ___ __   _ _  __ __   _ _ ________________________ 0.22  ");
@@ -373,7 +407,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf(" SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", verMajor, verMinor, verBuild);
+  printf("%R SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x1F, verMajor, verMinor, verBuild);
 
   GlobalDescriptorTable gdt;
 
@@ -383,19 +417,23 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   size_t heap = 10*1024*1024;
   MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
-  printf("memory heap: 0x%x%x%x%x, ",
+  printf("memory heap: %R0x%x%x%x%x%R, ",
+    0x1E,
     ((heap >> 24) & 0xFF),
     ((heap >> 16) & 0xFF),
     ((heap >> 8 ) & 0xFF),
-    ((heap      ) & 0xFF)
+    ((heap      ) & 0xFF),
+    0x1F
   );
   void* allocated = MemoryManager.malloc(1024);
   
-  printf("0x%x%x%x%x allocated by dmm.",
+  printf("%R0x%x%x%x%x %Rallocated by dmm.",
+    0x1E,
     (((size_t)allocated >> 24) & 0xFF),
     (((size_t)allocated >> 16) & 0xFF),
     (((size_t)allocated >> 8 ) & 0xFF),
-    (((size_t)allocated      ) & 0xFF)
+    (((size_t)allocated      ) & 0xFF),
+    0x1F
   );
   
   printf("\n");
@@ -419,7 +457,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   DriverManager drvManager;
   // drivers loading
-  printf("initialising drivers...");
+  printf(" initialising drivers...                                                  ");
 
   PrintfKeyboardEventHandler kbhandler;
   KeyboardDriver keyboard(&interrupts, &kbhandler);
@@ -436,28 +474,34 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   Speaker speaker;
   ClockBatteryDriver cmos;
+  char rtcSec[3], rtcMin[3];
 
-  printf(" done!\n");
-  printf("finding and selecting PCI devices and drivers...");
+  printf("%R [ok!]", 0x1A);
+  printf("%R finding and selecting PCI devices and drivers...                         ", 0x1F);
 
   PCIController PCIController;
   PCIController.SelectDrivers(&drvManager, &interrupts);
-  printf(" done\n");
+  printf("%R [ok!]", 0x1A);
 
   // VideoGraphicsArray vga;
 
-  printf("starting drivers and interrupts...");
+  printf("%R starting drivers and interrupts...                                       ", 0x1F);
   drvManager.ActivateAll();
 
   interrupts.Activate();
   RealTimeClockRegisters time = cmos.ReadRTC();
-  printf(" done!\n");
+  cmos.PadRTCInteger(rtcSec, time.second);
+  cmos.PadRTCInteger(rtcMin, time.minute);
+  printf("%R [ok!]", 0x1A);
 
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
   speaker.LifeChime();
-  printf("\nGood day, and welcome to OpenSteel/OS. Strike [F1] for help.\n"); // Denotes end of booting process <
+  printf("\n%RGood day, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nStrike [F1] for help.\n", 0x1F,
+  time.hour, rtcMin, rtcSec,
+  time.day, monthNames[time.month - 1], time.year);
+  // Denotes end of booting process  ^
 
   // the code below is supposed to try to determine if the OS is in real mode or not. spoiler: it's not.
   /*
@@ -477,10 +521,6 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   //printf("Integer and printf Output Test _________________________________________________");
   //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
-
-  // clock test
-  printf("It is the %d of month %d, year %d.", time.day, time.month, time.year);
-  printf(" It is also %d:%d:%d.", time.hour, time.minute, time.second);
 
   while(1);
   

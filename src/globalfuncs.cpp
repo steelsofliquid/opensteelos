@@ -12,6 +12,7 @@ extern int32_t verMinor;
 extern int32_t verBuild;
 
 
+
 int8_t* osos::GrabSysVer(int8_t sector)
 {
         int8_t* verstring;
@@ -90,6 +91,7 @@ int8_t* osos::GrabSysVer(int8_t sector)
 
         return verstring;
 }
+
 
 
 void osos::HardSleep(uint32_t interval)
