@@ -1,6 +1,3 @@
-// A legitimate purpose-built driver, holy shit
-// though honestly i may not need it
-
 #include <drivers/cmos.h>
 
 #define BUILDYEAR       2025
@@ -21,20 +18,6 @@ ClockBatteryDriver::ClockBatteryDriver() :
 }
 
 ClockBatteryDriver::~ClockBatteryDriver()
-{
-}
-
-
-// private functions are a subject of personal debate - should I add these to the thing? would it make things easier or harder?
-void ClockBatteryDriver::GetIndex(uint8_t reg)
-{
-}
-
-void ClockBatteryDriver::ReadData()
-{
-}
-
-void ClockBatteryDriver::WriteData(uint8_t value)
 {
 }
 
@@ -61,6 +44,14 @@ void ClockBatteryDriver::WriteCMOS(int32_t port, int32_t value)
 }
 
 
+void ClockBatteryDriver::PadRTCInteger(char* output, uint8_t val)
+{
+    output[0] = '0' + (val / 10 );
+    output[1] = '0' + (val % 10);
+    output[2] = '\0';
+}
+
+
 int ClockBatteryDriver::GetProgressUpdateFlag()
 {
     WriteCMOS(0x70, 0x0A);
@@ -73,54 +64,44 @@ uint8_t ClockBatteryDriver::GetRTCregister(int32_t reg)
     return ReadCMOS(reg);
 }
 
+RealTimeClockRegisters ClockBatteryDriver::GetClockRegisters(RealTimeClockRegisters registerSet)
+{
+    while(GetProgressUpdateFlag());
+
+    registerSet.second = GetRTCregister(0x00);
+    registerSet.minute = GetRTCregister(0x02);
+    registerSet.hour   = GetRTCregister(0x04);
+    registerSet.day    = GetRTCregister(0x07);
+    registerSet.month  = GetRTCregister(0x08);
+    registerSet.year   = GetRTCregister(0x09);
+
+    return registerSet;
+}
+
 RealTimeClockRegisters ClockBatteryDriver::ReadRTC()
 {
     uint8_t century;
-    uint8_t lastSecond;
-    uint8_t lastMinute;
-    uint8_t lastHour;
-    uint8_t lastDay;
-    uint8_t lastMonth;
-    uint8_t lastYear;
     uint8_t lastCentury;
 
     uint8_t regB;
 
-    RealTimeClockRegisters clockRegisters;
-    while(GetProgressUpdateFlag());        // are we updating?
+    RealTimeClockRegisters clockRegisters, lastTimeRegisters;
+    clockRegisters = GetClockRegisters(clockRegisters);
 
-    clockRegisters.second = GetRTCregister(0x00);
-    clockRegisters.minute = GetRTCregister(0x02);
-    clockRegisters.hour   = GetRTCregister(0x04);
-    clockRegisters.day    = GetRTCregister(0x07);
-    clockRegisters.month  = GetRTCregister(0x08);
-    clockRegisters.year   = GetRTCregister(0x09);
     if (centuryRegister != 0) century = GetRTCregister(centuryRegister);
 
+    // Verify all of the RTC registers
     do
     {
-        lastSecond  = clockRegisters.second;
-        lastMinute  = clockRegisters.minute;
-        lastHour    = clockRegisters.hour;
-        lastDay     = clockRegisters.day;
-        lastMonth   = clockRegisters.month;
-        lastYear    = clockRegisters.year;
+        lastTimeRegisters = clockRegisters;
         lastCentury = century;
 
-        while(GetProgressUpdateFlag());        // are we updating?
-
-        // and then this block, again...
-        clockRegisters.second = GetRTCregister(0x00);
-        clockRegisters.minute = GetRTCregister(0x02);
-        clockRegisters.hour   = GetRTCregister(0x04);
-        clockRegisters.day    = GetRTCregister(0x07);
-        clockRegisters.month  = GetRTCregister(0x08);
-        clockRegisters.year   = GetRTCregister(0x09);
+        clockRegisters = GetClockRegisters(clockRegisters);
         if (centuryRegister != 0) century = GetRTCregister(centuryRegister);
 
-    } while ( (lastSecond != clockRegisters.second) || (lastMinute != clockRegisters.minute) ||
-              (lastHour   != clockRegisters.hour)   || (lastDay    != clockRegisters.day)    ||
-              (lastMonth  != clockRegisters.month)  || (lastYear   != clockRegisters.year)   ||
+    } while ( (lastTimeRegisters.second != clockRegisters.second) || (lastTimeRegisters.minute != clockRegisters.minute) ||
+              (lastTimeRegisters.hour   != clockRegisters.hour)   || (lastTimeRegisters.day    != clockRegisters.day)    ||
+              (lastTimeRegisters.month  != clockRegisters.month)  || (lastTimeRegisters.year   != clockRegisters.year)   ||
               (lastCentury != century)
       );
     
@@ -128,17 +109,22 @@ RealTimeClockRegisters ClockBatteryDriver::ReadRTC()
     regB = GetRTCregister(0x0B);
     if (!(regB & 0x04))
     {
-        clockRegisters.second = (clockRegisters.second & 0x0F) + ((clockRegisters.second / 16) * 10);
-        clockRegisters.minute = (clockRegisters.minute & 0x0F) + ((clockRegisters.minute / 16) * 10);
-        clockRegisters.hour  = ((clockRegisters.hour   & 0x0F) + (((clockRegisters.hour & 0x70) / 16) * 10)) | (clockRegisters.hour & 0x80);
-        clockRegisters.day    = (clockRegisters.day    & 0x0F) + ((clockRegisters.day    / 16) * 10);
-        clockRegisters.month  = (clockRegisters.month  & 0x0F) + ((clockRegisters.month  / 16) * 10);
-        clockRegisters.year   = (clockRegisters.year   & 0x0F) + ((clockRegisters.year   / 16) * 10);
+        auto bcdToBinary = [](uint8_t val)
+        {
+            return (val & 0x0F) + ((val / 16) * 10);
+        };
+
+        clockRegisters.second = bcdToBinary(clockRegisters.second);
+        clockRegisters.minute = bcdToBinary(clockRegisters.minute);
+        clockRegisters.hour  = (clockRegisters.hour & 0x80) | bcdToBinary(clockRegisters.hour);
+        clockRegisters.day    = bcdToBinary(clockRegisters.day);
+        clockRegisters.month  = bcdToBinary(clockRegisters.month);
+        clockRegisters.year   = bcdToBinary(clockRegisters.year);
 
         if (centuryRegister != 0)
         {
             century = GetRTCregister(centuryRegister);
-            century = (century & 0x0F) + ((century / 16) * 10);
+            century = bcdToBinary(century);
         }
     }
 
@@ -151,7 +137,6 @@ RealTimeClockRegisters ClockBatteryDriver::ReadRTC()
     // fullyear calc.
     if (centuryRegister != 0)
     {
-        // century = GetRTCregister(centuryRegister);
         clockRegisters.year += century * 100;
     }
     else
@@ -162,8 +147,3 @@ RealTimeClockRegisters ClockBatteryDriver::ReadRTC()
 
     return clockRegisters;
 }
-
-/*void ClockBatteryDriver::GrabSystemTime()
-{
-}
-*/
