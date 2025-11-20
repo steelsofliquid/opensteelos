@@ -1,5 +1,3 @@
-// This is a work-in-progress at the moment, and isn't necessarily complete.
-
 #ifndef __OSOS__DRIVERS__CMOS_H
 #define __OSOS__DRIVERS__CMOS_H
 
@@ -26,14 +24,6 @@ namespace osos
 
         class ClockBatteryDriver
         {
-            
-
-
-            private:
-            void GetIndex(osos::common::uint8_t reg);
-            void ReadData();
-            void WriteData(osos::common::uint8_t value);
-
             public:
             osos::hwcom::Port8Bit portAddressCMOS;
             osos::hwcom::Port8Bit portDataCMOS;
@@ -45,11 +35,14 @@ namespace osos
             osos::common::uint8_t ReadCMOS(osos::common::int32_t port);
             void WriteCMOS(osos::common::int32_t port, osos::common::int32_t value);
 
+            // this is to assist the realtime clock
+            void PadRTCInteger(char* output, osos::common::uint8_t val);
+
             // these functions are for the realtime clock
             int GetProgressUpdateFlag();
             osos::common::uint8_t GetRTCregister(osos::common::int32_t reg);
+            RealTimeClockRegisters GetClockRegisters(RealTimeClockRegisters registerSet);
             RealTimeClockRegisters ReadRTC();
-            // void GrabSystemTime();
 
             // We do not need a HandleInterrupt(uint32_t esp) for this driver.
         };
