@@ -8,6 +8,7 @@ using namespace osos::hwcom;
 
 void printf(char* str, ...);
 void printfHex(uint8_t);
+void panic(uint32_t);
 
 InterruptHandler::InterruptHandler(InterruptManager* interruptManager, uint8_t interruptNumber)
 {
@@ -124,11 +125,9 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     {
         esp = handlers[interruptNumber]->HandleInterrupt(esp); // should call the appropriate function per driver.
     }
-    else if (interruptNumber = 0x06 || 0x0D)
+    else if (interruptNumber <= 0x1F)
     {
-        // this is a makeshift crash handler. I need to redo the panic() function.
-        printf("\nMAKESHIFT PANIC: 0x0D 0X06 GENERAL PROTECTION FAULT\nOpenSteel/OS encountered an error and needs to shut down.");
-        while(1);
+        panic(interruptNumber);
     }
     else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
     {
