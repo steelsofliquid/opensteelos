@@ -17,7 +17,25 @@
             public:
                 RecommendedStandard232Driver();
                 ~RecommendedStandard232Driver();
+
+                enum LineErrorType
+                {
+                    NoError        = 0,
+                    OverrunError   = 1,
+                    ParityError    = 2,
+                    FramingError   = 3,
+                    BreakInterrupt = 4
+                };
+
                 static osos::common::int32_t InitialiseSerial();
+
+                static bool thrBitReady();
+                static bool drBitReady();
+
+                osos::common::uint8_t GetLineStatus();
+                osos::common::uint8_t GetModemStatus();
+                bool hasError();
+                LineErrorType GetError();
 
                 osos::common::int32_t serialReceived();
                 osos::common::int8_t ReadSerial();
