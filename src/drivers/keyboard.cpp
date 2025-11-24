@@ -7,22 +7,44 @@ using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
 
-
 extern int32_t verMajor;
 extern int32_t verMinor;
 extern int32_t verBuild;
 
+void printf(char*, ...);
+void printfHex(uint8_t);
+
+
+
+volatile KeystrokeMode keymode = PrintOnly;
+volatile char lastChar;
+
+
+
 KeyboardEventHandler::KeyboardEventHandler()
 {
 }
-        
-void KeyboardEventHandler::OnKeyDown(char)
+
+char KeyboardEventHandler::SendKeystroke(char key)
 {
+    if ((unsigned char)key < 32 && key != '\n' && key != '\b') return 0;
+
+    lastChar = key;
+    return lastChar;
+}
+
+void KeyboardEventHandler::OnKeyDown(char c)
+{
+    if ((unsigned char)c < 32 && c != '\n' && c != '\b') return;
+
+    if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("%c", c);
+    if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
 }
 
 void KeyboardEventHandler::OnKeyUp(char)
 {
 }
+
 
 
 KeyboardDriver::KeyboardDriver(InterruptManager* manager, KeyboardEventHandler *handler)
@@ -49,9 +71,6 @@ void KeyboardDriver::Activate()
 
     dataPort.Write(0xF4);
 }
-
-void printf(char*, ...);
-void printfHex(uint8_t);
 
 uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 {
@@ -105,7 +124,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x0C: if(Shift) handler->OnKeyDown('_'); else handler->OnKeyDown('-'); break;
             case 0x0D: if(Shift) handler->OnKeyDown('+'); else handler->OnKeyDown('='); break;
 
-            case 0x0E: handler->OnKeyDown('\b'); break; // backspace.
+            case 0x0E: printf("\b"); break; // backspace.
 
             case 0x0F: printf("     "); break; // tab
             case 0x10: if (Shift ^ capsLock) handler->OnKeyDown('Q'); else handler->OnKeyDown('q'); break;
@@ -145,8 +164,8 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x34: if(Shift) handler->OnKeyDown('>'); else handler->OnKeyDown('.'); break;
             case 0x35: if(Shift) handler->OnKeyDown('?'); else handler->OnKeyDown('/'); break;
 
-            case 0x1C: handler->OnKeyDown('\n'); break; // Enter key
-            case 0x39: handler->OnKeyDown(' '); break; // Space key
+            case 0x1C: printf("\n"); break; // Enter key
+            case 0x39: printf(" "); break; // Space key
 
             case 0x2A: case 0x36: Shift = true; break;
             case 0xAA: case 0xB6: Shift = false; break;
