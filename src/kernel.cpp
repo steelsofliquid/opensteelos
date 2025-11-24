@@ -23,6 +23,7 @@
 #include <common/types.h>
 #include <globalfuncs.h>
 #include <gdt.h>
+#include <cli.h>
 #include <dmm.h>
 #include <hwcom/interrupts.h>
 #include <hwcom/pci.h>
@@ -52,7 +53,7 @@ using namespace osos::libs;
 
 int32_t verMajor = 0;
 int32_t verMinor = 22;
-int32_t verBuild = 128;
+int32_t verBuild = 135;
 
 int32_t testInteger1 = 5;
 int32_t testInteger2 = 15;
@@ -60,10 +61,14 @@ int32_t testInteger3 = 327;
 int32_t testInteger4 = 7629;
 int32_t testInteger5 = 0;
 
+static bool isShellAvailable;
+
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
 
 extern volatile uint32_t tickCount;
+extern volatile char lastChar;
+extern volatile KeystrokeMode keymode;
 
 void printf(char* str, ...) // the main screen output function.
 {
@@ -143,6 +148,15 @@ void printf(char* str, ...) // the main screen output function.
               videoMemory[80*y+x] = (currentColour << 8) | buffer[j];
               x++;
             }
+
+            break;
+          }
+
+          case 'c':
+          {
+            char charVal = va_arg(params, int);
+            videoMemory[80*y+x] = (currentColour << 8) | charVal;
+            x++;
 
             break;
           }
@@ -240,18 +254,6 @@ void printfHex(uint8_t key)
   printf(foo);
 }
 
-class PrintfKeyboardEventHandler : public KeyboardEventHandler
-{
-public:
-  void OnKeyDown(char c)
-  {
-    char* foo = " ";
-    foo[0] = c;
-    printf(foo);
-  }
-
-};
-
 class MouseToConsole : public MouseEventHandler // This moves the sometimes very useless mouse cursor.
 {
   int8_t x, y;
@@ -336,18 +338,47 @@ void cmdTest()
   printf("Test command. If you see this, then hello!");
 }
 
-void panic()
+
+
+// Crash handler logic and function
+void panic(uint32_t errorId)
 {
+  static volatile bool inStateOfPanic = false;
+
+  // go right here if already in panic
+  if (inStateOfPanic) asm volatile ("cli; hlt");
+
+  inStateOfPanic = true;
+  asm volatile ("cli");
+  const char* errorTextID[22] =
+  {
+    "DIVIDE_BY_ZERO", "DEBUG_TRAP", "NON_MASKABLE_INTERRUPT", "BREAKPOINT",
+    "OVERFLOW_INCIDENT", "BOUND_RANGE_EXCEEDED", "INVALID_OPCODE", "DEVICE_UNAVAILABLE",
+    "DOUBLE_FAULT", "COPROCCESSOR_OVERRUN", "INVALID_TASK_STATE_SEGMENT", "SEGMENT_NOT_PRESENT",
+    "STACK_SEGMENT_FAULT", "GENERAL_PROTECTION_FAULT", "PAGE_FAULT", "0x0F",
+    "X87_FLOATING_POINT_EXCEPTION", "MISALIGNED_MEMORY", "HARDWARE_ERROR", "SIMD_FLOATING_POINT_EXCEPTION",
+    "VIRTUALISATION_EXCEPTION", "CONTROL_PROTECTION_EXCEPTION"
+  };
+
+  const char* errorName = "UNKNOWN_EXCEPTION";
+  if (errorId < 22)
+    errorName = errorTextID[errorId];
+
+  // red screen of death
   printf("%R\a", 0x4F);
   printf(" <!> STOP                                                                       ");
   printf("                                                                                ");
-  printf(" OpenSteel/OS %d.%d.%d", verMajor, verMinor, verBuild);
-  printf(" Exception ID 0x??\n"); // keep it simple, only tell the end user what program/process broke it and why
+  printf(" OpenSteel/OS %d.%d.%d\n", verMajor, verMinor, verBuild);
+  printf(" Exception ID 0x%x - %s\n", errorId, errorName); // keep it simple, only tell the end user what program/process broke it and why
   printf("                                                                                ");
   printf(" A problem has occurred and OpenSteel/OS has shut down.                         ");
+  printf("                                                                                ");
 
-  asm volatile ("cli");
-  while(1); // use this in the kernel to try to stop someone from continuing to use an unstable system.
+  printf("     system halted. please press the power button, it is now safe to do so.     ");
+  while(1)
+  {
+    asm volatile ("cli; hlt");
+  };
 }
 
 typedef void (*constructor)();
@@ -399,11 +430,11 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("%R\a", 0x1B);
 
   // bootsplash header (ASCII)
-  printf("  ___                _ ___ __   _ _  __ __   _ _ ________________________ 0.22  ");
-  printf(" /  /                                         __ _ _   _ ____ _ _______________ ");
-  printf(" \\__\\     steelsofliquid                                  _ _   ___ _ _________ ");
-  printf("  \\  \\       OpenSteel/OS                                           _  __ _____ ");
-  printf("  /__/                                                                     ____ ");
+  printf("%R  ___                %R_ ___ __   _ _  __ __   _ _ ________________________ 0.22  ", 0x1B, 0x19);
+  printf("%R /  /                           %R              __ _ _   _ ____ _ _______________ ", 0x1B, 0x19);
+  printf("%R \\__\\     steelsofliquid        %R                          _ _   ___ _ _________ ", 0x1B, 0x19);
+  printf("%R  \\  \\       OpenSteel/OS       %R                                    _  __ _____ ", 0x1B, 0x19);
+  printf("%R  /__/                          %R                                           ____ ", 0x1B, 0x19);
   printf("                                                                                ");
 
   // sysagent header
@@ -417,7 +448,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   size_t heap = 10*1024*1024;
   MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
-  printf("memory heap: %R0x%x%x%x%x%R, ",
+  printf(" memory heap: %R0x%x%x%x%x%R, ",
     0x1E,
     ((heap >> 24) & 0xFF),
     ((heap >> 16) & 0xFF),
@@ -457,9 +488,9 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   DriverManager drvManager;
   // drivers loading
-  printf(" initialising drivers...                                                  ");
+  printf(" initialising drivers...                                                 ");
 
-  PrintfKeyboardEventHandler kbhandler;
+  KeyboardEventHandler kbhandler;
   KeyboardDriver keyboard(&interrupts, &kbhandler);
   drvManager.AddDriver(&keyboard);
 
@@ -476,29 +507,29 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   ClockBatteryDriver cmos;
   char rtcSec[3], rtcMin[3];
 
-  printf("%R [ok!]", 0x1A);
-  printf("%R finding and selecting PCI devices and drivers...                         ", 0x1F);
+  printf("%R [ok!] ", 0x1A);
+  printf("%R finding and selecting PCI devices and drivers...                        ", 0x1F);
 
   PCIController PCIController;
   PCIController.SelectDrivers(&drvManager, &interrupts);
-  printf("%R [ok!]", 0x1A);
+  printf("%R [ok!] ", 0x1A);
 
   // VideoGraphicsArray vga;
 
-  printf("%R starting drivers and interrupts...                                       ", 0x1F);
+  printf("%R starting drivers and interrupts...                                      ", 0x1F);
   drvManager.ActivateAll();
 
   interrupts.Activate();
   RealTimeClockRegisters time = cmos.ReadRTC();
   cmos.PadRTCInteger(rtcSec, time.second);
   cmos.PadRTCInteger(rtcMin, time.minute);
-  printf("%R [ok!]", 0x1A);
+  printf("%R [ok!] ", 0x1A);
 
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
   speaker.LifeChime();
-  printf("\n%RGood day, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nStrike [F1] for help.\n", 0x1F,
+  printf("\n%R Greetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\n Strike [F1] for help.\n", 0x1F,
   time.hour, rtcMin, rtcSec,
   time.day, monthNames[time.month - 1], time.year);
   // Denotes end of booting process  ^

@@ -2,7 +2,17 @@
 # Do not link this file to the main project, it is here for those who may find it useful.
 
 # kernel.cpp
-nop
+cli
+hlt
+
+cli
+
+cli
+hlt
+
+cli
+mov %%cr0, %0 # =r (cr0)
+sti
 
 # gdt.cpp
 lgdt %0 # =p
@@ -29,14 +39,15 @@ cli
 sti
 
 
-# interrupts.cpp
+# idt.cpp
 lidt %0 #...
+sidt %0 # =m
 
+
+# interrupts.cpp
 pushf
 \t
 pop %0 # =g
-
-sidt %0 # =m
 
 sti
 
