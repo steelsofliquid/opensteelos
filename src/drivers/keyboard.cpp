@@ -7,16 +7,16 @@ using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
 
-extern int32_t verMajor;
-extern int32_t verMinor;
-extern int32_t verBuild;
+extern volatile char inputBuffer[256];
+extern volatile uint32_t inputLength;
 
 void printf(char*, ...);
 void printfHex(uint8_t);
+void nrshManager();
 
 
 
-volatile KeystrokeMode keymode = PrintOnly;
+volatile KeystrokeMode keymode = PrintAndNotify;
 volatile char lastChar;
 
 
@@ -27,18 +27,63 @@ KeyboardEventHandler::KeyboardEventHandler()
 
 char KeyboardEventHandler::SendKeystroke(char key)
 {
-    if ((unsigned char)key < 32 && key != '\n' && key != '\b') return 0;
+    //if ((unsigned char)key < 32 && key != '\n' && key != '\b') return 0;
 
     lastChar = key;
     return lastChar;
 }
 
+void KeyboardEventHandler::CliInputBufferKeystroke(char c)
+{
+    if (inputLength < 255)
+    {
+        inputBuffer[inputLength++] = c;
+        inputBuffer[inputLength] = '\0';
+    }
+}
+
+void KeyboardEventHandler::CliInputBufferBackspace()
+{
+    if (inputLength > 0)
+    {
+        inputLength--;
+        inputBuffer[inputLength] = '\0';
+    }
+}
+
+char* KeyboardEventHandler::CliInputBufferComplete()
+{
+    inputBuffer[inputLength] = '\0';
+    inputLength = 0;
+    return (char*)inputBuffer;
+}
+
+
+
 void KeyboardEventHandler::OnKeyDown(char c)
 {
-    if ((unsigned char)c < 32 && c != '\n' && c != '\b') return;
+    //if ((unsigned char)c < 32 && c != '\n' && c != '\b') return;
 
-    if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("%c", c);
-    if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
+    if (c == '\n')
+    {
+        if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("\n");
+        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
+    }
+    else if (c == '\b')
+    {
+        if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("\b");
+        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
+    }
+    else
+    {
+        if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("%c", c);
+        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify))
+        {
+            SendKeystroke(c);
+        }
+    }
+
+    nrshManager();
 }
 
 void KeyboardEventHandler::OnKeyUp(char)
@@ -124,7 +169,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x0C: if(Shift) handler->OnKeyDown('_'); else handler->OnKeyDown('-'); break;
             case 0x0D: if(Shift) handler->OnKeyDown('+'); else handler->OnKeyDown('='); break;
 
-            case 0x0E: printf("\b"); break; // backspace.
+            case 0x0E: handler->OnKeyDown('\b'); break; // backspace.
 
             case 0x0F: printf("     "); break; // tab
             case 0x10: if (Shift ^ capsLock) handler->OnKeyDown('Q'); else handler->OnKeyDown('q'); break;
@@ -164,8 +209,8 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
             case 0x34: if(Shift) handler->OnKeyDown('>'); else handler->OnKeyDown('.'); break;
             case 0x35: if(Shift) handler->OnKeyDown('?'); else handler->OnKeyDown('/'); break;
 
-            case 0x1C: printf("\n"); break; // Enter key
-            case 0x39: printf(" "); break; // Space key
+            case 0x1C: handler->OnKeyDown('\n'); break; // Enter key
+            case 0x39: handler->OnKeyDown(' '); break; // Space key
 
             case 0x2A: case 0x36: Shift = true; break;
             case 0xAA: case 0xB6: Shift = false; break;
@@ -190,30 +235,11 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 
             case 0x3B: 
             {
-                printf("\n");
-                printf("                                                                                ");
-                printf(" Welcome to OpenSteel/OS!                                                       ");
-                printf(" There is currently no userland, so how you are seeing this is through hardcoded");
-                printf(" implementations in the keyboard driver. For support/assistance, please contact ");
-                printf(" this e-mail, shown on the left. Keys include:                                  ");
-                printf(" [F1] Help   [F2] About [F12] Clear Screen        steelsofliquid@hotmail.com    ");
-                printf("                                                                                ");
                 break;
-                }
+            }
             // Formula 1
             case 0x3C:
             {
-                printf("\n");
-                printf("                                                                                ");
-                printf(" OpenSteel/OS (Version %d.%d Build %d \"Denver\") \n", verMajor, verMinor, verBuild); // For exact 0.21.33 code just remove the two spaces at the end
-                printf(" Development Build, Circuit 4                                                     ");
-                printf("OpenSteel/OS Copyright (C) 2025 SteelsOfLiquid.                                 ");
-                printf("                                                                                ");
-                printf("This software comes with ABSOLUTELY ZERO WARRANTY.                              ");
-                printf("This is free software, and you are welcome to                                   ");
-                printf("resdistribute it under certain conditions.                                      ");
-                printf("                                                                                ");
-                printf(" *** LICENSE NOT INCLUDED DUE TO LACK OF FILESYSTEM                             ");
                 break;
             }
             // Formula 2
@@ -251,7 +277,6 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 
             case 0x58: // Formula 12
             {
-                printf("\a");
                 break;
             }
 
