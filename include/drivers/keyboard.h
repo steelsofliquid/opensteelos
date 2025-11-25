@@ -6,6 +6,7 @@
 #include <hwcom/interrupts.h>
 #include <drivers/driver.h>
 #include <hwcom/port.h>
+#include <cli.h>
 
 namespace osos
 {
@@ -24,6 +25,10 @@ namespace osos
             KeyboardEventHandler();
             
             char SendKeystroke(char key);
+            void CliInputBufferKeystroke(char c);
+            void CliInputBufferBackspace();
+            char* CliInputBufferComplete();
+            
             virtual void OnKeyDown(char c);
             virtual void OnKeyUp(char);
 
