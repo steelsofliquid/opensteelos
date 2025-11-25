@@ -1,11 +1,13 @@
 
 GPPPARAMS = -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+CCPARAMS = -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
 TIMESTAMP = $(shell date +"%Y-%m-%d %H:%M:%S")
 
 objects = object/loader.o \
+ object/common/version.o \
  object/gdt.o \
  object/drivers/driver.o \
  object/hwcom/port.o \
@@ -23,6 +25,8 @@ objects = object/loader.o \
  object/lib/libmem.o \
  object/lib/libstr.o \
  object/globalfuncs.o \
+ object/cli.o \
+ object/cliCommands.o \
  object/dmm.o \
  object/multitasking.o \
  object/testing_tasks.o \
@@ -34,6 +38,12 @@ object/%.o: src/%.cpp
 	g++ $(GPPPARAMS) -o $@ -c $<
 	echo 'Compile Attempt: $@ object file from $< - Time of Compile: $(TIMESTAMP) - Parameters: $(GPPPARAMS)' >> buildlog.txt
 	
+object/%.o: src/%.c
+	@echo "Initiating object compilation from C: file: $@"
+	mkdir -p $(@D)
+	cc $(CCPARAMS) -o $@ -c $<
+	echo 'Compile Attempt: $@ object file from $< - Time of Compile: $(TIMESTAMP) - Parameters: $(CCPARAMS)' >> buildlog.txt
+
 object/%.o: src/%.s
 	@echo "Initiating object compilation from assembly file: $@"
 	mkdir -p $(@D)
@@ -61,7 +71,7 @@ OpenSteelOS.iso: opensteelcore.bin
 	echo 'set timeout=0' > iso/boot/grub/grub.cfg
 	echo 'set default=0' >> iso/boot/grub/grub.cfg
 	echo '' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "OpenSteel/OS 0.22denv Debugging Tests [2025-09-24]" {' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "OpenSteel/OS 0.22 Beta 2 Circuit 4" {' >> iso/boot/grub/grub.cfg
 	echo '  multiboot /boot/opensteelcore.bin' >> iso/boot/grub/grub.cfg
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
