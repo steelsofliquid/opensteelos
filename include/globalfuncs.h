@@ -13,6 +13,7 @@ namespace osos
 
     // --- system APIs ---
     // GrabSys APIs
+    // DO NOT USE!!
     osos::common::int8_t* GrabSysVer(osos::common::int8_t sector);
 
     // hardware materials

@@ -9,15 +9,17 @@ namespace osos
     struct command_t
     {
         const char* name;
-        void (*func)(int argc, char** argv);
-        const char* helpDesc;
+        void (*func)(const char* arg);
     };
 
     class NathanRenaudShell
     {
+        public:
         NathanRenaudShell();
         ~NathanRenaudShell();
 
+        void Trim(char* str);
+        const char* GetToken(char* str);
         void ParseCommand(char* input);
     };
 }
