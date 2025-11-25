@@ -15,75 +15,54 @@ extern int32_t verBuild;
 
 int8_t* osos::GrabSysVer(int8_t sector)
 {
-        int8_t* verstring;
+        static int8_t verstring[32];
         verstring[0] = '\0';
+
+        int8_t strMajor[4];
+        int8_t strMinor[4];
+        int8_t strBuild[4];
+
+        itoa(verMajor, strMajor, 10);
+        itoa(verMinor, strMinor, 10);
+        itoa(verBuild, strBuild, 10);
 
         switch(sector)
         {
                 case 'p': // partial - major + minor
                 {
-                        int8_t* strMajor;
-                        int8_t* strMinor;
-
-                        itoa(verMajor, strMajor, 10);
-                        itoa(verMinor, strMinor, 10);
-
-                        int8_t* strResult[2] = {strMajor, strMinor};
-
-                        for (int i = 0; i != 2; i++)
-                        {
-                                verstring = strcat(verstring, strResult[i]);
-                                if (i != 2) verstring = strcat(verstring, ".");
-                        }
+                        strcpy (verstring, strMajor);
+                        strcat (verstring, ".");
+                        strcat (verstring, strMinor);
 
                         break;
                 }
 
                 case 'm': // major
                 {
-                        int8_t* strMajor;
-                        itoa(verMajor, strMajor, 10);
-
-                        verstring = strMajor;
+                        strcpy (verstring, strMajor);
                         break;
                 }
 
                 case 'n': // minor
                 {
-                        int8_t* strMinor;
-                        itoa(verMinor, strMinor, 10);
-
-                        verstring = strMinor;
+                        strcpy (verstring, strMinor);
                         break;
                 }
 
                 case 'b': // build
                 {
-                        int8_t* strBuild;
-                        itoa(verBuild, strBuild, 10);
-
-                        verstring = strBuild;
+                        strcpy (verstring, strBuild);
                         break;
                 }
 
                 case 'f': // full - major + minor + build
                 default:
                 {
-                        int8_t* strMajor;
-                        int8_t* strMinor;
-                        int8_t* strBuild;
-
-                        itoa(verMajor, strMajor, 10);
-                        itoa(verMinor, strMinor, 10);
-                        itoa(verBuild, strBuild, 10);
-
-                        int8_t* strResult[3] = {strMajor, strMinor, strBuild};
-
-                        for (int i = 0; i != 3; i++)
-                        {
-                                verstring = strcat(verstring, strResult[i]);
-                                if (i != 3) verstring = strcat(verstring, ".");
-                        }
+                        strcpy (verstring, strMajor);
+                        strcat (verstring, ".");
+                        strcat (verstring, strMinor);
+                        strcat (verstring, ".");
+                        strcat (verstring, strBuild);
 
                         break;
                 }

@@ -21,6 +21,7 @@
 
 // OpenSteel/OS headers
 #include <common/types.h>
+#include <common/version.h>
 #include <globalfuncs.h>
 #include <gdt.h>
 #include <cli.h>
@@ -49,11 +50,7 @@ using namespace osos::hwcom;
 using namespace osos::libs;
 // using namespace osos::gui;
 
-// The three int32_t values below denote the version number. It is some degree of "version control" or version indicator.
 
-int32_t verMajor = 0;
-int32_t verMinor = 22;
-int32_t verBuild = 135;
 
 int32_t testInteger1 = 5;
 int32_t testInteger2 = 15;
@@ -69,6 +66,8 @@ static bool isShellAvailable;
 extern volatile uint32_t tickCount;
 extern volatile char lastChar;
 extern volatile KeystrokeMode keymode;
+extern volatile char inputBuffer[256];
+extern volatile uint32_t inputLength;
 
 void printf(char* str, ...) // the main screen output function.
 {
@@ -328,18 +327,6 @@ void TestTask3()
   }
 }
 
-void cmdVersion()
-{
-  printf(" OpenSteel/OS version 0.22.44 \"Denver\"\n");
-}
-
-void cmdTest()
-{
-  printf("Test command. If you see this, then hello!");
-}
-
-
-
 // Crash handler logic and function
 void panic(uint32_t errorId)
 {
@@ -379,6 +366,40 @@ void panic(uint32_t errorId)
   {
     asm volatile ("cli; hlt");
   };
+}
+
+void nrshManager()
+{
+  NathanRenaudShell nrsh;
+
+  if (lastChar == '\b')
+  {
+    if (inputLength > 0)
+    {
+        inputLength--;
+        inputBuffer[inputLength] = '\0';
+
+        return;
+    }
+  }
+  else if (lastChar == '\n')
+  {
+    inputBuffer[inputLength] = '\0';
+
+    nrsh.ParseCommand((char*)inputBuffer);
+    inputLength = 0;
+    printf(" > ");
+
+    return;
+  }
+  else
+  {
+    if (inputLength < 255)
+    {
+      inputBuffer[inputLength++] = lastChar;
+      inputBuffer[inputLength] = '\0';
+    }
+  }
 }
 
 typedef void (*constructor)();
@@ -427,18 +448,18 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // Start of boot process v
 
   // reset video memory
-  printf("%R\a", 0x1B);
+  printf("%R\a", 0x0A);
 
   // bootsplash header (ASCII)
-  printf("%R  ___                %R_ ___ __   _ _  __ __   _ _ ________________________ 0.22  ", 0x1B, 0x19);
-  printf("%R /  /                           %R              __ _ _   _ ____ _ _______________ ", 0x1B, 0x19);
-  printf("%R \\__\\     steelsofliquid        %R                          _ _   ___ _ _________ ", 0x1B, 0x19);
-  printf("%R  \\  \\       OpenSteel/OS       %R                                    _  __ _____ ", 0x1B, 0x19);
-  printf("%R  /__/                          %R                                           ____ ", 0x1B, 0x19);
+  printf("%R  ___                %R_ ___ __   _ _  __ __   _ _ ________________________ 0.22  ", 0x0B, 0x08);
+  printf("%R /  /                           %R              __ _ _   _ ____ _ _______________ ", 0x0B, 0x08);
+  printf("%R \\__\\     steelsofliquid        %R                          _ _   ___ _ _________ ", 0x0B, 0x08);
+  printf("%R  \\  \\       OpenSteel/OS       %R                                    _  __ _____ ", 0x0B, 0x08);
+  printf("%R  /__/                          %R                                           ____ ", 0x0B, 0x08);
   printf("                                                                                ");
 
   // sysagent header
-  printf("%R SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x1F, verMajor, verMinor, verBuild);
+  printf("%R SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x0F, verMajor, verMinor, verBuild);
 
   GlobalDescriptorTable gdt;
 
@@ -449,22 +470,22 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
   printf(" memory heap: %R0x%x%x%x%x%R, ",
-    0x1E,
+    0x0E,
     ((heap >> 24) & 0xFF),
     ((heap >> 16) & 0xFF),
     ((heap >> 8 ) & 0xFF),
     ((heap      ) & 0xFF),
-    0x1F
+    0x0F
   );
   void* allocated = MemoryManager.malloc(1024);
   
   printf("%R0x%x%x%x%x %Rallocated by dmm.",
-    0x1E,
+    0x0E,
     (((size_t)allocated >> 24) & 0xFF),
     (((size_t)allocated >> 16) & 0xFF),
     (((size_t)allocated >> 8 ) & 0xFF),
     (((size_t)allocated      ) & 0xFF),
-    0x1F
+    0x0F
   );
   
   printf("\n");
@@ -475,8 +496,6 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   Task task1(&gdt, TestTask1);
   Task task2(&gdt, TestTask2);
   Task task3(&gdt, TestTask3);
-  Task taskcmd1(&gdt, cmdVersion);
-  Task taskcmd2(&gdt, cmdTest);
   //taskManager.AddTask(&task1);
   //taskManager.AddTask(&task2);
   //taskManager.AddTask(&task3);
@@ -507,29 +526,29 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   ClockBatteryDriver cmos;
   char rtcSec[3], rtcMin[3];
 
-  printf("%R [ok!] ", 0x1A);
-  printf("%R finding and selecting PCI devices and drivers...                        ", 0x1F);
+  printf("%R [ok!] ", 0x0A);
+  printf("%R finding and selecting PCI devices and drivers...                        ", 0x0F);
 
   PCIController PCIController;
   PCIController.SelectDrivers(&drvManager, &interrupts);
-  printf("%R [ok!] ", 0x1A);
+  printf("%R [ok!] ", 0x0A);
 
   // VideoGraphicsArray vga;
 
-  printf("%R starting drivers and interrupts...                                      ", 0x1F);
+  printf("%R starting drivers and interrupts...                                      ", 0x0F);
   drvManager.ActivateAll();
 
   interrupts.Activate();
   RealTimeClockRegisters time = cmos.ReadRTC();
   cmos.PadRTCInteger(rtcSec, time.second);
   cmos.PadRTCInteger(rtcMin, time.minute);
-  printf("%R [ok!] ", 0x1A);
+  printf("%R [ok!] ", 0x0A);
 
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
   speaker.LifeChime();
-  printf("\n%R Greetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\n Strike [F1] for help.\n", 0x1F,
+  printf("\n%R Greetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\n Strike ENTER to begin. Type help for help.\n", 0x0F,
   time.hour, rtcMin, rtcSec,
   time.day, monthNames[time.month - 1], time.year);
   // Denotes end of booting process  ^
@@ -552,6 +571,8 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   //printf("Integer and printf Output Test _________________________________________________");
   //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
+
+  nrshManager();
 
   while(1);
   
