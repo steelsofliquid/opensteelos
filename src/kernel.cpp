@@ -378,6 +378,7 @@ void nrshManager()
     {
         inputLength--;
         inputBuffer[inputLength] = '\0';
+        printf("\b");
 
         return;
     }
@@ -388,7 +389,7 @@ void nrshManager()
 
     nrsh.ParseCommand((char*)inputBuffer);
     inputLength = 0;
-    printf(" > ");
+    printf("> ");
 
     return;
   }
