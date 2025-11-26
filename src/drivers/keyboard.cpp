@@ -7,6 +7,7 @@ using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
 
+extern volatile bool isShellAvailable;
 extern volatile char inputBuffer[256];
 extern volatile uint32_t inputLength;
 
@@ -33,31 +34,6 @@ char KeyboardEventHandler::SendKeystroke(char key)
     return lastChar;
 }
 
-void KeyboardEventHandler::CliInputBufferKeystroke(char c)
-{
-    if (inputLength < 255)
-    {
-        inputBuffer[inputLength++] = c;
-        inputBuffer[inputLength] = '\0';
-    }
-}
-
-void KeyboardEventHandler::CliInputBufferBackspace()
-{
-    if (inputLength > 0)
-    {
-        inputLength--;
-        inputBuffer[inputLength] = '\0';
-    }
-}
-
-char* KeyboardEventHandler::CliInputBufferComplete()
-{
-    inputBuffer[inputLength] = '\0';
-    inputLength = 0;
-    return (char*)inputBuffer;
-}
-
 
 
 void KeyboardEventHandler::OnKeyDown(char c)
@@ -71,7 +47,7 @@ void KeyboardEventHandler::OnKeyDown(char c)
     }
     else if (c == '\b')
     {
-        if (keymode == PrintOnly ) printf("\b");
+        if ((keymode == PrintOnly ) || ((keymode == PrintAndNotify) && !(isShellAvailable))) printf("\b");
         if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
     }
     else
