@@ -71,7 +71,7 @@ void KeyboardEventHandler::OnKeyDown(char c)
     }
     else if (c == '\b')
     {
-        if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("\b");
+        if (keymode == PrintOnly ) printf("\b");
         if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
     }
     else
