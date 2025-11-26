@@ -810,3 +810,14 @@ Compile Attempt: object/cliCommands.o object file from src/cliCommands.cpp - Tim
 Compile Attempt: object/kernel.o object file from src/kernel.cpp - Time of Compile: 2025-11-25 10:59:59 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
 Compile Attempt: opensteelcore.bin binary file linked with linker.ld - Time of Compile: 2025-11-25 11:00:00 - Parameters: -melf_i386
 Compile Attempt: OpenSteelOS.iso disc image from opensteelcore.bin - Time of Compile: 2025-11-25 11:00:10
+Compile Attempt: object/common/version.o object file from src/common/version.cpp - Time of Compile: 2025-11-25 21:32:44 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: object/drivers/keyboard.o object file from src/drivers/keyboard.cpp - Time of Compile: 2025-11-25 21:32:44 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: object/cliCommands.o object file from src/cliCommands.cpp - Time of Compile: 2025-11-25 21:32:44 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: object/kernel.o object file from src/kernel.cpp - Time of Compile: 2025-11-25 21:32:44 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: opensteelcore.bin binary file linked with linker.ld - Time of Compile: 2025-11-25 21:32:44 - Parameters: -melf_i386
+Compile Attempt: OpenSteelOS.iso disc image from opensteelcore.bin - Time of Compile: 2025-11-25 21:32:48
+Compile Attempt: object/common/version.o object file from src/common/version.cpp - Time of Compile: 2025-11-25 21:35:36 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: object/drivers/keyboard.o object file from src/drivers/keyboard.cpp - Time of Compile: 2025-11-25 21:35:36 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: object/kernel.o object file from src/kernel.cpp - Time of Compile: 2025-11-25 21:35:36 - Parameters: -m32 -Iinclude -ffreestanding -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wno-write-strings
+Compile Attempt: opensteelcore.bin binary file linked with linker.ld - Time of Compile: 2025-11-25 21:35:37 - Parameters: -melf_i386
+Compile Attempt: OpenSteelOS.iso disc image from opensteelcore.bin - Time of Compile: 2025-11-25 21:35:38
