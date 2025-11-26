@@ -18,6 +18,7 @@ namespace osos
         NathanRenaudShell();
         ~NathanRenaudShell();
 
+        void Initialise();
         void Trim(char* str);
         const char* GetToken(char* str);
         void ParseCommand(char* input);
