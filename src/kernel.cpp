@@ -58,14 +58,13 @@ int32_t testInteger3 = 327;
 int32_t testInteger4 = 7629;
 int32_t testInteger5 = 0;
 
-static bool isShellAvailable;
-
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
 
 extern volatile uint32_t tickCount;
 extern volatile char lastChar;
 extern volatile KeystrokeMode keymode;
+extern volatile bool isShellInitialised;
 extern volatile char inputBuffer[256];
 extern volatile uint32_t inputLength;
 
@@ -372,6 +371,7 @@ void nrshManager()
 {
   NathanRenaudShell nrsh;
 
+  if (!isShellInitialised) nrsh.Initialise();
   if (lastChar == '\b')
   {
     if (inputLength > 0)
@@ -389,7 +389,7 @@ void nrshManager()
 
     nrsh.ParseCommand((char*)inputBuffer);
     inputLength = 0;
-    printf("> ");
+    printf("%R> %R", 0x0B, 0x0F);
 
     return;
   }
@@ -460,7 +460,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   printf("                                                                                ");
 
   // sysagent header
-  printf("%R SteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x0F, verMajor, verMinor, verBuild);
+  printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x0F, verMajor, verMinor, verBuild);
 
   GlobalDescriptorTable gdt;
 
@@ -470,7 +470,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   size_t heap = 10*1024*1024;
   MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
-  printf(" memory heap: %R0x%x%x%x%x%R, ",
+  printf("memory heap: %R0x%x%x%x%x%R, ",
     0x0E,
     ((heap >> 24) & 0xFF),
     ((heap >> 16) & 0xFF),
@@ -508,7 +508,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   DriverManager drvManager;
   // drivers loading
-  printf(" initialising drivers...                                                 ");
+  printf("initialising drivers...                                                    ");
 
   KeyboardEventHandler kbhandler;
   KeyboardDriver keyboard(&interrupts, &kbhandler);
@@ -527,29 +527,29 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   ClockBatteryDriver cmos;
   char rtcSec[3], rtcMin[3];
 
-  printf("%R [ok!] ", 0x0A);
-  printf("%R finding and selecting PCI devices and drivers...                        ", 0x0F);
+  printf("%R[ok!]", 0x0A);
+  printf("%Rfinding and selecting PCI devices and drivers...                           ", 0x0F);
 
   PCIController PCIController;
   PCIController.SelectDrivers(&drvManager, &interrupts);
-  printf("%R [ok!] ", 0x0A);
+  printf("%R[ok!]", 0x0A);
 
   // VideoGraphicsArray vga;
 
-  printf("%R starting drivers and interrupts...                                      ", 0x0F);
+  printf("%Rstarting drivers and interrupts...                                         ", 0x0F);
   drvManager.ActivateAll();
 
   interrupts.Activate();
   RealTimeClockRegisters time = cmos.ReadRTC();
   cmos.PadRTCInteger(rtcSec, time.second);
   cmos.PadRTCInteger(rtcMin, time.minute);
-  printf("%R [ok!] ", 0x0A);
+  printf("%R[ok!]", 0x0A);
 
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
   speaker.LifeChime();
-  printf("\n%R Greetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\n Strike ENTER to begin. Type help for help.\n", 0x0F,
+  printf("\n%RGreetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F,
   time.hour, rtcMin, rtcSec,
   time.day, monthNames[time.month - 1], time.year);
   // Denotes end of booting process  ^

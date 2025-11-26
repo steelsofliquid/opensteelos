@@ -7,11 +7,14 @@ using namespace osos::libs;
 
 void printf(char* str, ...);
 
+volatile bool isShellAvailable;
+volatile bool isShellInitialised = false;
 volatile char inputBuffer[256];
 volatile uint32_t inputLength = 0;
 
 NathanRenaudShell::NathanRenaudShell()
 {
+    isShellAvailable = true;
 }
 
 NathanRenaudShell::~NathanRenaudShell()
@@ -28,6 +31,13 @@ command_t commandsTable[] =
 };
 
 
+
+void NathanRenaudShell::Initialise()
+{
+    isShellAvailable = true;
+    isShellInitialised = true;
+    printf("%R> %R", 0x0B, 0x0F);
+}
 
 void NathanRenaudShell::Trim(char* str)
 {
