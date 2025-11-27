@@ -13,7 +13,6 @@ extern volatile uint32_t inputLength;
 
 void printf(char*, ...);
 void printfHex(uint8_t);
-void nrshManager();
 
 
 
@@ -58,8 +57,6 @@ void KeyboardEventHandler::OnKeyDown(char c)
             SendKeystroke(c);
         }
     }
-
-    nrshManager();
 }
 
 void KeyboardEventHandler::OnKeyUp(char)
