@@ -7,14 +7,19 @@ using namespace osos::libs;
 
 void printf(char* str, ...);
 
+
+
+
+
 volatile bool isShellAvailable;
 volatile bool isShellInitialised = false;
 volatile char inputBuffer[256];
 volatile uint32_t inputLength = 0;
 
+
+
 NathanRenaudShell::NathanRenaudShell()
 {
-    isShellAvailable = true;
 }
 
 NathanRenaudShell::~NathanRenaudShell()
@@ -94,4 +99,39 @@ void NathanRenaudShell::ParseCommand(char* input)
     }
 
     printf(" <!> This is not a valid command. Type \"help\" for a coherent list of commands.\n");
+}
+
+
+
+void NathanRenaudShell::HandleInput(char c)
+{
+    if (c == '\b')
+    {
+        if (inputLength > 0)
+        {
+            inputLength--;
+            inputBuffer[inputLength] = '\0';
+            printf("\b");
+
+            return;
+        }
+    }
+    else if (c == '\n')
+    {
+        inputBuffer[inputLength] = '\0';
+
+        ParseCommand((char*)inputBuffer);
+        inputLength = 0;
+        printf("%R> %R", 0x0B, 0x0F);
+
+        return;
+    }
+    else
+    {
+        if (inputLength < 255)
+        {
+            inputBuffer[inputLength++] = c;
+            inputBuffer[inputLength] = '\0';
+        }
+    }
 }
