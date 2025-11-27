@@ -42,7 +42,7 @@ namespace osos
             ~KeyboardDriver();
             virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
             virtual void Activate();
-
+            
         };
     }
 }
