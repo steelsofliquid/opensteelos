@@ -2,6 +2,7 @@
 #define __CLI_H
 
 #include <common/types.h>
+#include <common/sysHelpers.h>
 #include <lib/libstr.h>
 
 namespace osos
