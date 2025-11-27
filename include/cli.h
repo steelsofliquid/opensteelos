@@ -22,6 +22,8 @@ namespace osos
         void Trim(char* str);
         const char* GetToken(char* str);
         void ParseCommand(char* input);
+
+        void HandleInput(char c);
     };
 }
 
