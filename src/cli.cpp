@@ -5,6 +5,8 @@ using namespace osos;
 using namespace osos::common;
 using namespace osos::libs;
 
+extern volatile InterfaceModes currentInterface;
+
 void printf(char* str, ...);
 
 
@@ -39,8 +41,7 @@ command_t commandsTable[] =
 
 void NathanRenaudShell::Initialise()
 {
-    isShellAvailable = true;
-    isShellInitialised = true;
+    currentInterface = TextShell;
     printf("%R> %R", 0x0B, 0x0F);
 }
 

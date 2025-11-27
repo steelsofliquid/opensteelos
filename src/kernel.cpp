@@ -21,6 +21,7 @@
 
 // OpenSteel/OS headers
 #include <common/types.h>
+#include <common/sysHelpers.h>
 #include <common/version.h>
 #include <globalfuncs.h>
 #include <gdt.h>
@@ -67,6 +68,8 @@ extern volatile KeystrokeMode keymode;
 extern volatile bool isShellInitialised;
 extern volatile char inputBuffer[256];
 extern volatile uint32_t inputLength;
+
+volatile InterfaceModes currentInterface;
 
 void printf(char* str, ...) // the main screen output function.
 {
@@ -428,6 +431,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   // sysagent header
   printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x0F, verMajor, verMinor, verBuild);
 
+  currentInterface = BootUI;
   GlobalDescriptorTable gdt;
 
   // Get memory heap, allocate ram, etc. v
