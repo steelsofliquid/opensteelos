@@ -3,6 +3,7 @@
 #define __OSOS__DRIVERS__KEYBOARD_H
 
 #include <common/types.h>
+#include <common/sysHelpers.h>
 #include <hwcom/interrupts.h>
 #include <drivers/driver.h>
 #include <hwcom/port.h>
