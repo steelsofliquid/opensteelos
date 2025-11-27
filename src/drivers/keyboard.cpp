@@ -10,6 +10,7 @@ using namespace osos::hwcom;
 extern volatile bool isShellAvailable;
 extern volatile char inputBuffer[256];
 extern volatile uint32_t inputLength;
+extern volatile InterfaceModes currentInterface;
 
 void printf(char*, ...);
 void printfHex(uint8_t);
@@ -46,7 +47,7 @@ void KeyboardEventHandler::OnKeyDown(char c)
     }
     else if (c == '\b')
     {
-        if ((keymode == PrintOnly ) || ((keymode == PrintAndNotify) && !(isShellAvailable))) printf("\b");
+        if (((keymode == PrintOnly ) || ((keymode == PrintAndNotify)) && (currentInterface == TextModeEditor))) printf("\b");
         if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
     }
     else
