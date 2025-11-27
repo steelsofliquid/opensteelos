@@ -367,41 +367,7 @@ void panic(uint32_t errorId)
   };
 }
 
-void nrshManager()
-{
-  NathanRenaudShell nrsh;
 
-  if (!isShellInitialised) nrsh.Initialise();
-  if (lastChar == '\b')
-  {
-    if (inputLength > 0)
-    {
-        inputLength--;
-        inputBuffer[inputLength] = '\0';
-        printf("\b");
-
-        return;
-    }
-  }
-  else if (lastChar == '\n')
-  {
-    inputBuffer[inputLength] = '\0';
-
-    nrsh.ParseCommand((char*)inputBuffer);
-    inputLength = 0;
-    printf("%R> %R", 0x0B, 0x0F);
-
-    return;
-  }
-  else
-  {
-    if (inputLength < 255)
-    {
-      inputBuffer[inputLength++] = lastChar;
-      inputBuffer[inputLength] = '\0';
-    }
-  }
-}
 
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
@@ -545,6 +511,8 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   cmos.PadRTCInteger(rtcMin, time.minute);
   printf("%R[ok!]", 0x0A);
 
+  NathanRenaudShell nrsh;
+
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
@@ -573,9 +541,16 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   //printf("Integer and printf Output Test _________________________________________________");
   //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
 
-  nrshManager();
+  nrsh.Initialise();
 
-  while(1);
+  while(1)
+  {
+    if (lastChar != 0)
+    {
+      nrsh.HandleInput(lastChar);
+      lastChar = 0;
+    }
+  }
   
 }
 
