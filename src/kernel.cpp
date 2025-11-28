@@ -387,17 +387,19 @@ void shutdown()
   printf("                                                                                ");
   printf("                                                                                ");
   printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
   printf("    OpenSteel/OS has now halted and shut down. However, ACPI is unavailable.    ");
   printf("               As such, it is now safe to turn off your computer.               ");
-  printf("                                                                                ");
-  printf("                                                                                ");
   printf("                                                                                ");
   printf("                                                                           ___  ");
   printf("                                                                          /  /  ");
   printf("                                                                          \\__\\  ");
   printf("                                                                           \\  \\ ");
   printf("                                                                           /__/ ");
-  printf("                                                                                ");
 
   while(1)
   {

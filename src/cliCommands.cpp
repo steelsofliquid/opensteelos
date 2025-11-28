@@ -72,5 +72,5 @@ void osos::cmdCredits(const char* args)
     printf(" - Write Your Own Operating System       - OSDev.org Wiki and forums            ");
     printf(" - osakaOS                               - Nanami/OS                            ");
     printf(" - Linux kernel and Linus Torvalds       - MINIX 3                              ");
-    printf(" - Operating Systems: Three Easy Pieces                                        \n");
+    printf(" - Operating Systems: Three Easy Pieces  - Documentation from many companies. \n");
 }
