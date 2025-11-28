@@ -370,6 +370,41 @@ void panic(uint32_t errorId)
   };
 }
 
+void shutdown()
+{
+  printf("OpenSteel/OS is shutting down...");
+  asm volatile ("cli");
+
+  printf("%R\a", 0x09);
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("          .                   .                    .                      C     ");
+  printf("                      .                 .                                       ");
+  printf("      .                            .                   .                        ");
+  printf("        .                                        .              .               ");
+  printf("                  .           .                         .                       ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("    OpenSteel/OS has now halted and shut down. However, ACPI is unavailable.    ");
+  printf("               As such, it is now safe to turn off your computer.               ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                                ");
+  printf("                                                                           ___  ");
+  printf("                                                                          /  /  ");
+  printf("                                                                          \\__\\  ");
+  printf("                                                                           \\  \\ ");
+  printf("                                                                           /__/ ");
+  printf("                                                                                ");
+
+  while(1)
+  {
+    asm volatile ("cli; hlt");
+  };
+}
+
 
 
 typedef void (*constructor)();
