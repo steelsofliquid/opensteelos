@@ -15,6 +15,7 @@ namespace osos
 
     //void cmdCpudata(const char* args);
     //void cmdUptime(const char* args);
+    void cmdShutdown(const char* args);
 
     void cmdEcho(const char* args);
     void cmdCls(const char* args);
@@ -23,6 +24,8 @@ namespace osos
     
     void cmdVer(const char* args);
     void cmdHelp(const char* args);
+    void cmdLicensing(const char* args);
+    void cmdCredits(const char* args);
     //void cmdAbout(const char* args);
 }
 
