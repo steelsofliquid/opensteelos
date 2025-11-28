@@ -63,5 +63,14 @@ void osos::cmdLicensing(const char* args)
 
 void osos::cmdCredits(const char* args)
 {
-    printf("\n");
+    printf("The OpenSteel/OS Team Credits - This project wouldn\'t be possible without:\n");
+    printf(" Director: %RNeisa Sapphira-Aera\n", 0x0D);
+    printf("%R Developers: - Nathan Renaud\n\n", 0x0F);
+    printf("The team behind OpenSteel/OS expresses their gratitude towards these projects,\n");
+    printf("and resources, for their accessibility and usefulness as references at some time");
+    printf("or another in this project\'s development, even if no longer used/never used:   ");
+    printf(" - Write Your Own Operating System       - OSDev.org Wiki and forums            ");
+    printf(" - osakaOS                               - Nanami/OS                            ");
+    printf(" - Linux kernel and Linus Torvalds       - MINIX 3                              ");
+    printf(" - Operating Systems: Three Easy Pieces                                        \n");
 }
