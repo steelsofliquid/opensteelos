@@ -3,10 +3,19 @@
 using namespace osos;
 using namespace osos::common;
 
+extern volatile uint32_t tickCount;
+
 void printf(char* str, ...);
 void shutdown();
 
 
+
+
+
+void osos::cmdUptime(const char* args)
+{
+    printf("tick speed: 100 Hz\nuptime in ticks: %d\n", tickCount);
+}
 
 void osos::cmdShutdown(const char* args)
 {
@@ -39,6 +48,8 @@ void osos::cmdHelp(const char* args)
     printf(" cls      | Clears the screen.\n");
     printf(" echo     | Prints text fed to it. Example: echo Hello!\n");
     printf(" shutdown | Shut down OpenSteel/OS.\n");
+    printf(" Utility ______________________________\n");
+    printf(" uptime   | Get current system uptime.\n");
     printf(" Special ______________________________\n");
     printf(" credits  | Provides credits info for the OpenSteel/OS team.\n");
     printf(" help     | Provides a help menu of available commands.\n");

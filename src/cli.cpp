@@ -30,6 +30,7 @@ NathanRenaudShell::~NathanRenaudShell()
 
 command_t commandsTable[] =
 {
+    {"uptime", cmdUptime},
     {"shutdown", cmdShutdown},
     {"cls", cmdCls},
     {"echo", cmdEcho},
