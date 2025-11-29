@@ -3,6 +3,7 @@
 
 #include <common/types.h>
 #include <common/version.h>
+#include <drivers/pit.h>
 #include <globalfuncs.h>
 
 namespace osos
@@ -14,7 +15,7 @@ namespace osos
     // class and OS dev is very irresistable.
 
     //void cmdCpudata(const char* args);
-    //void cmdUptime(const char* args);
+    void cmdUptime(const char* args);
     void cmdShutdown(const char* args);
 
     void cmdEcho(const char* args);
