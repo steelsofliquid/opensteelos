@@ -5,19 +5,6 @@ using namespace osos::common;
 using namespace osos::libs;
 // me on my way to dump the most inspiring and influential quotes in my comments
 
-/*
-This is the new 0.22.41 libstr. In 0.22.40, when libstr was first written, it used
-uint8_ts all over and that caused problems when first trying to write a demo program.
-As it turns out, a large majority of strings written in C and C++ are not based off
-of unsigned chars. For context, in C, a string is an array of chars, practically.
-
-In order to utilise the library, you need to write the following code early in the
-file's execution:
-StringLibrary StringLibrary;
-
-Also, you should likely write it as, for example, if you want to use strlen:
-StringLibrary.strlen(LoremIpsum);
-*/
 
 
 namespace osos
@@ -36,14 +23,12 @@ namespace osos
 
         int32_t strcmp(const char* string1, const char* string2)
         {
-            // Built my interpretation off of the glibc manual. So does this make this GNU/OpenSteel/OS, GNU + OpenSteel/OS or is still just OpenSteel/OS?
-
             const int8_t* a = (const int8_t*) string1;
             const int8_t* b = (const int8_t*) string2;
 
             size_t i = 0;
 
-            while (a[i] != '\0' && b[i] != '\0')
+            while (a[i] != '\0' || b[i] != '\0')
             {
                 if (a[i] < b[i])  // i may have copied some of this from libmem.cpp's memcmp, but the base structure should work anyways...
                     return -1;
@@ -86,7 +71,7 @@ namespace osos
                 dest[i] = sourc[i];
                 i++;
             dest[i] = '\0';
-            
+
             return destination;
         }
 
