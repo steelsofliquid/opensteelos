@@ -36,6 +36,7 @@
 #include <drivers/pit.h>
 #include <drivers/snd/speaker.h>
 #include <drivers/vga.h>
+#include <lib/libcpu.h>
 #include <lib/libmem.h>
 #include <lib/libstr.h>
 #include <multitasking.h>
@@ -554,6 +555,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
   NathanRenaudShell nrsh;
 
+  cpudet();
   // booting is at the home stretch ^v
 
   // programmableIntervalTimer.HardSleep(30);
