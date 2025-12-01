@@ -7,6 +7,8 @@ using namespace osos::libs;
 
 
 
+
+
 namespace osos
 {
     namespace libs
@@ -277,6 +279,9 @@ namespace osos
             return string;
         }
         
+        int8_t* strtok(char* newstr, const char* delim)
+        {}
+
     }
 
 }
