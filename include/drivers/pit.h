@@ -20,7 +20,7 @@ namespace osos
 			osos::hwcom::Port8Bit PITComPort; // PIT Command Port
 			osos::hwcom::Port8Bit ProgIC;
 				
-		public:
+			public:
 			ProgrammableIntervalTimer(osos::hwcom::InterruptManager* manager);
 			~ProgrammableIntervalTimer();
 				

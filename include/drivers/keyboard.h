@@ -7,7 +7,6 @@
 #include <hwcom/interrupts.h>
 #include <drivers/driver.h>
 #include <hwcom/port.h>
-#include <cli.h>
 
 namespace osos
 {
@@ -22,7 +21,7 @@ namespace osos
 
         class KeyboardEventHandler
         {
-        public:
+            public:
             KeyboardEventHandler();
             
             char SendKeystroke(char key);
@@ -38,7 +37,8 @@ namespace osos
             osos::hwcom::Port8Bit commandPort;
 
             KeyboardEventHandler* handler;
-        public:
+            
+            public:
             KeyboardDriver(osos::hwcom::InterruptManager* manager, KeyboardEventHandler *handler);
             ~KeyboardDriver();
             virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);

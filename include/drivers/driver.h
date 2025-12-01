@@ -9,21 +9,21 @@ namespace osos
         class Driver
         {
             public:
-                Driver();
-                ~Driver();
+            Driver();
+            ~Driver();
                 
-                virtual void Activate();
-                virtual int Reset();
-                virtual void Deactivate();
+            virtual void Activate();
+            virtual int Reset();
+            virtual void Deactivate();
         };
 
         class DriverManager
         {
-        private:
+            private:
             Driver* drivers[255];
             int numDrivers;
 
-        public:
+            public:
             DriverManager();
             void AddDriver(Driver*);
 

@@ -2,45 +2,46 @@
 #ifndef __OSOS__DRIVERS__MOUSE_H // Using the keyboard driver as a template
 #define __OSOS__DRIVERS__MOUSE_H
 
-    #include <common/types.h>
-    #include <hwcom/interrupts.h>
-    #include <drivers/driver.h>
-    #include <hwcom/port.h>
+#include <common/types.h>
+#include <hwcom/interrupts.h>
+#include <drivers/driver.h>
+#include <hwcom/port.h>
 
-    namespace osos
+namespace osos
+{
+    namespace drivers
     {
-        namespace drivers
+        class MouseEventHandler
         {
-            class MouseEventHandler
-            {
             public:
-                MouseEventHandler();
+            MouseEventHandler();
                 
-                virtual void OnActivate();
-                virtual void OnMouseDown(osos::common::uint8_t button);
-                virtual void OnMouseUp(osos::common::uint8_t button);
-                virtual void OnMouseMove(int x, int y);
+            virtual void OnActivate();
+            virtual void OnMouseDown(osos::common::uint8_t button);
+            virtual void OnMouseUp(osos::common::uint8_t button);
+            virtual void OnMouseMove(int x, int y);
 
-            };
+        };
 
-            class MouseDriver : public osos::hwcom::InterruptHandler, public Driver
-            {
-                osos::hwcom::Port8Bit dataPort;
-                osos::hwcom::Port8Bit commandPort; // from keyboard driver
+        class MouseDriver : public osos::hwcom::InterruptHandler, public Driver
+        {
+            osos::hwcom::Port8Bit dataPort;
+            osos::hwcom::Port8Bit commandPort; // from keyboard driver
 
-                osos::common::uint8_t buffer[3];
-                osos::common::uint8_t offset;
-                osos::common::uint8_t buttons;
+            osos::common::uint8_t buffer[3];
+            osos::common::uint8_t offset;
+            osos::common::uint8_t buttons;
 
-                MouseEventHandler* handler;
+            MouseEventHandler* handler;
+
             public:
-                MouseDriver(osos::hwcom::InterruptManager* manager, MouseEventHandler* handler);
-                ~MouseDriver();
-                virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
-                virtual void Activate();
+            MouseDriver(osos::hwcom::InterruptManager* manager, MouseEventHandler* handler);
+            ~MouseDriver();
+            virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
+            virtual void Activate();
 
-            };
-        }
+        };
     }
+}
 
 #endif
