@@ -14,6 +14,8 @@ cli
 mov %%cr0, %0 # =r (cr0)
 sti
 
+hlt
+
 # gdt.cpp
 lgdt %0 # =p
 
@@ -21,6 +23,7 @@ lgdt %0 # =p
 # globalfuncs.h
 outb %0, %1 # a, Nd
 inb %1, %0 #=a, Nd
+cpuid
 
 
 # cmos.cpp
