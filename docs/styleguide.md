@@ -9,7 +9,7 @@ It's important to understand which case is the most optimal, whether that is cam
 
 ## Indentation
 
-This should be relatively obvious. *MOST* circumstances consist of the provided style of braces and indentation, however exceptions exist. Try to maintain it, as depicted below:
+Indents should be 4 spaces. As to how braces should be organised and indents handled, it should be relatively obvious. *MOST* circumstances consist of the provided style of braces and indentation, however exceptions exist. Try to maintain it, as depicted below:
 
     [C++]
     #include <header.h>
@@ -60,6 +60,21 @@ ___
     case 0x02: if(Shift) handler->OnKeyDown('!'); else handler->OnKeyDown('1'); break;
     case 0x03: if(Shift) handler->OnKeyDown('@'); else handler->OnKeyDown('2'); break;
 
+### Indentations in classes
+
+It can get messy with the `public:`, `protected:` and `private:` sections of classes. As such, for those bits, indent them as such:
+
+    ...
+    class SampleClass
+    {
+        private:
+        osos::common::uint32_t PrivateFunction();
+
+        public:
+        void SampleFunction();
+        void OtherSampleFunction();
+    };
+
 
 ## Order of Inclusions
 
@@ -87,7 +102,7 @@ There is also the more middle-of-the-road option for some components, such as th
     #include <cli.h>
     #include <cliCommands.h>
 
-As such, the headers are available when needed. However, there's more. While the headers are now included, the order of inclusions is basically, in the case of OpenSteel/OS, a fancy term for the procedure for how to organise the top/start of the file.
+As such, the headers are available when needed. They should also be organised in an orderly fashion, and, like shown above, organised in alphanumeric order. However, there's more. While the headers are now included, the order of inclusions is basically, in the case of OpenSteel/OS, a fancy term for the procedure for how to organise the top/start of the file.
 
 ### Namespaces
 
@@ -136,6 +151,22 @@ Namespaces are followed by external variables and voids in the main source. As s
 
     Source code starts proper...
 
-And so, that's how source code files should be started. This section is still in progress.
+And so, that's how source code files should be started. As for headers:
+
+    // Preliminary comment
+
+    #include <common/types.h>
+    #include <drivers/cmos.h>
+    #include <drivers/pit.h>
+    #include <hwcom/ports.h>
+    #include <lib/libstr.h>
+
+    namespace osos
+    {
+        namespace drivers
+        {
+            header code goes in here...
+        }
+    }
 
 Currently in progress. Will update over time!
