@@ -4,6 +4,7 @@
 #include <common/types.h>
 #include <common/version.h>
 #include <drivers/pit.h>
+#include <lib/libcpu.h>
 #include <globalfuncs.h>
 
 namespace osos
@@ -14,7 +15,7 @@ namespace osos
     // for on the repository). The reason these are here is because I got bored in
     // class and OS dev is very irresistable.
 
-    //void cmdCpudata(const char* args);
+    void cmdCpudata(const char* args);
     void cmdUptime(const char* args);
     void cmdShutdown(const char* args);
 
