@@ -7,9 +7,6 @@ using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::hwcom;
 
-extern volatile bool isShellAvailable;
-extern volatile char inputBuffer[256];
-extern volatile uint32_t inputLength;
 extern volatile InterfaceModes currentInterface;
 
 void printf(char*, ...);
