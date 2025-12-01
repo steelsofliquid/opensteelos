@@ -31,6 +31,14 @@ namespace osos
         asm volatile("inb %1, %0" : "=a" (result) : "Nd" (port));
         return result;
     }
+    static inline void cpuid(int code, 
+        osos::common::uint32_t* a, 
+        osos::common::uint32_t* b, 
+        osos::common::uint32_t* c, 
+        osos::common::uint32_t* d)
+    {
+        asm volatile("cpuid" : "=a"(*a), "=b"(*b), "=c"(*c), "=d"(*d) : "a"(code), "c"(0));
+    }
 }
 
 #endif
