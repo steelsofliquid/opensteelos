@@ -8,26 +8,27 @@ TIMESTAMP = $(shell date +"%Y-%m-%d %H:%M:%S")
 
 objects = object/loader.o \
  object/common/version.o \
- object/gdt.o \
- object/drivers/driver.o \
- object/hwcom/port.o \
- object/hwcom/interruptstubs.o \
- object/hwcom/idt.o \
- object/hwcom/interrupts.o \
- object/hwcom/pci.o \
- object/hwcom/pic.o \
+ object/drivers/snd/speaker.o \
  object/drivers/cmos.o \
+ object/drivers/driver.o \
  object/drivers/keyboard.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
- object/drivers/snd/speaker.o \
  object/drivers/vga.o \
+ object/hwcom/idt.o \
+ object/hwcom/interrupts.o \
+ object/hwcom/interruptstubs.o \
+ object/hwcom/pci.o \
+ object/hwcom/pic.o \
+ object/hwcom/port.o \
+ object/lib/libcpu.o \
  object/lib/libmem.o \
  object/lib/libstr.o \
- object/globalfuncs.o \
  object/cli.o \
  object/cliCommands.o \
  object/dmm.o \
+ object/gdt.o \
+ object/globalfuncs.o \
  object/multitasking.o \
  object/testing_tasks.o \
  object/kernel.o
