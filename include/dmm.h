@@ -5,32 +5,31 @@
 
 #include <common/types.h>
 
-    namespace osos
+namespace osos
+{
+    struct MemoryChunk
     {
-        struct MemoryChunk
-        {
-            MemoryChunk *next;
-            MemoryChunk *prev;
+        MemoryChunk *next;
+        MemoryChunk *prev;
 
-            bool allocated;
-            osos::common::size_t size;
-        };
+        bool allocated;
+        osos::common::size_t size;
+    };
 
-        class MemoryManager
-        {
-
+    class MemoryManager
+    {
         protected:
-            MemoryChunk* first;
+        MemoryChunk* first;
             
         public:
-            static MemoryManager *activeMemoryManager;
+        static MemoryManager *activeMemoryManager;
 
-            MemoryManager(osos::common::size_t start, osos::common::size_t size);
-            ~MemoryManager();
+        MemoryManager(osos::common::size_t start, osos::common::size_t size);
+        ~MemoryManager();
 
-            void* malloc(osos::common::size_t size);
-            void free(void* ptr);
-        };
+        void* malloc(osos::common::size_t size);
+        void free(void* ptr);
+    };
 }
 
 void* operator new(unsigned size);

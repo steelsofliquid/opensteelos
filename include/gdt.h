@@ -8,23 +8,23 @@ namespace osos
 {
     class GlobalDescriptorTable
     {
-
         public:
-            class SegmentDescriptor
-            {
+        class SegmentDescriptor
+        {
             private:
-                osos::common::uint16_t limitLow;
-                osos::common::uint16_t baseLow;
-                osos::common::uint8_t baseHigh;
-                osos::common::uint8_t type;
-                osos::common::uint8_t flagsLimitHigh;
-                osos::common::uint8_t baseVirtualHigh;
-            public:
-                SegmentDescriptor(osos::common::uint32_t base, osos::common::uint32_t limit, osos::common::uint8_t type);
-                osos::common::uint32_t Base();
-                osos::common::uint32_t Limit();
+            osos::common::uint16_t limitLow;
+            osos::common::uint16_t baseLow;
+            osos::common::uint8_t baseHigh;
+            osos::common::uint8_t type;
+            osos::common::uint8_t flagsLimitHigh;
+            osos::common::uint8_t baseVirtualHigh;
 
-            } __attribute__((packed));
+            public:
+            SegmentDescriptor(osos::common::uint32_t base, osos::common::uint32_t limit, osos::common::uint8_t type);
+            osos::common::uint32_t Base();
+            osos::common::uint32_t Limit();
+
+        } __attribute__((packed));
 
 
         SegmentDescriptor nullSegmentSelector;
@@ -32,7 +32,7 @@ namespace osos
         SegmentDescriptor codeSegmentSelector;
         SegmentDescriptor dataSegmentSelector;
 
-    public:
+        public:
         GlobalDescriptorTable();
         ~GlobalDescriptorTable();
 
