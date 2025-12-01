@@ -2,6 +2,7 @@
 
 using namespace osos;
 using namespace osos::common;
+using namespace osos::libs;
 
 extern volatile uint32_t tickCount;
 
@@ -12,9 +13,15 @@ void shutdown();
 
 
 
+void osos::cmdCpudata(const char* args)
+{
+    printf("Vendor: %s\nCPU: %s\n", cpuven(), cpubrd());
+}
+
 void osos::cmdUptime(const char* args)
 {
-    printf("tick speed: 100 Hz\nuptime in ticks: %d\n", tickCount);
+    if (args == "-?") printf("%Ruptime        %R: Provides the system uptime in ticks.\nExample usage: uptime", 0x0E, 0x0F);
+    else printf("tick speed: 100 Hz\nuptime in ticks: %d\n", tickCount);
 }
 
 void osos::cmdShutdown(const char* args)
@@ -43,12 +50,13 @@ void osos::cmdVer(const char* args)
 
 void osos::cmdHelp(const char* args)
 {
-    printf(" List of available commands ___________\n");
-    printf(" General ______________________________\n");
+    printf("List of available commands ___________\n");
+    printf("(i) A more convenient way to get a description of a command is in development.  ");
     printf(" cls      | Clears the screen.\n");
     printf(" echo     | Prints text fed to it. Example: echo Hello!\n");
     printf(" shutdown | Shut down OpenSteel/OS.\n");
     printf(" Utility ______________________________\n");
+    printf(" cpudata  | Get some information about the CPU.\n");
     printf(" uptime   | Get current system uptime.\n");
     printf(" Special ______________________________\n");
     printf(" credits  | Provides credits info for the OpenSteel/OS team.\n");
