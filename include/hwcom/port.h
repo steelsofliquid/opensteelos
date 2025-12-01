@@ -10,15 +10,15 @@ namespace osos
     {
         class Port
         {
-        protected:
-        osos::common::uint16_t portNumber;
+            protected:
+            osos::common::uint16_t portNumber;
             Port(osos::common::uint16_t portNumber); // Must be virtual when kernel gets memory management
             ~Port();
         };
 
         class Port8Bit : public Port
         {
-        public:
+            public:
             Port8Bit(osos::common::uint16_t portNumber);
             ~Port8Bit();
             virtual osos::common::uint8_t Read();
@@ -27,7 +27,7 @@ namespace osos
 
         class Port8BitSlow : public Port8Bit
         {
-        public:
+            public:
             Port8BitSlow(osos::common::uint16_t portNumber);
             ~Port8BitSlow();
             virtual void Write(osos::common::uint8_t data);
@@ -35,7 +35,7 @@ namespace osos
 
         class Port16Bit : public Port
         {
-        public:
+            public:
             Port16Bit(osos::common::uint16_t portNumber);
             ~Port16Bit();
             virtual void Write(osos::common::uint16_t data);
@@ -44,7 +44,7 @@ namespace osos
 
         class Port32Bit : public Port
         {
-        public:
+            public:
             Port32Bit(osos::common::uint16_t portNumber);
             ~Port32Bit();
             virtual void Write(osos::common::uint32_t data);

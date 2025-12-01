@@ -35,11 +35,9 @@ namespace osos
 
         };
 
-
-
         class BaseAddressRegister
         {
-        public:
+            public:
             bool prefetchable;
             osos::common::uint8_t* address;
             osos::common::uint32_t size;
@@ -49,7 +47,7 @@ namespace osos
 
         class PCIDevDesc // Short for "PCI Device Descriptor", or "PeripheralComponentInterconnectDeviceDescriptor".
         {
-        public:
+            public:
             osos::common::uint32_t portBase;
             osos::common::uint32_t interrupt; // I don't remember this being in the interrupts header...
 
@@ -77,7 +75,7 @@ namespace osos
             osos::hwcom::Port32Bit dataPort;
             osos::hwcom::Port32Bit commandPort;
 
-        public:
+            public:
             PCIController();
             ~PCIController();
 
