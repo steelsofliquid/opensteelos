@@ -3,7 +3,9 @@
 
 #include <common/types.h>
 #include <drivers/driver.h>
+#include <drivers/pit.h>
 #include <hwcom/port.h>
+#include <globalfuncs.h>
 
 namespace osos
 {
