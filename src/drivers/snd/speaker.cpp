@@ -1,6 +1,4 @@
-#include <globalfuncs.h>
 #include <drivers/snd/speaker.h>
-#include <drivers/pit.h>
 
 using namespace osos;
 using namespace osos::common;
