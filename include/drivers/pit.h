@@ -5,14 +5,14 @@
 
 #include <common/types.h>
 #include <drivers/driver.h>
-#include <hwcom/port.h>
 #include <hwcom/interrupts.h>
+#include <hwcom/port.h>
 	
 namespace osos
 {
 	namespace drivers
 	{
-		class ProgrammableIntervalTimer : public Driver, public hwcom::InterruptHandler
+		class ProgrammableIntervalTimer : public Driver, public osos::hwcom::InterruptHandler
 		{
 			osos::hwcom::Port8Bit Channel0;
 			osos::hwcom::Port8Bit Channel1;

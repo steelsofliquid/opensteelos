@@ -4,7 +4,6 @@
 #include <common/types.h>
 #include <drivers/driver.h>
 #include <hwcom/port.h>
-#include <hwcom/interrupts.h>
 #include <globalfuncs.h>
 
 namespace osos

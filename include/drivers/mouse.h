@@ -3,8 +3,8 @@
 #define __OSOS__DRIVERS__MOUSE_H
 
 #include <common/types.h>
-#include <hwcom/interrupts.h>
 #include <drivers/driver.h>
+#include <hwcom/interrupts.h>
 #include <hwcom/port.h>
 
 namespace osos
