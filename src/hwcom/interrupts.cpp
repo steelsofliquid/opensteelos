@@ -1,6 +1,6 @@
 #include <hwcom/interrupts.h>
-#include <hwcom/pic.h>
 #include <hwcom/idt.h>
+#include <hwcom/pic.h>
 
 using namespace osos;
 using namespace osos::common;
