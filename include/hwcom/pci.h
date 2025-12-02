@@ -16,11 +16,10 @@
 #ifndef __OSOS__HWCOM__PCI_H
 #define __OSOS__HWCOM__PCI_H
 
-#include <hwcom/port.h>
 #include <common/types.h>
-#include <hwcom/interrupts.h>
 #include <drivers/driver.h>
-
+#include <hwcom/interrupts.h>
+#include <hwcom/port.h>
 #include <dmm.h>
 // #include <drivers/amd_am79c973.h>.h>>
 

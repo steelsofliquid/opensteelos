@@ -4,8 +4,8 @@
 
 #include <common/types.h>
 #include <hwcom/port.h>
-#include <multitasking.h>
 #include <gdt.h>
+#include <multitasking.h>
 
 
 namespace osos
