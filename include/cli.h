@@ -10,7 +10,7 @@ namespace osos
     struct command_t
     {
         const char* name;
-        void (*func)(const char* arg);
+        osos::common::commandVoid func;
     };
 
     class NathanRenaudShell

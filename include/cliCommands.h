@@ -15,19 +15,19 @@ namespace osos
     // for on the repository). The reason these are here is because I got bored in
     // class and OS dev is very irresistable.
 
-    void cmdCpudata(const char* args);
-    void cmdUptime(const char* args);
-    void cmdShutdown(const char* args);
+    void cmdCpudata(osos::common::uint32_t argc, const char** argv);
+    void cmdUptime(osos::common::uint32_t argc, const char** argv);
+    void cmdShutdown(osos::common::uint32_t agrc, const char** argv);
 
-    void cmdEcho(const char* args);
-    void cmdCls(const char* args);
-    //void cmdClock(const char* args);
-    //void cmdBeep(const char* args);
+    void cmdEcho(osos::common::uint32_t argc, const char** argv);
+    void cmdCls(osos::common::uint32_t argc, const char** argv);
+    //void cmdClock(osos::common::uint32_t agrc, const char* argv);
+    //void cmdBeep(int agrc, const char* argv);
     
-    void cmdVer(const char* args);
-    void cmdHelp(const char* args);
-    void cmdLicensing(const char* args);
-    void cmdCredits(const char* args);
+    void cmdVer(osos::common::uint32_t argc, const char** argv);
+    void cmdHelp(osos::common::uint32_t argc, const char** argv);
+    void cmdLicensing(osos::common::uint32_t argc, const char** argv);
+    void cmdCredits(osos::common::uint32_t argc, const char** argv);
     //void cmdAbout(const char* args);
 }
 
