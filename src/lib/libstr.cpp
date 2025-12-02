@@ -247,40 +247,60 @@ namespace osos
             uint32_t v;
 
             
-                int sign = (base == 10 && value < 0);
-                if (sign)
-                {
-                    *temp1++ = '-';
-                    v = -value;
-                }
-                else
-                {
-                    v = (uint32_t)value;
-                }
+            int sign = (base == 10 && value < 0);
+            if (sign)
+            {
+                *temp1++ = '-';
+                v = -value;
+            }
+            else
+            {
+                v = (uint32_t)value;
+            }
 
-                do
-                {
-                    tval = v % base;
-                    *temp1++ = "0123456789ABCDEF"[tval];
-                    v /= base;
-                } while (v > 0);
+            do
+            {
+                tval = v % base;
+                *temp1++ = "0123456789ABCDEF"[tval];
+                v /= base;
+            } while (v > 0);
 
-                *temp1 = '\0';
-                temp1--;
+            *temp1 = '\0';
+            temp1--;
 
-                if (*temp2 == '-') temp1++;
-                while (temp2 < temp1)
-                {
-                    tchar = *temp1;
-                    *temp1-- = *temp2;
-                    *temp2++ = tchar;
-                }
+            if (*temp2 == '-') temp1++;
+            while (temp2 < temp1)
+            {
+                tchar = *temp1;
+                *temp1-- = *temp2;
+                *temp2++ = tchar;
+            }
             
             return string;
         }
         
         int8_t* strtok(char* newstr, const char* delim)
-        {}
+        {
+            static char* saved;
+            int8_t* result;
+
+            if (newstr != nullptr) saved = newstr;
+            else if (saved == nullptr) return nullptr;
+            while (*saved != *delim && *saved != '\0') saved++;
+            if (*saved == '\0') return nullptr;
+
+            result = saved;
+
+            while (*saved != *delim && *saved != '\0') saved++;
+
+            if (*saved != '\0')
+            {
+                *saved = '\0';
+                saved++;
+            }
+
+            return result;
+        }
 
     }
 
