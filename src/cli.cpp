@@ -30,16 +30,17 @@ NathanRenaudShell::~NathanRenaudShell()
 
 command_t commandsTable[] =
 {
-    {"cpudata", cmdCpudata},
+    {"cpuinfo", cmdCpudata},
     {"uptime", cmdUptime},
     {"shutdown", cmdShutdown},
     {"cls", cmdCls},
     {"echo", cmdEcho},
     {"help", cmdHelp},
     {"ver", cmdVer},
+    {"version", cmdVer},
     {"licensing", cmdLicensing},
     {"credits", cmdCredits},
-    {0, 0}
+    {nullptr, nullptr}
 };
 
 
@@ -90,16 +91,22 @@ void NathanRenaudShell::ParseCommand(char* input)
     
     if(input[0] == 0) return;
 
-    const char* cmd = GetToken(input);
-    const char* args = input + strlen(cmd) + 1;
+    //const char* cmd = GetToken(input);
+    const char* token = strtok(input, " ");
+    const char* args[8];
+    uint32_t argsCount = 0;
 
-    if (*args == 0) args = nullptr;
+    while (token != nullptr && argsCount < 8)
+    {
+        args[argsCount++] = token;
+        token = strtok(nullptr, " ");
+    }
 
     for (int i = 0; commandsTable[i].name != 0; i++)
     {
-        if (strcmp(cmd, commandsTable[i].name) == 0)
+        if (strcmp(args[0], commandsTable[i].name) == 0)
         {
-            commandsTable[i].func(args);
+            commandsTable[i].func(argsCount, args);
             return;
         }
     }
