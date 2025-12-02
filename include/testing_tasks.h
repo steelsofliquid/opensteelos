@@ -2,8 +2,8 @@
 #define __TESTING_TASKS_H
 
 #include <common/types.h>
-#include <multitasking.h>
 #include <drivers/pit.h>
+#include <multitasking.h>
 
 namespace osos
 {
