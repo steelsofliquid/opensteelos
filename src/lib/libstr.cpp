@@ -279,25 +279,37 @@ namespace osos
             return string;
         }
         
+        static inline bool isDelim(char c, const char* delim)
+        {
+            const char* d = delim;
+            while (*d)
+            {
+                if (*d == c) return true;
+                ++d;
+            }
+            return false;
+        }
+
         int8_t* strtok(char* newstr, const char* delim)
         {
-            static char* saved;
+            static char* saved = nullptr;
             int8_t* result;
 
             if (newstr != nullptr) saved = newstr;
-            else if (saved == nullptr) return nullptr;
-            while (*saved != *delim && *saved != '\0') saved++;
+            if (saved == nullptr) return nullptr;
+            while (*saved && isDelim(*saved, delim)) ++saved;
             if (*saved == '\0') return nullptr;
 
             result = saved;
 
-            while (*saved != *delim && *saved != '\0') saved++;
+            while (*saved != *delim && *saved != '\0') ++saved;
 
             if (*saved != '\0')
             {
                 *saved = '\0';
-                saved++;
+                ++saved;
             }
+            else saved = nullptr;
 
             return result;
         }
