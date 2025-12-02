@@ -169,4 +169,24 @@ And so, that's how source code files should be started. As for headers:
         }
     }
 
+There is, however, an exception to including only the relevant file's dedicated header and stuffing all of the required headers in to the relevant file's header. There are cases in which a required, or at least, *necessary* header should be included in the source code file and not its header. An example of this can be found in the tetrad `pit.h`, `pit.cpp`, `multitasking.h` and `multitasking.cpp` as of 2025 December 2. These files currently depend on each other, but in a way that putting `#include <drivers/pit.h>` in `multitasking.h` and `#include <multitasking.h>` in `pit.cpp` will cause the compiler to get grumpy. This already is a rancid design choice to have a core component of the kernel rely on the programmable interval timer driver and vice versa, even if the only need of the latter component is only to give `multitasking.cpp` access to the variable `tickCount`. As such, while there isn't a contigency plan for if the compiler throws the error `expected class-name before'{' token`, an example of that scenario's theoretical resolution can be seen in the `pit.cpp/h`-`multitasking.cpp/h` tetrad, in which the inclusions are as such:
+
+    [include/drivers/pit.h]
+    #include <common/types.h>
+    #include <drivers/driver.h>
+    #include <hwcom/interrupts.h>
+    #include <hwcom/port.h>
+
+    [include/multitasking.h]
+    #include <common/types.h>
+    #include <gdt.h>
+
+    [src/drivers/pit.cpp]
+    #include <drivers/pit.h>
+    #include <multitasking.h>
+
+    [src/multitasking.cpp]
+    #include <multitasking.h>
+    #include <drivers/pit.h>
+
 Currently in progress. Will update over time!
