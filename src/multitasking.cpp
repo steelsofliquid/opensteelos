@@ -13,15 +13,20 @@
 
 #include <multitasking.h>
 #include <drivers/pit.h>
+
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
 
+extern volatile uint32_t tickCount;
+
 void printf(char* str, ...);
 
-// Class Task
 
-extern volatile uint32_t tickCount;
+
+
+
+// Class Task
 
 Task::Task(GlobalDescriptorTable *gdt, void entrypoint())
 {
@@ -121,6 +126,7 @@ void TaskManager::WakeTask(uint32_t ticks)
     }
 }
 
-namespace osos{
+namespace osos
+{
     TaskManager taskManager; // we sent this piece from the kernel off to the gulag, otherwise known as where the class this thing is defined in. on that thought why don't i do this for shit like the libraries?
 }

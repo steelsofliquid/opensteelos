@@ -25,6 +25,8 @@ Here is a cheat-sheet for this base-level directory's abbreviated contents:
 | `dmm.cpp` | Dynamic Memory Manager |
 | `gdt.cpp` | Global Descriptor Table |
 
+Note: As OpenSteel/OS grows as a project, the files for the kernel, and the `hwcom/` directory, likely with the exception of `kernel.cpp`, will be moved to its own directory, `kernel/`. This is to keep things clean and tidy once things like a package manager, custom bootloader, and GUI get added.
+
 ## Additional Files
 
 There are some additional files here that may be helpful, due to either containing APIs or being indexes of some languages. These are as such:
