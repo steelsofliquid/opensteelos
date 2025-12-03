@@ -69,6 +69,8 @@ int32_t testInteger2 = 15;
 int32_t testInteger3 = 327;
 int32_t testInteger4 = 7629;
 int32_t testInteger5 = 0;
+uint16_t curX = 0;
+uint16_t curY = 0;
 
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
@@ -105,37 +107,52 @@ void printf(char* str, ...) // the main screen output function.
             */
 
             case '\n':
-            y++;
-            x = 0;
-            break;
+            {
+                y++; curY++;
+                x = 0; curX = 0;
+                break;
+            }
 
             case '\b':
-            if(x == 0)
             {
-                if(y != 0)
+                if(x == 0)
                 {
-                    y--;
-                    int backX = 79;
-                    while (backX >= 0 && (videoMemory[80*y+backX] & 0x00FF) == ' ') backX--;
-                    if (backX < 0) x = 0; else x = backX;
+                    if(y != 0)
+                    {
+                        y--; curY--;
+                        int backX = 79;
+                        while (backX >= 0 && (videoMemory[80*y+backX] & 0x00FF) == ' ') backX--;
+                        if (backX < 0)
+                        {
+                            x = 0;
+                            curX = 0;
+                        }
+                        else
+                        {
+                            x = backX;
+                            curX = backX;
+                        }
 
+                        videoMemory[80*y+x] = (currentColour << 8) | ' ';
+                    }
+                }
+                else
+                {
+                    x--; curX--;
                     videoMemory[80*y+x] = (currentColour << 8) | ' ';
                 }
+                break;
             }
-            else
-            {
-                x--;
-                videoMemory[80*y+x] = (currentColour << 8) | ' ';
-            }
-            break;
       
             case '\a':
+            {
                 for (y = 0; y < 25; y++)
                     for (x = 0; x < 80; x++)
                         videoMemory[80*y+x] = (currentColour << 8) | ' ';
-                x = 0;
-                y = 0;
+                x = 0; curX = 0;
+                y = 0; curY = 0;
                 break;
+            }
 
             case '%':
                 i++;
@@ -151,7 +168,7 @@ void printf(char* str, ...) // the main screen output function.
                         for (int j = 0; buffer[j] != '\0'; j++)
                         {
                             videoMemory[80*y+x] = (currentColour << 8) | buffer[j];
-                            x++;
+                            x++; curX++;
                         }
 
                         break;
@@ -161,7 +178,7 @@ void printf(char* str, ...) // the main screen output function.
                     {
                         char charVal = va_arg(params, int);
                         videoMemory[80*y+x] = (currentColour << 8) | charVal;
-                        x++;
+                        x++; curX++;
 
                         break;
                     }
@@ -175,8 +192,8 @@ void printf(char* str, ...) // the main screen output function.
                         foo[0] = hex[(key >> 4) & 0xF];
                         foo[1] = hex[key & 0xF];
             
-                        videoMemory[80*y+x] = (currentColour << 8) | foo[0]; x++;
-                        videoMemory[80*y+x] = (currentColour << 8) | foo[1]; x++;
+                        videoMemory[80*y+x] = (currentColour << 8) | foo[0]; x++; curX++;
+                        videoMemory[80*y+x] = (currentColour << 8) | foo[1]; x++; curX++;
 
                         break;
                     }
@@ -189,7 +206,7 @@ void printf(char* str, ...) // the main screen output function.
                         while (*s != '\0')
                         {
                             videoMemory[80*y+x] = (currentColour << 8) | *s;
-                            x++; s++;
+                            x++; curX++; s++;
                         }
                         break;
                     }
@@ -204,7 +221,7 @@ void printf(char* str, ...) // the main screen output function.
                     {
                         i--;
                         videoMemory[80*y+x] = (currentColour << 8) | str[i];
-                        x++;
+                        x++; curX++;
                         break;
                     }
                 }
@@ -212,15 +229,17 @@ void printf(char* str, ...) // the main screen output function.
             continue;
 
             default:
+            {
                 videoMemory[80*y+x] = (currentColour << 8) | str[i];
-                x++;
+                x++; curX++;
                 break;
+            }
         }
 
         if(x >= 80)
         {
-            x = 0;
-            y++;
+            x = 0; curX = 0;
+            y++; curY++;
         }
 
         if(y >= 25)
@@ -242,8 +261,8 @@ void printf(char* str, ...) // the main screen output function.
             for(x = 0; x < 80; x++)
             videoMemory[80 * 24 + x] = (currentColour << 8);
 
-            x = 0;
-            y = 24;
+            x = 0; curX = 0;
+            y = 24; curY = 24;
         }
     }
 
@@ -296,6 +315,36 @@ class MouseToConsole : public MouseEventHandler // This moves the sometimes very
     }
 
 };
+
+void EnableCursor(uint8_t start, uint8_t end)
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (inb(0x3D5) & 0xC0) | start);
+
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (inb(0x3D5) & 0xE0) | end);
+}
+
+void DisableCursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
+}
+
+void UpdateCursor()
+{
+    uint16_t pos = curY * 80 + curX;
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
+void FlushShell()
+{
+    UpdateCursor();
+}
 
 static const char* monthNames[12] =
 {
@@ -378,6 +427,7 @@ void panic(uint32_t errorId)
 void shutdown()
 {
     printf("OpenSteel/OS is shutting down...");
+    DisableCursor();
     asm volatile ("cli");
 
     printf("%R\a", 0x09);
@@ -460,7 +510,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // Start of boot process v
 
     // reset video memory
-    printf("%R\a", 0x0A);
+    printf("%R\a", 0x0F);
 
     // bootsplash header (ASCII)
     printf("%R  ___                %R_ ___ __   _ _  __ __   _ _ ________________________ 0.22  ", 0x0B, 0x08);
@@ -567,6 +617,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     printf("\n%RGreetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F,
     time.hour, rtcMin, rtcSec,
     time.day, monthNames[time.month - 1], time.year);
+    printf("Ceremonial Build 200\n");
     // Denotes end of booting process  ^
 
     // the code below is supposed to try to determine if the OS is in real mode or not. spoiler: it's not.
@@ -588,6 +639,8 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     //printf("Integer and printf Output Test _________________________________________________");
     //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
 
+    EnableCursor(13, 15);
+    FlushShell();
     nrsh.Initialise();
 
     while(1)

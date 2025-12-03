@@ -8,6 +8,7 @@ using namespace osos::libs;
 extern volatile InterfaceModes currentInterface;
 
 void printf(char* str, ...);
+void FlushShell();
 
 
 
@@ -125,6 +126,7 @@ void NathanRenaudShell::HandleInput(char c)
             inputLength--;
             inputBuffer[inputLength] = '\0';
             printf("\b");
+            FlushShell();
 
             return;
         }
@@ -136,6 +138,7 @@ void NathanRenaudShell::HandleInput(char c)
         ParseCommand((char*)inputBuffer);
         inputLength = 0;
         printf("%R> %R", 0x0B, 0x0F);
+        FlushShell();
 
         return;
     }
@@ -145,6 +148,7 @@ void NathanRenaudShell::HandleInput(char c)
         {
             inputBuffer[inputLength++] = c;
             inputBuffer[inputLength] = '\0';
+            FlushShell();
         }
     }
 }
