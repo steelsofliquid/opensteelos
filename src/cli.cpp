@@ -93,7 +93,7 @@ void NathanRenaudShell::ParseCommand(char* input)
 
     //const char* cmd = GetToken(input);
     const char* token = strtok(input, " ");
-    const char* args[8];
+    const char* args[32];
     uint32_t argsCount = 0;
 
     while (token != nullptr && argsCount < 8)

@@ -60,8 +60,24 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
         if (strcmp(argv[i], "-?") == 0) helpFlag = true;
     }
 
-    if (helpFlag) printf("%Recho        %R: Allows you to print text onto the screen, only in Simlish for now.Example usage: echo\n", 0x0E, 0x0F);
-    else if (argv) printf("%s", argv);
+    if (helpFlag) 
+    {
+        printf("%Recho        %R: Allows you to print text onto the screen.\nExample usage: echo\n", 0x0E, 0x0F);
+        return;
+    }
+    
+    if (argc <= 1) 
+    {
+        printf("\n");
+        return;
+    }
+
+    for (int i = 1; i < argc; i++)
+    {
+        printf("%s", argv[i]);
+        if (i + 1 < argc) printf(" ");
+    }
+
     printf("\n");
 }
 
