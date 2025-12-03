@@ -96,7 +96,7 @@ void NathanRenaudShell::ParseCommand(char* input)
     const char* args[32];
     uint32_t argsCount = 0;
 
-    while (token != nullptr && argsCount < 8)
+    while (token != nullptr && argsCount < 32)
     {
         args[argsCount++] = token;
         token = strtok(nullptr, " ");
