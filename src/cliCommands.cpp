@@ -46,7 +46,7 @@ void osos::cmdShutdown(uint32_t argc, const char** argv)
         if (strcmp(argv[i], "-?") == 0) helpFlag = true;
     }
 
-    if (helpFlag) printf("%Rshutdown    %R: Shuts down OpenSteel/OS by disabling interrupts and putting the system in idle.\nExample usage: shutdown\n", 
+    if (helpFlag) printf("%Rshutdown    %R: Shuts down OpenSteel/OS.\nExample usage: shutdown\n", 
         0x0E, 0x0F);
     else shutdown();
 }
@@ -86,9 +86,8 @@ void osos::cmdVer(uint32_t argc, const char** argv)
         if (strcmp(argv[i], "-?") == 0) helpFlag = true;
     }
 
-    if (helpFlag) printf("%Rversion     :\nver         %R: Provides the system version number.\nExample usage: ver\n", 0x0E, 0x0F);
-
-    printf(" OpenSteel/OS %d.%d.%d \"Denver\"\n", verMajor, verMinor, verBuild);
+    if (helpFlag) printf("%Rversion\nver         %R: Provides the system version number.\nExample usage: ver\n", 0x0E, 0x0F);
+    else printf(" OpenSteel/OS %d.%d.%d \"Denver\"\n", verMajor, verMinor, verBuild);
 }
 
 void osos::cmdHelp(uint32_t argc, const char** argv)
