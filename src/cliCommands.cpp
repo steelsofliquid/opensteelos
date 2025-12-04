@@ -2,12 +2,16 @@
 
 using namespace osos;
 using namespace osos::common;
+using namespace osos::drivers;
 using namespace osos::libs;
 
 extern volatile uint32_t tickCount;
 
 void printf(char* str, ...);
 void shutdown();
+
+static Speaker speakerNrshComs;
+static RecommendedStandard232Driver serialNrshComs;
 
 
 
@@ -48,11 +52,15 @@ void osos::cmdShutdown(uint32_t argc, const char** argv)
 
     if (helpFlag) printf("%Rshutdown    %R: Shuts down OpenSteel/OS.\nExample usage: shutdown\n", 
         0x0E, 0x0F);
-    else shutdown();
+    else 
+    {
+        serialNrshComs.WriteString("Ending session; OpenSteel/OS is shutting down...");
+        speakerNrshComs.RestChime();
+        shutdown();
+    }
 }
 
-
-void osos::cmdEcho(uint32_t argc, const char** argv)
+void osos::cmdPacinae(uint32_t argc, const char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -60,9 +68,27 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
         if (strcmp(argv[i], "-?") == 0) helpFlag = true;
     }
 
+    if (helpFlag) printf("%Rpacinae     %R: Placeholder command for eventual OpenSteel/OS Package Manager.\nNot of use right now.\n", 0x0E, 0x0F);
+    else
+    {
+        printf("OpenSteel/OS Package Manager (Pacinae)\nThe command %Rpacinae%R will be utilised by the, as of this build, unimplemented\npackage manager that will be added at a later date.", 0x0E, 0x0F);
+    }
+}
+
+
+void osos::cmdEcho(uint32_t argc, const char** argv)
+{
+    bool helpFlag = false;
+    bool serialFlag = false;
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "-rs") == 0) serialFlag = true;
+        if (strcmp(argv[i], "-?") == 0) helpFlag = true;
+    }
+
     if (helpFlag) 
     {
-        printf("%Recho        %R: Allows you to print text onto the screen.\nExample usage: echo\n", 0x0E, 0x0F);
+        printf("%Recho        %R: Allows you to print text onto the screen.\nExample usage: echo\nFlags: -rs: Send to serial\n", 0x0E, 0x0F);
         return;
     }
     
@@ -72,13 +98,26 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
         return;
     }
 
-    for (int i = 1; i < argc; i++)
+    if (serialFlag)
     {
-        printf("%s", argv[i]);
-        if (i + 1 < argc) printf(" ");
-    }
+        for (int i = 2; i < argc; i++)
+        {
+            serialNrshComs.WriteString(argv[i]);
+            if (i + 1 < argc) serialNrshComs.WriteString(" ");
+        }
 
-    printf("\n");
+        serialNrshComs.WriteString("\n");
+    }
+    else
+    {
+        for (int i = 1; i < argc; i++)
+        {
+            printf("%s", argv[i]);
+            if (i + 1 < argc) printf(" ");
+        }
+
+        printf("\n");
+    }
 }
 
 void osos::cmdCls(uint32_t argc, const char** argv)
@@ -92,6 +131,22 @@ void osos::cmdCls(uint32_t argc, const char** argv)
     if (helpFlag) printf("%Rcls        %R: Clears all contents from the screen.\nExample usage: cls\n", 0x0E, 0x0F);
     else printf("\a");
 }
+
+/*void osos::cmdClock(uint32_t argc, const char** argv)
+{}
+
+void osos::cmdBeep(uint32_t argc, const char** argv)
+{
+    bool helpFlag;
+    uint32_t argFreq = 0;
+    uint32_t argLen = 0;
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "-?") == 0) helpFlag = true;
+    }
+
+    if (helpFlag) printf("%Rbeep        %R: Plays a tone from the PC speaker for a specified duration.");
+}*/
 
 
 void osos::cmdVer(uint32_t argc, const char** argv)

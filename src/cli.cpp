@@ -37,6 +37,7 @@ command_t commandsTable[] =
     {"cpuinfo", cmdCpudata},
     {"uptime", cmdUptime},
     {"shutdown", cmdShutdown},
+    {"pacinae", cmdPacinae},
     {"cls", cmdCls},
     {"echo", cmdEcho},
     {"help", cmdHelp},
