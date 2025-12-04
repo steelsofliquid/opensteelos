@@ -129,7 +129,7 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     {
         panic(interruptNumber);
     }
-    else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
+    else if(interruptNumber != 0x20 && interruptNumber != 0x24) // assuming it's not a timer interrupt?
     {
         // this semi-legacy code needs to some reworking. the original if statement was deleted, since it's contents were
         // transferred to pit.cpp. should be as simple as an if statement, but i'm not going to test my luck right now.
