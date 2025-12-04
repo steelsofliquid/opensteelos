@@ -36,6 +36,7 @@ namespace osos
             void BeepVariable(osos::common::uint32_t frequency, osos::common::uint32_t interval);
             void BeepBasic();
             void LifeChime();
+            void RestChime();
         };
     }
 }
