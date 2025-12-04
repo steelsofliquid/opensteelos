@@ -25,6 +25,7 @@ int32_t RecommendedStandard232Driver::InitialiseSerial()
     outb(0x3F8 + 0, 0x03);
     outb(0x3F8 + 1, 0x00);
     outb(0x3F8 + 3, 0x03);
+    outb(0x3F8 + 1, 0x00);
     outb(0x3F8 + 2, 0xC7);
     outb(0x3F8 + 4, 0x0B);
     outb(0x3F8 + 4, 0x1E);
@@ -39,30 +40,26 @@ int32_t RecommendedStandard232Driver::InitialiseSerial()
 
 
 
-bool RecommendedStandard232Driver::thrBitReady()
-{
-}
-
-bool RecommendedStandard232Driver::drBitReady()
-{
-}
-
-
-
 uint8_t RecommendedStandard232Driver::GetLineStatus()
 {
+    return inb(0x3F8 + 5);
 }
 
 uint8_t RecommendedStandard232Driver::GetModemStatus()
 {
+    return inb(0x3F8 + 6);
 }
 
 bool RecommendedStandard232Driver::hasError()
 {
+    uint8_t lsrStat = inb(0x3F8 + 5);
+    return (lsrStat & 0x1E) != 0;
 }
 
 RecommendedStandard232Driver::LineErrorType RecommendedStandard232Driver::GetError()
 {
+    uint8_t lsrStat = inb(0x3F8 + 5);
+    return static_cast<LineErrorType>(lsrStat & 0x1E);
 }
 
 
@@ -83,10 +80,15 @@ int32_t RecommendedStandard232Driver::isTransitEmpty()
     return inb(0x3F8 + 5) & 0x20;
 }
 
-void RecommendedStandard232Driver::WriteToSerial(uint8_t material)
+void RecommendedStandard232Driver::WriteToSerial(char material)
 {
     while (isTransitEmpty() == 0);
     COM1.Write(material);
+}
+
+void RecommendedStandard232Driver::WriteString(const char* material)
+{
+    while (*material) WriteToSerial(*material++);
 }
 
 
@@ -97,4 +99,6 @@ void RecommendedStandard232Driver::Activate()
 
 uint32_t RecommendedStandard232Driver::HandleInterrupt(uint32_t esp)
 {
+    uint8_t iir = inb(0x3F8 + 2);
+    return esp;
 }
