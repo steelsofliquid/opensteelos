@@ -29,9 +29,6 @@ namespace osos
 
             static osos::common::int32_t InitialiseSerial();
 
-            static bool thrBitReady();
-            static bool drBitReady();
-
             osos::common::uint8_t GetLineStatus();
             osos::common::uint8_t GetModemStatus();
             bool hasError();
@@ -40,7 +37,8 @@ namespace osos
             osos::common::int32_t serialReceived();
             osos::common::int8_t ReadSerial();
             osos::common::int32_t isTransitEmpty();
-            void WriteToSerial(osos::common::uint8_t material);
+            void WriteToSerial(char material);
+            void WriteString(const char* material);
 
             virtual void Activate();
             virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
