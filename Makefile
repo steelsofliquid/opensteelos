@@ -14,6 +14,7 @@ objects = object/loader.o \
  object/drivers/keyboard.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
+ object/drivers/rs232.o \
  object/drivers/vga.o \
  object/hwcom/idt.o \
  object/hwcom/interrupts.o \
