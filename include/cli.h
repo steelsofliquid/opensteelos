@@ -3,6 +3,7 @@
 
 #include <common/types.h>
 #include <common/sysHelpers.h>
+#include <drivers/snd/speaker.h>
 #include <lib/libstr.h>
 
 namespace osos
