@@ -98,4 +98,12 @@ void Speaker::LifeChime()
 	BeepVariable(330, 6);
 }
 
+void Speaker::RestChime()
+{
+	BeepVariable(330, 17);
+	BeepVariable(698, 24);
+	BeepVariable(523, 14);
+	BeepVariable(131, 7);
+}
+
 // a
