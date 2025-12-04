@@ -617,7 +617,6 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     printf("\n%RGreetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F,
     time.hour, rtcMin, rtcSec,
     time.day, monthNames[time.month - 1], time.year);
-    printf("Ceremonial Build 200\n");
     // Denotes end of booting process  ^
 
     // the code below is supposed to try to determine if the OS is in real mode or not. spoiler: it's not.

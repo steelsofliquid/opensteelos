@@ -3,12 +3,15 @@
 
 using namespace osos;
 using namespace osos::common;
+using namespace osos::drivers;
 using namespace osos::libs;
 
 extern volatile InterfaceModes currentInterface;
 
 void printf(char* str, ...);
 void FlushShell();
+
+static Speaker speakCLI;
 
 
 
@@ -129,6 +132,10 @@ void NathanRenaudShell::HandleInput(char c)
             FlushShell();
 
             return;
+        }
+        else
+        {
+            speakCLI.BeepVariable(741, 1);
         }
     }
     else if (c == '\n')
