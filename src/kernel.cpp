@@ -29,6 +29,7 @@
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/pit.h>
+#include <drivers/rs232.h>
 #include <drivers/vga.h>
 #include <hwcom/interrupts.h>
 #include <hwcom/pci.h>
@@ -572,6 +573,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // drivers loading
     printf("initialising drivers...                                                    ");
 
+    RecommendedStandard232Driver serialPort;
+    //serialPort.InitialiseSerial();
+    serialPort.WriteString("OpenSteel/OS 0.22 \"Denver\" [OpenSteel/OS RS232 COM+Serial Driver]\nYou are seeing this because a successful COM1 connection was made.\n\n");
+
     KeyboardEventHandler kbhandler;
     KeyboardDriver keyboard(&interrupts, &kbhandler);
     drvManager.AddDriver(&keyboard);
@@ -614,6 +619,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     // programmableIntervalTimer.HardSleep(30);
     speaker.LifeChime();
+    serialPort.WriteString("Welcome to OpenSteel/OS.\n");
     printf("\n%RGreetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F,
     time.hour, rtcMin, rtcSec,
     time.day, monthNames[time.month - 1], time.year);
