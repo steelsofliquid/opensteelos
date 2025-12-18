@@ -6,6 +6,9 @@ To see my thoughts and whatnot on the current situation of the project, check ou
 
 This repository was designed to be more clear and concise compared to major open source projects, such as Linux and particularly LibreOffice. Anyone interested should be able to work on open source, and so for those who either (a) want to start their own OS project wanting insight into how they should organise their project, (b) those who are trying to find the source code, (c) those who want to help out or develop a fork of OpenSteel/OS, and/or (d) not too familiar with coding and wish to see simpler layouts, you're welcome. Anywhere I think it's not as clear, I'll provide a readme with context so that it's more understandable.
 
+# Project currently on hold
+Due to circumstances related to this project's very fast development during November 2025, and how it has caused setbacks in other aspects of my life, I need to put this project on hold until I am able to rectify these issues. I was in the process of renovating the directory structure and the driver/device manager, as in 0.22 Circuit 4, it is, to put it simply, broken. If you want to see the currently broken state that is in (where drivers are not operating correctly), I either will make or have made a branch with the new structure.
+
 ## *What's new in OpenSteel/OS (as of 2025-11-16)*
  - PIT driver heavily reworked
  - Better organisation
