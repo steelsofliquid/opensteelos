@@ -6,7 +6,7 @@
 #include <drivers/snd/speaker.h>
 #include <drivers/pit.h>
 #include <drivers/rs232.h>
-#include <lib/libcpu.h>
+#include <userland/lib/libcpu.h>
 #include <globalfuncs.h>
 
 namespace osos
