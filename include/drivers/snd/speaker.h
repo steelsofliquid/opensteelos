@@ -2,25 +2,27 @@
 #define __OSOS__DRIVERS__SND__SPEAKER_H
 
 #include <common/types.h>
-#include <drivers/driver.h>
 #include <drivers/pit.h>
-#include <hwcom/port.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/port.h>
 #include <globalfuncs.h>
 
 namespace osos
 {
     namespace drivers
     {
-        class Speaker
+        class Speaker : public osos::kernel::hwcom::DriverModel
         {
             public:
-            osos::hwcom::Port8Bit PITChannel2;
-            osos::hwcom::Port8Bit PITCom;
-            osos::hwcom::Port8Bit SpeakerPort;
+            osos::kernel::hwcom::Port8Bit PITChannel2;
+            osos::kernel::hwcom::Port8Bit PITCom;
+            osos::kernel::hwcom::Port8Bit SpeakerPort;
 
             public:
             Speaker();
             ~Speaker();
+
+            virtual void StartDriver();
 
             struct meledy
             {
