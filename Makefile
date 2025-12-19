@@ -8,30 +8,31 @@ TIMESTAMP = $(shell date +"%Y-%m-%d %H:%M:%S")
 
 objects = object/loader.o \
  object/common/version.o \
+ object/drivers/drv/ata.o \
  object/drivers/snd/speaker.o \
  object/drivers/cmos.o \
- object/drivers/driver.o \
  object/drivers/keyboard.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
  object/drivers/rs232.o \
  object/drivers/vga.o \
- object/hwcom/idt.o \
- object/hwcom/interrupts.o \
- object/hwcom/interruptstubs.o \
- object/hwcom/pci.o \
- object/hwcom/pic.o \
- object/hwcom/port.o \
- object/lib/libcpu.o \
- object/lib/libmem.o \
- object/lib/libstr.o \
- object/cli.o \
- object/cliCommands.o \
- object/dmm.o \
- object/gdt.o \
+ object/kernel/hwcom/driverManager.o \
+ object/kernel/hwcom/driverModel.o \
+ object/kernel/hwcom/idt.o \
+ object/kernel/hwcom/interrupts.o \
+ object/kernel/hwcom/interruptstubs.o \
+ object/kernel/hwcom/pci.o \
+ object/kernel/hwcom/pic.o \
+ object/kernel/hwcom/port.o \
+ object/kernel/mem/dmm.o \
+ object/kernel/gdt.o \
+ object/kernel/multitasking.o \
+ object/userland/lib/libcpu.o \
+ object/userland/lib/libmem.o \
+ object/userland/lib/libstr.o \
+ object/userland/nrsh/cli.o \
+ object/userland/nrsh/cliCommands.o \
  object/globalfuncs.o \
- object/multitasking.o \
- object/testing_tasks.o \
  object/kernel.o
 
 object/%.o: src/%.cpp
@@ -73,7 +74,7 @@ OpenSteelOS.iso: opensteelcore.bin
 	echo 'set timeout=0' > iso/boot/grub/grub.cfg
 	echo 'set default=0' >> iso/boot/grub/grub.cfg
 	echo '' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "OpenSteel/OS 0.22 Beta 2 Circuit 4" {' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "OpenSteel/OS 0.22 Beta 2 Circuit 5" {' >> iso/boot/grub/grub.cfg
 	echo '  multiboot /boot/opensteelcore.bin' >> iso/boot/grub/grub.cfg
 	echo '  boot' >> iso/boot/grub/grub.cfg
 	echo '}' >> iso/boot/grub/grub.cfg
@@ -84,4 +85,4 @@ OpenSteelOS.iso: opensteelcore.bin
 
 .PHONY: clean
 clean:
-	rm -f $(objects) opensteelcore.bin OpenSteelOS.iso
+	rm -f $(objects) opensteelcore.bin
