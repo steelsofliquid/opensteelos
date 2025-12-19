@@ -1,4 +1,4 @@
-#include <lib/libstr.h>
+#include <userland/lib/libstr.h>
 
 using namespace osos;
 using namespace osos::common;

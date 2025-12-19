@@ -2,7 +2,7 @@
 // The first library to be developed for OpenSteel/OS. It contains memory functions.
 // If you're looking for malloc and free, those are already defined in dmm.cpp and its header.
 
-#include <lib/libmem.h>
+#include <userland/lib/libmem.h>
 
 using namespace osos;
 using namespace osos::common;

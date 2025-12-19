@@ -1,4 +1,4 @@
-#include <lib/libcpu.h>
+#include <userland/lib/libcpu.h>
 
 using namespace osos;
 using namespace osos::common;
