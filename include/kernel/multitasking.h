@@ -3,65 +3,67 @@
 #define __MULTITASKING_H
 
 #include <common/types.h>
-#include <gdt.h>
+#include <kernel/gdt.h>
 
 namespace osos
 {
-    struct CPUState
+    namespace kernel
     {
-        osos::common::uint32_t eax;
-        osos::common::uint32_t ebx;
-        osos::common::uint32_t ecx;
-        osos::common::uint32_t edx;
+        struct CPUState
+        {
+            osos::common::uint32_t eax;
+            osos::common::uint32_t ebx;
+            osos::common::uint32_t ecx;
+            osos::common::uint32_t edx;
 
-        osos::common::uint32_t esi;
-        osos::common::uint32_t edi;
-        osos::common::uint32_t ebp;
+            osos::common::uint32_t esi;
+            osos::common::uint32_t edi;
+            osos::common::uint32_t ebp;
 
-        osos::common::uint32_t error;
+            osos::common::uint32_t error;
 
-        osos::common::uint32_t eip;
-        osos::common::uint32_t cs;
-        osos::common::uint32_t eflags;
-        osos::common::uint32_t esp;
-        osos::common::uint32_t ss;
+            osos::common::uint32_t eip;
+            osos::common::uint32_t cs;
+            osos::common::uint32_t eflags;
+            osos::common::uint32_t esp;
+            osos::common::uint32_t ss;
 
-    } __attribute__((packed));
+        } __attribute__((packed));
 
-    class Task
-    {
-        friend class TaskManager;
+        class Task
+        {
+            friend class TaskManager;
 
-        private:
-        osos::common::uint8_t stack[4096]; // 4 KiB
-        CPUState* cpuState;
+            private:
+            osos::common::uint8_t stack[4096]; // 4 KiB
+            CPUState* cpuState;
 
-        public:
-        bool isAsleep;
-        osos::common::uint32_t wakeTick;
-        Task(GlobalDescriptorTable *gdt, void entrypoint());
-        ~Task();
-    };
+            public:
+            bool isAsleep;
+            osos::common::uint32_t wakeTick;
+            Task(GlobalDescriptorTable *gdt, void entrypoint());
+            ~Task();
+        };
 
-    class TaskManager
-    {
-        private:
-        Task* tasks[256];
-        int numTasks;
-        int currentTask;
-        
-        public:
-        TaskManager();
-        ~TaskManager();
-        bool AddTask(Task* task);
-        CPUState* Schedule(CPUState* cpuState);
+        class TaskManager
+        {
+            private:
+            Task* tasks[256];
+            int numTasks;
+            int currentTask;
+            
+            public:
+            TaskManager();
+            ~TaskManager();
+            bool AddTask(Task* task);
+            CPUState* Schedule(CPUState* cpuState);
 
-        void sleep(osos::common::uint32_t interval);
-        void WakeTask(osos::common::uint32_t ticks);
-    };
+            void sleep(osos::common::uint32_t interval);
+            void WakeTask(osos::common::uint32_t ticks);
+        };
 
-    extern TaskManager taskManager;
-    
+        extern TaskManager taskManager;
+    }
 }
 
 #endif
