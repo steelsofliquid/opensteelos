@@ -5,7 +5,8 @@
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 RecommendedStandard232Driver::RecommendedStandard232Driver() :
     COM1(0x3F8)
@@ -20,7 +21,7 @@ RecommendedStandard232Driver::~RecommendedStandard232Driver()
 
 int32_t RecommendedStandard232Driver::InitialiseSerial()
 {
-    asm volatile ("cli");
+    //asm volatile ("cli");
     outb(0x3F8 + 3, 0x80);
     outb(0x3F8 + 0, 0x03);
     outb(0x3F8 + 1, 0x00);
@@ -34,7 +35,7 @@ int32_t RecommendedStandard232Driver::InitialiseSerial()
     if (inb(0x3F8 + 0) != 0xAE) return 1;
 
     outb(0x3F8 + 4, 0x0F);
-    asm volatile ("sti");
+    //asm volatile ("sti");
     return 0;
 }
 

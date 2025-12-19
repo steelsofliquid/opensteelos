@@ -4,8 +4,9 @@
 
 using namespace osos;
 using namespace osos::common;
-using namespace osos::hwcom;
 using namespace osos::drivers;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 int centuryRegister = 0x00; // Set by ACPI table parsing
 
@@ -27,20 +28,20 @@ uint8_t ClockBatteryDriver::ReadCMOS(int32_t port)
 {
     uint8_t value;
 
-    asm volatile("cli");
+    //asm volatile("cli");
     portAddressCMOS.Write(port & 0x7F);
     value = portDataCMOS.Read();
-    asm volatile("sti");
+    //asm volatile("sti");
 
     return value;
 }
 
 void ClockBatteryDriver::WriteCMOS(int32_t port, int32_t value)
 {
-    asm volatile("cli");
+    //asm volatile("cli");
     portAddressCMOS.Write(port & 0x7F);
     portDataCMOS.Write(value);
-    asm volatile("sti");
+    //asm volatile("sti");
 }
 
 

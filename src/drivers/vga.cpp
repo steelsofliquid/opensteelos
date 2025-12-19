@@ -6,7 +6,8 @@
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 VideoGraphicsArray::VideoGraphicsArray() :
     MiscPort(0x3C2),

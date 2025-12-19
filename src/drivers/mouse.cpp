@@ -4,7 +4,8 @@
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 void printf(char*, ...);
 
@@ -35,6 +36,17 @@ MouseDriver::MouseDriver(InterruptManager* manager, MouseEventHandler* handler)
 dataPort(0x60),
 commandPort(0x64)
 {
+    driverAttributes.name      = "Generic PS/2 Mouse Driver";
+    driverAttributes.publisher = "SteelsOfLiquid";
+    driverAttributes.type      = "hidMouse";
+
+    driverAttributes.isInitialised = false;
+    driverAttributes.isActive      = false;
+
+    driverAttributes.hasInterruptRequest  = true;
+    driverAttributes.interruptRequestLine = 0x0C;
+    driverAttributes.vectorOffset         = interruptNumber;
+
     this->handler = handler;
 }
 
@@ -42,7 +54,12 @@ MouseDriver::~MouseDriver()
 {
 }
 
-void MouseDriver::Activate()
+InterruptHandler* MouseDriver::InterruptHandlerForme()
+{
+    return this;
+}
+
+void MouseDriver::StartDriver()
 {
 
     offset = 0;

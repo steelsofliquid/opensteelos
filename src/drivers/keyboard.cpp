@@ -5,7 +5,7 @@
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::kernel::hwcom;
 
 extern volatile InterfaceModes currentInterface;
 
@@ -68,6 +68,17 @@ KeyboardDriver::KeyboardDriver(InterruptManager* manager, KeyboardEventHandler *
 dataPort(0x60),
 commandPort(0x64)
 {
+    driverAttributes.name      = "Generic PS/2 Keyboard Driver";
+    driverAttributes.publisher = "SteelsOfLiquid";
+    driverAttributes.type      = "hidKeyboard";
+
+    driverAttributes.isInitialised = false;
+    driverAttributes.isActive      = false;
+
+    driverAttributes.hasInterruptRequest  = true;
+    driverAttributes.interruptRequestLine = 0x01;
+    driverAttributes.vectorOffset         = interruptNumber;
+
     this->handler = handler;
 }
 
@@ -75,30 +86,37 @@ KeyboardDriver::~KeyboardDriver()
 {
 }
 
-void KeyboardDriver::Activate()
+InterruptHandler* KeyboardDriver::InterruptHandlerForme()
 {
-    while(commandPort.Read() & 0x1)
-        dataPort.Read();
-    commandPort.Write(0xAE); // Activate interrupts
-    commandPort.Write(0x20); // Get current state
-    uint8_t status = (dataPort.Read() | 1) & ~0x10;
-    commandPort.Write(0x60); // Set the state
-    dataPort.Write(status);
+    return this;
+}
 
-    dataPort.Write(0xF4);
+void KeyboardDriver::StartDriver()
+{
+    while (commandPort.Read() & 0x02); commandPort.Write(0xAE); // Activate interrupts
+    while (commandPort.Read() & 0x02); commandPort.Write(0x20); // Get current state
+
+    while (!(commandPort.Read() & 0x01));
+    uint8_t status = dataPort.Read();
+    status |= 0x01;
+    status &= ~0x10;
+
+    while (commandPort.Read() & 0x02); commandPort.Write(0x60); // Set the state
+    while (commandPort.Read() & 0x02); dataPort.Write(status);
+
+    while (commandPort.Read() & 0x02); dataPort.Write(0xF4);
 }
 
 uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 {
     uint8_t key = dataPort.Read();
 
-    if(handler == 0)
-        return esp;
-
-    static bool Shift = false;
-    static bool Control = false;
-    static bool Alt = false;
-    static bool capsLock = false;
+    if(handler)
+    {
+        static bool Shift = false;
+        static bool Control = false;
+        static bool Alt = false;
+        static bool capsLock = false;
 
         switch(key)
         {
@@ -260,7 +278,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 //break;
             }
         }
-    
+    }
 
     return esp;
 }
