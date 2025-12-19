@@ -5,4 +5,4 @@ using namespace osos::common;
 
 int32_t verMajor = 0;
 int32_t verMinor = 22;
-int32_t verBuild = 224;
+int32_t verBuild = 272;
