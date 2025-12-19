@@ -1,8 +1,9 @@
-#include <hwcom/idt.h>
+#include <kernel/hwcom/idt.h>
 
 using namespace osos;
 using namespace osos::common;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 void printf(char* str, ...);
 

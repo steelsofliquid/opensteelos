@@ -1,8 +1,9 @@
 
-#include <hwcom/port.h>
+#include <kernel/hwcom/port.h>
 using namespace osos;
 using namespace osos::common;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 Port::Port(uint16_t portNumber)
 {

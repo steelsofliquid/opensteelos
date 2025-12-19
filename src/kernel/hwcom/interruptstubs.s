@@ -3,20 +3,20 @@
 
 .section .text
 
-.extern _ZN4osos5hwcom16InterruptManager15handleInterruptEhj
-.global _ZN4osos5hwcom16InterruptManager22IgnoreInterruptRequestEv
+.extern _ZN4osos6kernel5hwcom16InterruptManager15handleInterruptEhj
+.global _ZN4osos6kernel5hwcom16InterruptManager22IgnoreInterruptRequestEv
 
 .macro HandleException num
-.global _ZN4osos5hwcom24InterruptDescriptorTable19HandleException\num\()Ev
-_ZN4osos5hwcom24InterruptDescriptorTable19HandleException\num\()Ev:
+.global _ZN4osos6kernel5hwcom24InterruptDescriptorTable19HandleException\num\()Ev
+_ZN4osos6kernel5hwcom24InterruptDescriptorTable19HandleException\num\()Ev:
     movb $\num, (interruptnumber)
     jmp int_bottom
 
 .endm
 
 .macro HandleInterruptRequest num
-.global _ZN4osos5hwcom24InterruptDescriptorTable26HandleInterruptRequest\num\()Ev
-_ZN4osos5hwcom24InterruptDescriptorTable26HandleInterruptRequest\num\()Ev:
+.global _ZN4osos6kernel5hwcom24InterruptDescriptorTable26HandleInterruptRequest\num\()Ev
+_ZN4osos6kernel5hwcom24InterruptDescriptorTable26HandleInterruptRequest\num\()Ev:
     movb $\num + IRQ_BASE, (interruptnumber)
     pushl $0
     jmp int_bottom
@@ -84,7 +84,7 @@ int_bottom:
 
     pushl %esp
     push (interruptnumber)
-    call _ZN4osos5hwcom16InterruptManager15handleInterruptEhj
+    call _ZN4osos6kernel5hwcom16InterruptManager15handleInterruptEhj
     # add $5, %esp
     movl %eax, %esp
 
@@ -106,7 +106,7 @@ int_bottom:
     add $4, %esp
 
 
-_ZN4osos5hwcom16InterruptManager22IgnoreInterruptRequestEv:
+_ZN4osos6kernel5hwcom16InterruptManager22IgnoreInterruptRequestEv:
     iret
 
 .data

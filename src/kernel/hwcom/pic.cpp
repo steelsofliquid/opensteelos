@@ -1,8 +1,9 @@
-#include <hwcom/pic.h>
+#include <kernel/hwcom/pic.h>
 
 using namespace osos;
 using namespace osos::common;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 ProgrammableInterruptController::ProgrammableInterruptController()
 : picLeadCommand   (0x20),
@@ -45,9 +46,43 @@ void ProgrammableInterruptController::Disable()
 
 
 
+void ProgrammableInterruptController::MaskIRQ(uint8_t interruptReq)
+{
+    uint8_t value;
+    if (interruptReq < 8)
+    {
+        value = picLeadData.Read() | (1 << interruptReq);
+        picLeadData.Write(value);
+    }
+    else
+    {
+        interruptReq -= 8;
+        value = picFollowData.Read() | (1 << interruptReq);
+        picFollowData.Write(value);
+    }
+}
+
+void ProgrammableInterruptController::UnmaskIRQ(uint8_t interruptReq)
+{
+    uint8_t value;
+    if (interruptReq < 8)
+    {
+        value = picLeadData.Read() | ~(1 << interruptReq);
+        picLeadData.Write(value);
+    }
+    else
+    {
+        interruptReq -= 8;
+        value = picFollowData.Read() | ~(1 << interruptReq);
+        picFollowData.Write(value);
+    }
+}
+
+
+
 void ProgrammableInterruptController::SendEOI(osos::common::uint8_t interruptRequest)
 {
-    if(0x28 <= interruptRequest)
+    if(8 <= interruptRequest)
         picFollowCommand.Write(0x20);
     picLeadCommand.Write(0x20);
 }

@@ -1,8 +1,9 @@
-#include <hwcom/pci.h>
+#include <kernel/hwcom/pci.h>
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 
 PCIDevDesc::PCIDevDesc() // Whoops, broke the rule of no acronyms inside of variables and functions in my code en masse! Just so you know, "PCI" means Peripheral Component Interconnect.
@@ -82,7 +83,7 @@ void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager
                     if(bar.address && (bar.type == InputOutput))
                         dev.portBase = (uint32_t)bar.address; // Scrap the comment above. We're six layers deep. I'm sorry Linus torvalds... >_<
                     
-                    Driver* driver = GetDriver(dev, interrupts);
+                    DriverModel* driver = GetDriver(dev, interrupts);
                     if(driver != 0)
                         driverManager->AddDriver(driver);
                 }
@@ -147,9 +148,9 @@ BaseAddressRegister PCIController::GetBasAdrReg(uint16_t bus, uint16_t device, u
     return result;
 }
 
-Driver* PCIController::GetDriver(PCIDevDesc dev, InterruptManager* interrupts)
+DriverModel* PCIController::GetDriver(PCIDevDesc dev, InterruptManager* interrupts)
 {
-    Driver *driver = 0;
+    DriverModel *driver = 0;
     switch(dev.vendorId)
     {
         case 0x1022: // AMD

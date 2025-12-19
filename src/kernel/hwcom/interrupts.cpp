@@ -1,10 +1,11 @@
-#include <hwcom/interrupts.h>
-#include <hwcom/idt.h>
-#include <hwcom/pic.h>
+#include <kernel/hwcom/interrupts.h>
+#include <kernel/hwcom/idt.h>
+#include <kernel/hwcom/pic.h>
 
 using namespace osos;
 using namespace osos::common;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 
 void printf(char* str, ...);
 void printfHex(uint8_t);
@@ -134,15 +135,16 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
         // this semi-legacy code needs to some reworking. the original if statement was deleted, since it's contents were
         // transferred to pit.cpp. should be as simple as an if statement, but i'm not going to test my luck right now.
 
-        char* foo = "\nUnhandled interrupt. Please write an entry for: 0x00";
-        char* hex = "0123456789ABCDEF";
-        foo[51] = hex[(interruptNumber >> 4) & 0x0F];
-        foo[52] = hex[interruptNumber & 0x0F];
-        printf(foo);
+        char interruptHex[3] = {'0', '0', 0};
+        const char* hex = "0123456789ABCDEF";
+        interruptHex[0] = hex[(interruptNumber >> 4) & 0x0F];
+        interruptHex[1] = hex[interruptNumber & 0x0F];
+        printf("\nUnhandled interrupt. Please write an entry for: 0x%x", interruptNumber);
     }
 
     if(0x20 <= interruptNumber && interruptNumber < 0x30)
     {
+        uint8_t irq = interruptNumber - 0x20;
         programmableInterruptController.SendEOI(interruptNumber);
     }
 
