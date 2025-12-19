@@ -1,62 +1,67 @@
 
-#ifndef __INTERRUPTS_H
-#define __INTERRUPTS_H
+#ifndef __OSOS__KERNEL__HWCOM__INTERRUPTS_H
+#define __OSOS__KERNEL__HWCOM__INTERRUPTS_H
 
 #include <common/types.h>
-#include <hwcom/port.h>
-#include <gdt.h>
-#include <multitasking.h>
+#include <kernel/hwcom/port.h>
+#include <kernel/gdt.h>
+#include <kernel/multitasking.h>
 
 
 namespace osos
 {
-    namespace hwcom
+    namespace kernel
     {
-        class InterruptManager;
-
-        class InterruptHandler
+        namespace hwcom
         {
-            protected:
-            osos::common::uint8_t interruptNumber;
-            InterruptManager* interruptManager;
+            class InterruptManager;
 
-            InterruptHandler(InterruptManager* interruptManager, osos::common::uint8_t interruptNumber);
-            ~InterruptHandler();
+            class InterruptHandler
+            {
+                protected:
+                osos::common::uint8_t interruptNumber;
+                InterruptManager* interruptManager;
 
-            public:
-            virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
-            void attachToInterruptManager(InterruptManager* interruptManager);
+                InterruptHandler(InterruptManager* interruptManager, osos::common::uint8_t interruptNumber);
+                virtual ~InterruptHandler();
 
-        };
+                public:
+                virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
+                void attachToInterruptManager(InterruptManager* interruptManager);
+                //void RegisterRequestHandler();
+                //void DeregisterRequestHandler();
 
-        class InterruptManager
-        {
-            friend class InterruptHandler;
+            };
 
-            protected:
-            static InterruptManager* ActiveInterruptManager;
-            InterruptHandler* handlers[256];
-            TaskManager *taskManager;
+            class InterruptManager
+            {
+                friend class InterruptHandler;
 
-            static void IgnoreInterruptRequest();
+                protected:
+                static InterruptManager* ActiveInterruptManager;
+                InterruptHandler* handlers[256];
+                TaskManager *taskManager;
 
-            static osos::common::uint32_t handleInterrupt(osos::common::uint8_t interruptNumber, osos::common::uint32_t esp);
-            osos::common::uint32_t DoHandleInterrupt(osos::common::uint8_t interruptNumber, osos::common::uint32_t esp);
+                static void IgnoreInterruptRequest();
+
+                static osos::common::uint32_t handleInterrupt(osos::common::uint8_t interruptNumber, osos::common::uint32_t esp);
+                osos::common::uint32_t DoHandleInterrupt(osos::common::uint8_t interruptNumber, osos::common::uint32_t esp);
 
 
 
-            public:
-            InterruptManager(osos::common::uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt, TaskManager* taskManager);
-            ~InterruptManager();
-            osos::common::uint16_t hardwareInterruptOffset();
+                public:
+                InterruptManager(osos::common::uint16_t hardwareInterruptOffset, GlobalDescriptorTable* gdt, TaskManager* taskManager);
+                ~InterruptManager();
+                osos::common::uint16_t hardwareInterruptOffset();
 
-            bool handlerExists(osos::common::uint8_t interruptNumber);
-            static bool interruptsEnabled();
+                bool handlerExists(osos::common::uint8_t interruptNumber);
+                static bool interruptsEnabled();
 
-            void Activate();
-            void Deactivate();
+                void Activate();
+                void Deactivate();
 
-        };
+            };
+        }
     }
 }
 
