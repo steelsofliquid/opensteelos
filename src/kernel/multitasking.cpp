@@ -11,12 +11,13 @@
     similar to Windows Task Manager, that component will be called the Task Assistant.
 */
 
-#include <multitasking.h>
+#include <kernel/multitasking.h>
 #include <drivers/pit.h>
 
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
+using namespace osos::kernel;
 
 extern volatile uint32_t tickCount;
 
@@ -128,5 +129,8 @@ void TaskManager::WakeTask(uint32_t ticks)
 
 namespace osos
 {
-    TaskManager taskManager; // we sent this piece from the kernel off to the gulag, otherwise known as where the class this thing is defined in. on that thought why don't i do this for shit like the libraries?
+    namespace kernel
+    {
+        TaskManager taskManager; // we sent this piece from the kernel off to the gulag, otherwise known as where the class this thing is defined in. on that thought why don't i do this for shit like the libraries?
+    }
 }

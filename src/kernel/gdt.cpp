@@ -1,7 +1,8 @@
 
-#include <gdt.h>
+#include <kernel/gdt.h>
 using namespace osos;
 using namespace osos::common;
+using namespace osos::kernel;
 
 GlobalDescriptorTable::GlobalDescriptorTable() // GDT, not GPT or ChatGPT. Is there even a thing as "ChatGDT"? Meh, probably. Probably some goofy ahh bootleg ChatGPT.
 : nullSegmentSelector(0,0,0),
