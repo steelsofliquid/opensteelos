@@ -1,6 +1,6 @@
 // Memory Manager
 
-#include <dmm.h>
+#include <kernel/mem/dmm.h>
 using namespace osos;
 using namespace osos::common;
 
@@ -119,4 +119,14 @@ void operator delete[](void* ptr)
 {
     if(MemoryManager::activeMemoryManager != 0)
         MemoryManager::activeMemoryManager->free(ptr);
+}
+
+
+void operator delete(void* ptr, unsigned size)
+{
+    operator delete(ptr);
+}
+void operator delete[](void* ptr, unsigned size)
+{
+    operator delete[](ptr);
 }
