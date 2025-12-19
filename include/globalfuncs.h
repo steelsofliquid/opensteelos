@@ -4,8 +4,8 @@
 #include <common/types.h>
 #include <common/version.h>
 #include <drivers/cmos.h>
-#include <drivers/pit.h>
-#include <lib/libstr.h>
+// #include <drivers/pit.h>
+#include <userland/lib/libstr.h>
 
 namespace osos
 {

@@ -3,7 +3,7 @@
 
 #include <common/types.h>
 #include <drivers/pit.h>
-#include <multitasking.h>
+#include <kernel/multitasking.h>
 
 namespace osos
 {
