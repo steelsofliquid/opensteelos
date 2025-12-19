@@ -1,5 +1,5 @@
-#include <cli.h>
-#include <cliCommands.h>
+#include <userland/nrsh/cli.h>
+#include <userland/nrsh/cliCommands.h>
 
 using namespace osos;
 using namespace osos::common;
@@ -136,7 +136,7 @@ void NathanRenaudShell::HandleInput(char c)
         }
         else
         {
-            speakCLI.BeepVariable(741, 1);
+            //speakCLI.BeepVariable(741, 1);
         }
     }
     else if (c == '\n')

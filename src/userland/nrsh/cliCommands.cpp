@@ -1,4 +1,4 @@
-#include <cliCommands.h>
+#include <userland/nrsh/cliCommands.h>
 
 using namespace osos;
 using namespace osos::common;
@@ -54,8 +54,8 @@ void osos::cmdShutdown(uint32_t argc, const char** argv)
         0x0E, 0x0F);
     else 
     {
-        serialNrshComs.WriteString("Ending session; OpenSteel/OS is shutting down...");
-        speakerNrshComs.RestChime();
+        //serialNrshComs.WriteString("Ending session; OpenSteel/OS is shutting down...");
+        //speakerNrshComs.RestChime();
         shutdown();
     }
 }
@@ -102,11 +102,11 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
     {
         for (int i = 2; i < argc; i++)
         {
-            serialNrshComs.WriteString(argv[i]);
-            if (i + 1 < argc) serialNrshComs.WriteString(" ");
+            //serialNrshComs.WriteString(argv[i]);
+            //if (i + 1 < argc) serialNrshComs.WriteString(" ");
         }
 
-        serialNrshComs.WriteString("\n");
+        //serialNrshComs.WriteString("\n");
     }
     else
     {
