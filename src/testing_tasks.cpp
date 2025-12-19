@@ -2,6 +2,7 @@
 
 // using namespace osos;
 using namespace osos::common;
+using namespace osos::kernel;
 void printf(char* str, ...);
 
 namespace osos

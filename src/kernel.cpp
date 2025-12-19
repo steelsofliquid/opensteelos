@@ -23,24 +23,27 @@
 #include <common/types.h>
 #include <common/sysHelpers.h>
 #include <common/version.h>
+#include <drivers/drv/ata.h>
 #include <drivers/snd/speaker.h>
 #include <drivers/cmos.h>
-#include <drivers/driver.h>
+// #include <drivers/driver.h>
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/pit.h>
 #include <drivers/rs232.h>
 #include <drivers/vga.h>
-#include <hwcom/interrupts.h>
-#include <hwcom/pci.h>
-#include <lib/libcpu.h>
-#include <lib/libmem.h>
-#include <lib/libstr.h>
-#include <cli.h>
-#include <dmm.h>
-#include <gdt.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/driverManager.h>
+#include <kernel/hwcom/interrupts.h>
+#include <kernel/hwcom/pci.h>
+#include <userland/lib/libcpu.h>
+#include <userland/lib/libmem.h>
+#include <userland/lib/libstr.h>
+#include <userland/nrsh/cli.h>
+#include <kernel/mem/dmm.h>
+#include <kernel/gdt.h>
 #include <globalfuncs.h>
-#include <multitasking.h>
+#include <kernel/multitasking.h>
 
 // GCC headers
 #include <stdarg.h>
@@ -49,7 +52,9 @@
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::drivers::drives;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
 using namespace osos::libs;
 // using namespace osos::gui;
 
@@ -77,6 +82,14 @@ uint16_t curY = 0;
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
 
 volatile InterfaceModes currentInterface;
+
+namespace osos
+{
+    namespace kernel
+    {
+        //TaskManager* taskManager = nullptr;
+    }
+}
 
 void printf(char* str, ...) // the main screen output function.
 {
@@ -394,30 +407,70 @@ void panic(uint32_t errorId)
 
     inStateOfPanic = true;
     asm volatile ("cli");
-    const char* errorTextID[22] =
+    const char* errorTextID[24] =
     {
         "DIVIDE_BY_ZERO", "DEBUG_TRAP", "NON_MASKABLE_INTERRUPT", "BREAKPOINT",
         "OVERFLOW_INCIDENT", "BOUND_RANGE_EXCEEDED", "INVALID_OPCODE", "DEVICE_UNAVAILABLE",
         "DOUBLE_FAULT", "COPROCCESSOR_OVERRUN", "INVALID_TASK_STATE_SEGMENT", "SEGMENT_NOT_PRESENT",
         "STACK_SEGMENT_FAULT", "GENERAL_PROTECTION_FAULT", "PAGE_FAULT", "0x0F",
         "X87_FLOATING_POINT_EXCEPTION", "MISALIGNED_MEMORY", "HARDWARE_ERROR", "SIMD_FLOATING_POINT_EXCEPTION",
-        "VIRTUALISATION_EXCEPTION", "CONTROL_PROTECTION_EXCEPTION"
+        "VIRTUALISATION_EXCEPTION", "CONTROL_PROTECTION_EXCEPTION", "DRIVER_VIOLATION", "KILLSWITCH_INVOKED"
     };
 
     const char* errorName = "UNKNOWN_EXCEPTION";
-    if (errorId < 22)
+    if (errorId < 24)
         errorName = errorTextID[errorId];
 
     // red screen of death
     printf("%R\a", 0x4F);
-    printf(" <!> STOP                                                                       ");
+    printf(" <!> STOP                                                                   >_< ");
     printf("                                                                                ");
     printf(" OpenSteel/OS %d.%d.%d\n", verMajor, verMinor, verBuild);
     printf(" Exception ID 0x%x - %s\n", errorId, errorName); // keep it simple, only tell the end user what program/process broke it and why
     printf("                                                                                ");
     printf(" A problem has occurred and OpenSteel/OS has shut down.                         ");
-    printf("                                                                                ");
 
+    switch (errorId)
+    {
+        case 0x00:
+            printf(" Attempt to divide by zero in the kernel or a kernel-level task caused a        ");
+            printf(" system crash. Please contact the vendor of the faulting task to resolve this   ");
+            printf(" problem.                                                                       ");
+            break;
+
+        case 0x09:
+            printf(" Your system invoked a legacy error that has not been used since the Intel i486 ");
+            printf(" series of processors. If you are running OpenSteel/OS on a computer with an    ");
+            printf(" Intel Pentium (1993) or newer, you should not be seeing this error. If you are ");
+            printf(" running OpenSteel/OS on a computer with an Intel i486 series processor or      ");
+            printf(" older, please turn off the computer and restart it.                            ");
+            break;
+
+        case 0x12:
+            printf(" This error, also called a machine check, indicates that there was a serious    ");
+            printf(" hardware problem and that the CPU aborted itself. Please contact your hardware ");
+            printf(" vendor(s) or distributor(s) for technical support.                             ");
+            break;
+
+        case 0x16:
+            printf(" A task attempted to access a driver function without an appropriate system     ");
+            printf(" call or API or construct its own driver outside of the driver manager.         ");
+            break;
+
+        case 0x17:
+            printf(" A killswitch has been flipped to intentionally crash OpenSteel/OS. This could  ");
+            printf(" be for a variety of reasons, ranging from you just want to have fun to you     ");
+            printf(" could not access a shutdown interface safely and have a killswitch keybind.    ");
+            printf(" Regardless, please try to avoid this error and shut the PC down normally, so   ");
+            printf(" that you are not as numb to a serious error.                                   ");
+            break;
+        
+        default:
+            printf(" A description for this error is unavailable.                                   ");
+            break;
+    }
+
+    printf("                                                                                ");
     printf("     system halted. please press the power button, it is now safe to do so.     ");
     while(1)
     {
@@ -522,7 +575,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     printf("                                                                                ");
 
     // sysagent header
-    printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 4\n", 0x0F, verMajor, verMinor, verBuild);
+    printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 5\n", 0x0F, verMajor, verMinor, verBuild);
 
     currentInterface = BootUI;
     GlobalDescriptorTable gdt;
@@ -557,6 +610,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // since a thing with this build is scheduler refinement, feel free to play around with my infinite-looping commands.
     // register tasks v
 
+    //taskManager = new TaskManager();
     Task task1(&gdt, TestTask1);
     Task task2(&gdt, TestTask2);
     Task task3(&gdt, TestTask3);
@@ -582,7 +636,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     drvManager.AddDriver(&keyboard);
 
     ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
-    programmableIntervalTimer.attachToInterruptManager(&interrupts);
+    drvManager.AddDriver(&programmableIntervalTimer);
 
     //MouseToConsole mousehandler;
     //MouseDriver mouse(&interrupts, &mousehandler);
@@ -590,7 +644,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     // ^ mouse driver sucked. let's not use it, if possible.
 
-    Speaker speaker;
+    Speaker speaker; drvManager.AddDriver(&speaker);
     ClockBatteryDriver cmos;
     char rtcSec[3], rtcMin[3];
 
@@ -604,7 +658,25 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // VideoGraphicsArray vga;
 
     printf("%Rstarting drivers and interrupts...                                         ", 0x0F);
-    drvManager.ActivateAll();
+    drvManager.ActivateAll(&interrupts);
+
+/*     AdvancedTechnologyAttachment ata0l(0x1F0, true);  // IRQ 14
+    serialPort.WriteString("ATA Pri. Lead: "); printf("%RATA Pri. Lead: ", 0x0F); ata0l.IdentifyDrive();
+    AdvancedTechnologyAttachment ata0f(0x1F0, false);
+    serialPort.WriteString("ATA Pri. Follow: "); printf("ATA Pri. Follow: "); ata0f.IdentifyDrive();
+
+    char* testDriveString = "Testing hard drive stuff";
+    ata0l.Write28Bit(0, testDriveString, 25);
+    ata0l.FlushDrive();
+
+    ata0l.Read28Bit(0, testDriveString, 25);
+
+    AdvancedTechnologyAttachment ata1l(0x170, true);  // IRQ 15
+    serialPort.WriteString("\nATA Sec. Lead: "); printf("\nATA Sec. Lead: "); ata1l.IdentifyDrive();
+    AdvancedTechnologyAttachment ata1f(0x170, false);
+    serialPort.WriteString("ATA Sec. Follow: "); printf("ATA Sec. Follow: "); ata1f.IdentifyDrive();
+ */
+    // the others are 0x1E8 and 0x168
 
     interrupts.Activate();
     RealTimeClockRegisters time = cmos.ReadRTC();
@@ -643,7 +715,12 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     //printf("Integer and printf Output Test _________________________________________________");
     //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
-
+/* 
+    if (interrupts.handlerExists(0x24)) printf("\nIRQ 4 Handler Exists."); else printf("\nIRQ 4 Handler doesn\'t exist.");
+    if (interrupts.handlerExists(0x2E)) printf("\nIRQ 14 Handler Exists."); else printf("\nIRQ 14 Handler doesn\'t exist.");
+    if (interrupts.handlerExists(0x21)) printf("\nIRQ 1 Handler Exists"); else printf("\nIRQ 1 handler doesn\'t exist.");
+    if (interrupts.handlerExists(0x2C)) printf("\nIRQ 12 Handler exists."); else printf("\nIRQ 12 Handler doesn\'t exist.");
+ */
     EnableCursor(13, 15);
     FlushShell();
     nrsh.Initialise();
