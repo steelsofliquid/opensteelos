@@ -3,13 +3,24 @@
 using namespace osos;
 using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::hwcom;
+using namespace osos::kernel;
+using namespace osos::kernel::hwcom;
+
+bool drvFuncLocked = true;
 
 Speaker::Speaker()
  : PITChannel2(0x42),
    PITCom(0x43),
    SpeakerPort(0x61)
 {
+    driverAttributes.name      = "PC Speaker Driver";
+    driverAttributes.publisher = "SteelsOfLiquid";
+    driverAttributes.type      = "audioDevice";
+
+    driverAttributes.isInitialised = false;
+    driverAttributes.isActive      = false;
+
+    driverAttributes.hasInterruptRequest  = false;
 }
 
 Speaker::~Speaker()
@@ -18,31 +29,43 @@ Speaker::~Speaker()
 
 
 
+void Speaker::StartDriver()
+{
+	drvFuncLocked = false;
+}
+
+
+
 // Hardware Functions
 void Speaker::play_sound(uint32_t nFrequence)
 {
-    uint32_t Div;
-	uint8_t tmp;
+	if (!drvFuncLocked)
+	{
+		uint32_t div;
+		uint8_t tmp;
 
-	Div = 1193180 / nFrequence;
+		div = 1193180 / nFrequence;
 
-	PITCom.Write(0xB6);
-	PITChannel2.Write((uint8_t) (Div));
-	PITChannel2.Write((uint8_t) (Div >> 8));
-	
-	tmp = SpeakerPort.Read();
+		PITCom.Write(0xB6);
+		PITChannel2.Write((uint8_t) (div));
+		PITChannel2.Write((uint8_t) (div >> 8));
+		
+		tmp = SpeakerPort.Read();
 
-	if (tmp != (tmp | 3)) {
-		SpeakerPort.Write(tmp | 3);
+		if (tmp != (tmp | 3)) {
+			SpeakerPort.Write(tmp | 3);
+		}
 	}
-	
 }
 
 void Speaker::nosound()
 {
-    uint8_t tmp = SpeakerPort.Read();
-	
-	SpeakerPort.Write(tmp & 0xFC);
+	if (!drvFuncLocked)
+	{
+		uint8_t tmp = SpeakerPort.Read();
+		
+		SpeakerPort.Write(tmp & 0xFC);
+	}
 }
 
 
@@ -92,18 +115,18 @@ void Speaker::LifeChime()
 	// built off of MIDI technologies
 	// it also could be more optimised -_-
 
-	BeepVariable(261, 6);
-	BeepVariable(523, 6);
-	BeepVariable(698, 6);
-	BeepVariable(330, 6);
+	BeepVariable(261, 30);
+	BeepVariable(523, 30);
+	BeepVariable(698, 30);
+	BeepVariable(330, 30);
 }
 
 void Speaker::RestChime()
 {
-	BeepVariable(330, 17);
-	BeepVariable(698, 24);
-	BeepVariable(523, 14);
-	BeepVariable(131, 7);
+	BeepVariable(330, 42);
+	BeepVariable(698, 60);
+	BeepVariable(523, 35);
+	BeepVariable(131, 17);
 }
 
 // a
