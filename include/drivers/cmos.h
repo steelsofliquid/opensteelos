@@ -2,8 +2,7 @@
 #define __OSOS__DRIVERS__CMOS_H
 
 #include <common/types.h>
-#include <drivers/driver.h>
-#include <hwcom/port.h>
+#include <kernel/hwcom/port.h>
 #include <globalfuncs.h>
 
 namespace osos
@@ -24,8 +23,8 @@ namespace osos
         class ClockBatteryDriver
         {
             public:
-            osos::hwcom::Port8Bit portAddressCMOS;
-            osos::hwcom::Port8Bit portDataCMOS;
+            osos::kernel::hwcom::Port8Bit portAddressCMOS;
+            osos::kernel::hwcom::Port8Bit portDataCMOS;
 
             public:
             ClockBatteryDriver();

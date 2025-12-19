@@ -4,30 +4,32 @@
 #define __OSOS__DRIVERS__PIT_H
 
 #include <common/types.h>
-#include <drivers/driver.h>
-#include <hwcom/interrupts.h>
-#include <hwcom/port.h>
-	
+#include <kernel/hwcom/interrupts.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/port.h>
+
 namespace osos
 {
 	namespace drivers
 	{
-		class ProgrammableIntervalTimer : public Driver, public osos::hwcom::InterruptHandler
+		class ProgrammableIntervalTimer : public osos::kernel::hwcom::DriverModel, public osos::kernel::hwcom::InterruptHandler
 		{
-			osos::hwcom::Port8Bit Channel0;
-			osos::hwcom::Port8Bit Channel1;
-			osos::hwcom::Port8Bit Channel2;
-			osos::hwcom::Port8Bit PITComPort; // PIT Command Port
-			osos::hwcom::Port8Bit ProgIC;
+			osos::kernel::hwcom::Port8Bit Channel0;
+			osos::kernel::hwcom::Port8Bit Channel1;
+			osos::kernel::hwcom::Port8Bit Channel2;
+			osos::kernel::hwcom::Port8Bit PITComPort; // PIT Command Port
+			osos::kernel::hwcom::Port8Bit ProgIC;
 				
 			public:
-			ProgrammableIntervalTimer(osos::hwcom::InterruptManager* manager);
+			ProgrammableIntervalTimer(osos::kernel::hwcom::InterruptManager* manager);
 			~ProgrammableIntervalTimer();
+
+			osos::kernel::hwcom::InterruptHandler* InterruptHandlerForme();
 				
 			osos::common::uint32_t ReadPIT();
 			void SetPITCount(osos::common::uint32_t count);
 
-			virtual void Activate();
+			virtual void StartDriver();
 			virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
 		}; // initially forgot a semicolon (almost said semilion for some reason) -▿-
 	}

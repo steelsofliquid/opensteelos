@@ -2,8 +2,7 @@
 #define __OSOS__DRIVERS__RS232_H
 
 #include <common/types.h>
-#include <drivers/driver.h>
-#include <hwcom/port.h>
+#include <kernel/hwcom/port.h>
 #include <globalfuncs.h>
 
 namespace osos
@@ -12,7 +11,7 @@ namespace osos
     {
         class RecommendedStandard232Driver
         {
-            osos::hwcom::Port8Bit COM1;
+            osos::kernel::hwcom::Port8Bit COM1;
 
             public:
             RecommendedStandard232Driver();

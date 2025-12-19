@@ -2,8 +2,8 @@
 #define __OSOS__DRIVERS__VGA_H
 
 #include <common/types.h>
-#include <drivers/driver.h>
-#include <hwcom/port.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/port.h>
 
 namespace osos
 {
@@ -12,17 +12,17 @@ namespace osos
         class VideoGraphicsArray
         {
             protected:
-            osos::hwcom::Port8Bit MiscPort; // MP
-            osos::hwcom::Port8Bit CRTCIndexPort; // CTRCIP
-            osos::hwcom::Port8Bit CRTCDataPort; // CTRCDP
-            osos::hwcom::Port8Bit SequencerIndexPort; // SIP
-            osos::hwcom::Port8Bit SequencerDataPort; // SDP
-            osos::hwcom::Port8Bit GCIndexPort; // GCIP (Graphics Controller Index Port)
-            osos::hwcom::Port8Bit GCDataPort; // GCDP (Graphics Controller Data Port)
-            osos::hwcom::Port8Bit ACIndexPort; // ACIP (Attribute Controller Index Port)
-            osos::hwcom::Port8Bit ACReadPort; // ACReaP (Attribute Controller Read Port)
-            osos::hwcom::Port8Bit ACWritePort; // ACWP (Attribute Controller Write Port)
-            osos::hwcom::Port8Bit ACResetPort; // ACResP (Attribute Controller Reset Port)
+            osos::kernel::hwcom::Port8Bit MiscPort; // MP
+            osos::kernel::hwcom::Port8Bit CRTCIndexPort; // CTRCIP
+            osos::kernel::hwcom::Port8Bit CRTCDataPort; // CTRCDP
+            osos::kernel::hwcom::Port8Bit SequencerIndexPort; // SIP
+            osos::kernel::hwcom::Port8Bit SequencerDataPort; // SDP
+            osos::kernel::hwcom::Port8Bit GCIndexPort; // GCIP (Graphics Controller Index Port)
+            osos::kernel::hwcom::Port8Bit GCDataPort; // GCDP (Graphics Controller Data Port)
+            osos::kernel::hwcom::Port8Bit ACIndexPort; // ACIP (Attribute Controller Index Port)
+            osos::kernel::hwcom::Port8Bit ACReadPort; // ACReaP (Attribute Controller Read Port)
+            osos::kernel::hwcom::Port8Bit ACWritePort; // ACWP (Attribute Controller Write Port)
+            osos::kernel::hwcom::Port8Bit ACResetPort; // ACResP (Attribute Controller Reset Port)
 
             void WriteRegisters(osos::common::uint8_t* registers);
             osos::common::uint8_t* GetFrameBufferSegment();

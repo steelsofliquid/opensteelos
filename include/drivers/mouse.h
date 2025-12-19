@@ -3,9 +3,9 @@
 #define __OSOS__DRIVERS__MOUSE_H
 
 #include <common/types.h>
-#include <drivers/driver.h>
-#include <hwcom/interrupts.h>
-#include <hwcom/port.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/interrupts.h>
+#include <kernel/hwcom/port.h>
 
 namespace osos
 {
@@ -23,10 +23,10 @@ namespace osos
 
         };
 
-        class MouseDriver : public osos::hwcom::InterruptHandler, public Driver
+        class MouseDriver : public osos::kernel::hwcom::InterruptHandler, public osos::kernel::hwcom::DriverModel
         {
-            osos::hwcom::Port8Bit dataPort;
-            osos::hwcom::Port8Bit commandPort; // from keyboard driver
+            osos::kernel::hwcom::Port8Bit dataPort;
+            osos::kernel::hwcom::Port8Bit commandPort; // from keyboard driver
 
             osos::common::uint8_t buffer[3];
             osos::common::uint8_t offset;
@@ -35,10 +35,13 @@ namespace osos
             MouseEventHandler* handler;
 
             public:
-            MouseDriver(osos::hwcom::InterruptManager* manager, MouseEventHandler* handler);
+            MouseDriver(osos::kernel::hwcom::InterruptManager* manager, MouseEventHandler* handler);
             ~MouseDriver();
+
+            osos::kernel::hwcom::InterruptHandler* InterruptHandlerForme();
+
             virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
-            virtual void Activate();
+            virtual void StartDriver();
 
         };
     }

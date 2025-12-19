@@ -4,9 +4,9 @@
 
 #include <common/types.h>
 #include <common/sysHelpers.h>
-#include <drivers/driver.h>
-#include <hwcom/interrupts.h>
-#include <hwcom/port.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/interrupts.h>
+#include <kernel/hwcom/port.h>
 
 namespace osos
 {
@@ -31,18 +31,21 @@ namespace osos
 
         };
 
-        class KeyboardDriver : public osos::hwcom::InterruptHandler, public Driver
+        class KeyboardDriver : public osos::kernel::hwcom::InterruptHandler, public osos::kernel::hwcom::DriverModel
         {
-            osos::hwcom::Port8Bit dataPort;
-            osos::hwcom::Port8Bit commandPort;
+            osos::kernel::hwcom::Port8Bit dataPort;
+            osos::kernel::hwcom::Port8Bit commandPort;
 
             KeyboardEventHandler* handler;
             
             public:
-            KeyboardDriver(osos::hwcom::InterruptManager* manager, KeyboardEventHandler *handler);
+            KeyboardDriver(osos::kernel::hwcom::InterruptManager* manager, KeyboardEventHandler *handler);
             ~KeyboardDriver();
+
+            osos::kernel::hwcom::InterruptHandler* InterruptHandlerForme();
+            
             virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
-            virtual void Activate();
+            virtual void StartDriver();
             
         };
     }
