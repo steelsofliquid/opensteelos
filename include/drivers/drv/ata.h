@@ -2,6 +2,7 @@
 #define __OSOS__DRIVERS__DRV__ATA_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <drivers/rs232.h>
 #include <kernel/hwcom/port.h>
 
@@ -30,15 +31,15 @@ namespace osos
                 // As such, we use "lead" and "follow".
                 bool lead;
 
-                osos::common::uint16_t bytesPerSector;
+                uint16_t bytesPerSector;
 
                 public:
-                AdvancedTechnologyAttachment(osos::common::uint16_t portBase, bool lead);
+                AdvancedTechnologyAttachment(uint16_t portBase, bool lead);
                 ~AdvancedTechnologyAttachment();
 
                 void IdentifyDrive();
-                void Read28Bit(osos::common::uint32_t sector, char* data, int count);
-                void Write28Bit(osos::common::uint32_t sector, char* data, int count);
+                void Read28Bit(uint32_t sector, char* data, int count);
+                void Write28Bit(uint32_t sector, char* data, int count);
                 void FlushDrive(); // Flush>Drive< to differentiate from kernel-NRSh function Flush>Shell<.
 
                 // TODO one day: Add a twin-journal system
