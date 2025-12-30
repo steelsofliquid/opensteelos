@@ -1,7 +1,6 @@
 #include <kernel/hwcom/pci.h>
 using namespace osos;
-using namespace osos::common;
-using namespace osos::drivers;
+// using namespace osos::drivers;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
 
@@ -60,8 +59,7 @@ bool PCIController::deviceHasFunctions(uint16_t bus, uint16_t device) // device 
     return PCIRead(bus, device, 0, 0x0E) & (1<<7);
 }
 
-void printf(char* str, ...);
-void printfHex(uint8_t);
+void printfHex(uint8_t); // legacy code that needs to be eradicated
 
 void PCIController::SelectDrivers(DriverManager* driverManager, InterruptManager* interrupts)
 {

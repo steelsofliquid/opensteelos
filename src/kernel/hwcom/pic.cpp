@@ -1,7 +1,6 @@
 #include <kernel/hwcom/pic.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
 
@@ -80,7 +79,7 @@ void ProgrammableInterruptController::UnmaskIRQ(uint8_t interruptReq)
 
 
 
-void ProgrammableInterruptController::SendEOI(osos::common::uint8_t interruptRequest)
+void ProgrammableInterruptController::SendEOI(uint8_t interruptRequest)
 {
     if(8 <= interruptRequest)
         picFollowCommand.Write(0x20);

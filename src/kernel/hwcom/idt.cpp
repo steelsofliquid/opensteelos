@@ -1,11 +1,8 @@
 #include <kernel/hwcom/idt.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
-
-void printf(char* str, ...);
 
 InterruptDescriptorTable::InterruptDescriptorTable()
 {
@@ -86,6 +83,11 @@ void InterruptDescriptorTable::SetInterruptRequests(GlobalDescriptorTable* gdt)
     SetInterruptDescriptorTableEntry(0x2D, codeSegment, &HandleInterruptRequest0x0D, 0, IDT_INTERRUPT_GATE);
     SetInterruptDescriptorTableEntry(0x2E, codeSegment, &HandleInterruptRequest0x0E, 0, IDT_INTERRUPT_GATE);
     SetInterruptDescriptorTableEntry(0x2F, codeSegment, &HandleInterruptRequest0x0F, 0, IDT_INTERRUPT_GATE);
+}
+
+void InterruptDescriptorTable::SetSystemCalls(GlobalDescriptorTable* gdt)
+{
+    // currently, we don't have any system call stuff yet. but there will be soon...
 }
 
 void InterruptDescriptorTable::Initialise()

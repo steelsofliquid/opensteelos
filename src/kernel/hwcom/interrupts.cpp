@@ -3,13 +3,8 @@
 #include <kernel/hwcom/pic.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
-
-void printf(char* str, ...);
-void printfHex(uint8_t);
-void panic(uint32_t);
 
 InterruptHandler::InterruptHandler(InterruptManager* interruptManager, uint8_t interruptNumber)
 {
@@ -75,7 +70,7 @@ InterruptManager::~InterruptManager() // I'm leaving this in, the comment said "
 }
 
 
-bool InterruptManager::handlerExists(osos::common::uint8_t interruptNumber)
+bool InterruptManager::handlerExists(uint8_t interruptNumber)
 {
     return handlers[interruptNumber] != nullptr;
 }
@@ -130,15 +125,8 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t e
     {
         panic(interruptNumber);
     }
-    else if(interruptNumber != 0x20 && interruptNumber != 0x24) // assuming it's not a timer interrupt?
+    else if(interruptNumber != 0x20) // assuming it's not a timer interrupt?
     {
-        // this semi-legacy code needs to some reworking. the original if statement was deleted, since it's contents were
-        // transferred to pit.cpp. should be as simple as an if statement, but i'm not going to test my luck right now.
-
-        char interruptHex[3] = {'0', '0', 0};
-        const char* hex = "0123456789ABCDEF";
-        interruptHex[0] = hex[(interruptNumber >> 4) & 0x0F];
-        interruptHex[1] = hex[interruptNumber & 0x0F];
         printf("\nUnhandled interrupt. Please write an entry for: 0x%x", interruptNumber);
     }
 

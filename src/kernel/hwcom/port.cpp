@@ -1,7 +1,6 @@
 
 #include <kernel/hwcom/port.h>
 using namespace osos;
-using namespace osos::common;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
 
