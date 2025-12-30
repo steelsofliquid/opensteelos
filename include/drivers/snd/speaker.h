@@ -26,16 +26,16 @@ namespace osos
 
             struct meledy
             {
-                osos::common::uint32_t frequency;
-                osos::common::uint32_t length;
+                uint32_t frequency;
+                uint32_t length;
             };
                 
             // hardware functions
-            void play_sound(osos::common::uint32_t nFrequence);
+            void play_sound(uint32_t nFrequence);
             void nosound();
 
             // system sounds (might be transferred to their own object in the future)
-            void BeepVariable(osos::common::uint32_t frequency, osos::common::uint32_t interval);
+            void BeepVariable(uint32_t frequency, uint32_t interval);
             void BeepBasic();
             void LifeChime();
             void RestChime();
