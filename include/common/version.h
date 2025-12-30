@@ -4,8 +4,8 @@
 
 #include <common/types.h>
 
-extern osos::common::int32_t verMajor;
-extern osos::common::int32_t verMinor;
-extern osos::common::int32_t verBuild;
+extern int32_t verMajor;
+extern int32_t verMinor;
+extern int32_t verBuild;
 
 #endif
