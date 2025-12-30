@@ -14,17 +14,17 @@ namespace osos
             class SegmentDescriptor
             {
                 private:
-                osos::common::uint16_t limitLow;
-                osos::common::uint16_t baseLow;
-                osos::common::uint8_t baseHigh;
-                osos::common::uint8_t type;
-                osos::common::uint8_t flagsLimitHigh;
-                osos::common::uint8_t baseVirtualHigh;
+                uint16_t limitLow;
+                uint16_t baseLow;
+                uint8_t baseHigh;
+                uint8_t type;
+                uint8_t flagsLimitHigh;
+                uint8_t baseVirtualHigh;
 
                 public:
-                SegmentDescriptor(osos::common::uint32_t base, osos::common::uint32_t limit, osos::common::uint8_t type);
-                osos::common::uint32_t Base();
-                osos::common::uint32_t Limit();
+                SegmentDescriptor(uint32_t base, uint32_t limit, uint8_t type);
+                uint32_t Base();
+                uint32_t Limit();
 
             } __attribute__((packed));
 
@@ -38,8 +38,8 @@ namespace osos
             GlobalDescriptorTable();
             ~GlobalDescriptorTable();
 
-            osos::common::uint16_t CodeSegmentSelector();
-            osos::common::uint16_t DataSegmentSelector();
+            uint16_t CodeSegmentSelector();
+            uint16_t DataSegmentSelector();
     };
     }
 }

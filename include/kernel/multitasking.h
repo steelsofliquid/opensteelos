@@ -3,6 +3,7 @@
 #define __MULTITASKING_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <kernel/gdt.h>
 
 namespace osos
@@ -11,22 +12,22 @@ namespace osos
     {
         struct CPUState
         {
-            osos::common::uint32_t eax;
-            osos::common::uint32_t ebx;
-            osos::common::uint32_t ecx;
-            osos::common::uint32_t edx;
+            uint32_t eax;
+            uint32_t ebx;
+            uint32_t ecx;
+            uint32_t edx;
 
-            osos::common::uint32_t esi;
-            osos::common::uint32_t edi;
-            osos::common::uint32_t ebp;
+            uint32_t esi;
+            uint32_t edi;
+            uint32_t ebp;
 
-            osos::common::uint32_t error;
+            uint32_t error;
 
-            osos::common::uint32_t eip;
-            osos::common::uint32_t cs;
-            osos::common::uint32_t eflags;
-            osos::common::uint32_t esp;
-            osos::common::uint32_t ss;
+            uint32_t eip;
+            uint32_t cs;
+            uint32_t eflags;
+            uint32_t esp;
+            uint32_t ss;
 
         } __attribute__((packed));
 
@@ -35,12 +36,12 @@ namespace osos
             friend class TaskManager;
 
             private:
-            osos::common::uint8_t stack[4096]; // 4 KiB
+            uint8_t stack[4096]; // 4 KiB
             CPUState* cpuState;
 
             public:
             bool isAsleep;
-            osos::common::uint32_t wakeTick;
+            uint32_t wakeTick;
             Task(GlobalDescriptorTable *gdt, void entrypoint());
             ~Task();
         };
@@ -58,8 +59,8 @@ namespace osos
             bool AddTask(Task* task);
             CPUState* Schedule(CPUState* cpuState);
 
-            void sleep(osos::common::uint32_t interval);
-            void WakeTask(osos::common::uint32_t ticks);
+            void sleep(uint32_t interval);
+            void WakeTask(uint32_t ticks);
         };
 
         extern TaskManager taskManager;
