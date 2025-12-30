@@ -1,9 +1,7 @@
 #include <globalfuncs.h>
 
 using namespace osos;
-using namespace osos::common;
-using namespace osos::drivers;
-using namespace osos::libs;
+// using namespace osos::drivers;
 
 extern volatile uint32_t tickCount;
 
