@@ -1,17 +1,14 @@
 #include <userland/nrsh/cliCommands.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
-using namespace osos::libs;
 
 extern volatile uint32_t tickCount;
 
-void printf(char* str, ...);
 void shutdown();
 
-static Speaker speakerNrshComs;
-static RecommendedStandard232Driver serialNrshComs;
+//static Speaker speakerNrshComs;
+//static RecommendedStandard232Driver serialNrshComs;
 
 
 
@@ -100,6 +97,7 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
 
     if (serialFlag)
     {
+        printf("Serial Port Functionality is disabled for now.\n");
         for (int i = 2; i < argc; i++)
         {
             //serialNrshComs.WriteString(argv[i]);
