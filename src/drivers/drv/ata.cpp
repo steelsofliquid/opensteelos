@@ -1,20 +1,18 @@
 #include <drivers/drv/ata.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::drivers::drives;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
 
-static RecommendedStandard232Driver rs232AtaHelper;
-void printf(char* str, ...);
+//static RecommendedStandard232Driver rs232AtaHelper;
 
 
 
 
 
-AdvancedTechnologyAttachment::AdvancedTechnologyAttachment(osos::common::uint16_t portBase, bool lead) :
+AdvancedTechnologyAttachment::AdvancedTechnologyAttachment(uint16_t portBase, bool lead) :
     dataPort        (portBase),
     errorPort       (portBase + 1),
     sectorCountPort (portBase + 2),
@@ -56,7 +54,7 @@ void AdvancedTechnologyAttachment::IdentifyDrive()
 
     if (status & 0x01)
     {
-        rs232AtaHelper.WriteString("ERROR");
+        //rs232AtaHelper.WriteString("ERROR");
         printf("ERROR");
         return;
     }
@@ -66,10 +64,10 @@ void AdvancedTechnologyAttachment::IdentifyDrive()
         uint16_t data = dataPort.Read();
         printf("%x", data);
     }
-    rs232AtaHelper.WriteString("DISK OK");
+    //rs232AtaHelper.WriteString("DISK OK");
 }
 
-void AdvancedTechnologyAttachment::Read28Bit(osos::common::uint32_t sector, char* data, int count)
+void AdvancedTechnologyAttachment::Read28Bit(uint32_t sector, char* data, int count)
 {
     if (sector & 0xF0000000) return;
     if (count > bytesPerSector) return;
@@ -88,7 +86,7 @@ void AdvancedTechnologyAttachment::Read28Bit(osos::common::uint32_t sector, char
 
     if (status & 0x01)
     {
-        rs232AtaHelper.WriteString("\n<!> Error trying to read HDD.");
+        //rs232AtaHelper.WriteString("\n<!> Error trying to read HDD.");
         return;
     }
 
@@ -105,7 +103,7 @@ void AdvancedTechnologyAttachment::Read28Bit(osos::common::uint32_t sector, char
     for (uint16_t i = count + (count % 2); i < bytesPerSector; i += 2) dataPort.Read();
 }
 
-void AdvancedTechnologyAttachment::Write28Bit(osos::common::uint32_t sector, char* data, int count)
+void AdvancedTechnologyAttachment::Write28Bit(uint32_t sector, char* data, int count)
 {
     if (sector & 0xF0000000) return;
     if (count > bytesPerSector) return;
@@ -140,7 +138,7 @@ void AdvancedTechnologyAttachment::FlushDrive()
 
     if (status & 0x01)
     {
-        rs232AtaHelper.WriteString("\n<!> Error trying to flush HDD.");
+        //rs232AtaHelper.WriteString("\n<!> Error trying to flush HDD.");
         return;
     }
 }
