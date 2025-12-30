@@ -2,6 +2,7 @@
 #define __OSOS__KERNEL__HWCOM__IDT_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <kernel/gdt.h>
 
 namespace osos
@@ -15,8 +16,8 @@ namespace osos
                 protected:
                 struct interruptDescriptorTablePointer
                 {
-                    osos::common::uint16_t size;
-                    osos::common::uint32_t base;
+                    uint16_t size;
+                    uint32_t base;
                 } __attribute__((packed));
 
                 static void HandleException0x00();
@@ -62,11 +63,11 @@ namespace osos
                 public:
                 struct GateDescriptor
                 {
-                    osos::common::uint16_t handlerAddressLowBits;
-                    osos::common::uint16_t gdtCodeSegmentSelector;
-                    osos::common::uint8_t reserved;
-                    osos::common::uint8_t access;
-                    osos::common::uint16_t handlerAddressHighBits;
+                    uint16_t handlerAddressLowBits;
+                    uint16_t gdtCodeSegmentSelector;
+                    uint8_t reserved;
+                    uint8_t access;
+                    uint16_t handlerAddressHighBits;
 
                 } __attribute__((packed)); // 2024-10-31 ah yes, intellisense is totally fine and not drunk as this code compiled a-ok in the original ubuntu install
                 // also why tf am i coding this on windows 10 garbage edition (poor timing for that joke -_-) when i could be doing this on linux
@@ -77,26 +78,27 @@ namespace osos
                 static GateDescriptor interruptDescriptorTable[256];
 
                 static void SetInterruptDescriptorTableEntry(
-                    osos::common::uint8_t interruptNumber,
-                    osos::common::uint16_t codeSegmentSelectorOffset,
+                    uint8_t interruptNumber,
+                    uint16_t codeSegmentSelectorOffset,
                     void (*handler)(),
-                    osos::common::uint8_t descriptorPrivilegeLevel,
-                    osos::common::uint8_t descriptorType
+                    uint8_t descriptorPrivilegeLevel,
+                    uint8_t descriptorType
                 );
 
                 void SetExceptions(GlobalDescriptorTable* gdt);
                 void SetInterruptRequests(GlobalDescriptorTable* gdt);
+                void SetSystemCalls(GlobalDescriptorTable* gdt);
                 void Initialise();
 
                 // debug checks
-                static void CheckIDTVector(osos::common::uint8_t vector);
-                static void CheckIDTAttribAndSlctr(osos::common::uint8_t vector);
+                static void CheckIDTVector(uint8_t vector);
+                static void CheckIDTAttribAndSlctr(uint8_t vector);
                 //static void DebugStage5();
 
                 struct idtR
                 {
-                        osos::common::uint16_t limit;
-                        osos::common::uint32_t base;
+                        uint16_t limit;
+                        uint32_t base;
                 } __attribute__((packed));
             };
         }

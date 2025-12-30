@@ -17,6 +17,7 @@
 #define __OSOS__KERNEL__HWCOM__PCI_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <kernel/hwcom/driverModel.h>
 #include <kernel/hwcom/driverManager.h>
 #include <kernel/hwcom/interrupts.h>
@@ -41,8 +42,8 @@ namespace osos
             {
                 public:
                 bool prefetchable;
-                osos::common::uint8_t* address;
-                osos::common::uint32_t size;
+                uint8_t* address;
+                uint32_t size;
                 BaseAddressRegisterType type;
 
             };
@@ -50,21 +51,21 @@ namespace osos
             class PCIDevDesc // Short for "PCI Device Descriptor", or "PeripheralComponentInterconnectDeviceDescriptor".
             {
                 public:
-                osos::common::uint32_t portBase;
-                osos::common::uint32_t interrupt; // I don't remember this being in the interrupts header...
+                uint32_t portBase;
+                uint32_t interrupt; // I don't remember this being in the interrupts header...
 
-                osos::common::uint16_t bus;
-                osos::common::uint16_t device;
-                osos::common::uint16_t function;
+                uint16_t bus;
+                uint16_t device;
+                uint16_t function;
 
-                osos::common::uint16_t vendorId; // Up to 65 thousand vendor IDs can be assigned.
-                osos::common::uint16_t deviceId;
+                uint16_t vendorId; // Up to 65 thousand vendor IDs can be assigned.
+                uint16_t deviceId;
 
-                osos::common::uint8_t classId;
-                osos::common::uint8_t subclassId;
-                osos::common::uint8_t interfaceId;
+                uint8_t classId;
+                uint8_t subclassId;
+                uint8_t interfaceId;
 
-                osos::common::uint8_t revision;
+                uint8_t revision;
 
 
                 PCIDevDesc();
@@ -81,15 +82,15 @@ namespace osos
                 PCIController();
                 ~PCIController();
 
-                osos::common::uint32_t PCIRead(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint32_t registerOffset);
-                void PCIWrite(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint32_t registerOffset, 
-                    osos::common::uint32_t value);
-                bool deviceHasFunctions(osos::common::uint16_t bus, osos::common::uint16_t device);
+                uint32_t PCIRead(uint16_t bus, uint16_t device, uint16_t function, uint32_t registerOffset);
+                void PCIWrite(uint16_t bus, uint16_t device, uint16_t function, uint32_t registerOffset, 
+                    uint32_t value);
+                bool deviceHasFunctions(uint16_t bus, uint16_t device);
 
                 void SelectDrivers(osos::kernel::hwcom::DriverManager* driverManager, osos::kernel::hwcom::InterruptManager* interrupts);
                 osos::kernel::hwcom::DriverModel* GetDriver(PCIDevDesc dev, osos::kernel::hwcom::InterruptManager* interrupts);
-                PCIDevDesc GetDeviceDescriptor(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function);
-                BaseAddressRegister GetBasAdrReg(osos::common::uint16_t bus, osos::common::uint16_t device, osos::common::uint16_t function, osos::common::uint16_t bar);
+                PCIDevDesc GetDeviceDescriptor(uint16_t bus, uint16_t device, uint16_t function);
+                BaseAddressRegister GetBasAdrReg(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar);
 
             };
         }

@@ -14,6 +14,7 @@
 #define __OSOS__KERNEL__HWCOM__DRIVERMODEL_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <kernel/hwcom/interrupts.h>
 #include <kernel/hwcom/pic.h>
 #include <kernel/hwcom/port.h>
@@ -33,8 +34,8 @@ namespace osos
                 bool isInitialised;
                 bool isActive;
                 bool hasInterruptRequest;
-                osos::common::uint8_t interruptRequestLine;
-                osos::common::uint8_t vectorOffset;
+                uint8_t interruptRequestLine;
+                uint8_t vectorOffset;
             };
 
             class DriverModel
@@ -67,8 +68,8 @@ namespace osos
                 InterruptDriver();
                 ~InterruptDriver();
 
-                virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
-                virtual osos::common::uint8_t GetInterruptRequest();
+                virtual uint32_t HandleInterrupt(uint32_t esp);
+                virtual uint8_t GetInterruptRequest();
             }; */
         }
     }

@@ -2,8 +2,8 @@
 #define __OSOS__KERNEL__HWCOM__PIC_H
 
 #include <common/types.h>
+#include <common/lib/libasm.h>
 #include <kernel/hwcom/port.h>
-#include <globalfuncs.h>
 
 namespace osos
 {
@@ -31,10 +31,10 @@ namespace osos
                 void Initialise();
                 void Disable();
 
-                void MaskIRQ(osos::common::uint8_t interruptReq);
-                void UnmaskIRQ(osos::common::uint8_t interruptReq);
+                void MaskIRQ(uint8_t interruptReq);
+                void UnmaskIRQ(uint8_t interruptReq);
 
-                void SendEOI(osos::common::uint8_t interruptRequest);
+                void SendEOI(uint8_t interruptRequest);
             };
         }
     }
