@@ -2,7 +2,6 @@
 
 #include <kernel/mem/dmm.h>
 using namespace osos;
-using namespace osos::common;
 
 MemoryManager* MemoryManager::activeMemoryManager = 0;
 
