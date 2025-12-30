@@ -7,6 +7,10 @@ LDPARAMS = -melf_i386
 TIMESTAMP = $(shell date +"%Y-%m-%d %H:%M:%S")
 
 objects = object/loader.o \
+ object/common/lib/libcpu.o \
+ object/common/lib/libio.o \
+ object/common/lib/libmem.o \
+ object/common/lib/libstr.o \
  object/common/version.o \
  object/drivers/drv/ata.o \
  object/drivers/snd/speaker.o \
@@ -25,11 +29,9 @@ objects = object/loader.o \
  object/kernel/hwcom/pic.o \
  object/kernel/hwcom/port.o \
  object/kernel/mem/dmm.o \
+ object/kernel/crashHandler.o \
  object/kernel/gdt.o \
  object/kernel/multitasking.o \
- object/userland/lib/libcpu.o \
- object/userland/lib/libmem.o \
- object/userland/lib/libstr.o \
  object/userland/nrsh/cli.o \
  object/userland/nrsh/cliCommands.o \
  object/globalfuncs.o \
