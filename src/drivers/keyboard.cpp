@@ -3,13 +3,11 @@
 #include <drivers/keyboard.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::kernel::hwcom;
 
 extern volatile InterfaceModes currentInterface;
 
-void printf(char*, ...);
 void printfHex(uint8_t);
 
 

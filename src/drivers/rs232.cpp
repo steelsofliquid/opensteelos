@@ -3,14 +3,24 @@
 #include <drivers/rs232.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
 
-RecommendedStandard232Driver::RecommendedStandard232Driver() :
+RecommendedStandard232Driver::RecommendedStandard232Driver(InterruptManager* manager) :
+    InterruptHandler(manager, 0x24),
     COM1(0x3F8)
 {
+    driverAttributes.name      = "RS232 Serial Port Driver";
+    driverAttributes.publisher = "SteelsOfLiquid";
+    driverAttributes.type      = "inorian"; // TODO: replace the generic typename with what would be most viable
+
+    driverAttributes.isInitialised = false;
+    driverAttributes.isActive      = false;
+
+    driverAttributes.hasInterruptRequest  = true;
+    driverAttributes.interruptRequestLine = 0x04;
+    driverAttributes.vectorOffset         = interruptNumber;
 }
 
 RecommendedStandard232Driver::~RecommendedStandard232Driver()
@@ -21,21 +31,24 @@ RecommendedStandard232Driver::~RecommendedStandard232Driver()
 
 int32_t RecommendedStandard232Driver::InitialiseSerial()
 {
-    //asm volatile ("cli");
     outb(0x3F8 + 3, 0x80);
     outb(0x3F8 + 0, 0x03);
     outb(0x3F8 + 1, 0x00);
     outb(0x3F8 + 3, 0x03);
     outb(0x3F8 + 1, 0x00);
-    outb(0x3F8 + 2, 0xC7);
-    outb(0x3F8 + 4, 0x0B);
+    //outb(0x3F8 + 4, 0x0B); // this doesn't seem very useful.
     outb(0x3F8 + 4, 0x1E);
-    outb(0x3F8 + 0, 0xAE);
+    while ((inb(0x3F8 + 5) & 0x20) == 0); outb(0x3F8 + 0, 0xAE);
 
-    if (inb(0x3F8 + 0) != 0xAE) return 1;
+    while ((inb(0x3F8 + 5) & 0x01) == 0);
+    if (inb(0x3F8 + 0) != 0xAE)
+    {
+        printf("\nSerial loopback test failed during initialisation.                         %R[err]%R", 0x0C, 0x0F);
+        return 1;
+    }
 
     outb(0x3F8 + 4, 0x0F);
-    //asm volatile ("sti");
+    outb(0x3F8 + 2, 0xC7);
     return 0;
 }
 
@@ -94,8 +107,9 @@ void RecommendedStandard232Driver::WriteString(const char* material)
 
 
 
-void RecommendedStandard232Driver::Activate()
+void RecommendedStandard232Driver::StartDriver()
 {
+    InitialiseSerial();
 }
 
 uint32_t RecommendedStandard232Driver::HandleInterrupt(uint32_t esp)

@@ -4,7 +4,6 @@
 // this was file management hell.
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;

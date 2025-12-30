@@ -4,12 +4,9 @@
 #include <kernel/multitasking.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
-
-void printf(char* str, ...);
 
 volatile uint32_t tickCount = 0; // global variable
 
