@@ -23,10 +23,14 @@
 #include <common/types.h>
 #include <common/sysHelpers.h>
 #include <common/version.h>
+#include <common/lib/libasm.h>
+#include <common/lib/libcpu.h>
+#include <common/lib/libio.h>
+#include <common/lib/libmem.h>
+#include <common/lib/libstr.h>
 #include <drivers/drv/ata.h>
 #include <drivers/snd/speaker.h>
 #include <drivers/cmos.h>
-// #include <drivers/driver.h>
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/pit.h>
@@ -36,26 +40,22 @@
 #include <kernel/hwcom/driverManager.h>
 #include <kernel/hwcom/interrupts.h>
 #include <kernel/hwcom/pci.h>
-#include <userland/lib/libcpu.h>
-#include <userland/lib/libmem.h>
-#include <userland/lib/libstr.h>
 #include <userland/nrsh/cli.h>
 #include <kernel/mem/dmm.h>
+#include <kernel/crashHandler.h>
 #include <kernel/gdt.h>
 #include <globalfuncs.h>
 #include <kernel/multitasking.h>
 
 // GCC headers
-#include <stdarg.h>
+
 
 // namespaces
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::drivers::drives;
 using namespace osos::kernel;
 using namespace osos::kernel::hwcom;
-using namespace osos::libs;
 // using namespace osos::gui;
 
 // external variables and whatnot
@@ -75,8 +75,8 @@ int32_t testInteger2 = 15;
 int32_t testInteger3 = 327;
 int32_t testInteger4 = 7629;
 int32_t testInteger5 = 0;
-uint16_t curX = 0;
-uint16_t curY = 0;
+volatile uint16_t curX = 0;
+volatile uint16_t curY = 0;
 
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
@@ -89,198 +89,6 @@ namespace osos
     {
         //TaskManager* taskManager = nullptr;
     }
-}
-
-void printf(char* str, ...) // the main screen output function.
-{
-    va_list params;
-    va_start (params, str);
-
-    static uint16_t* videoMemory = (uint16_t*)0xb8000;
-    static uint8_t x = 0 , y = 0;
-    static uint8_t currentColour = 0x0F;
-
-    for(int i = 0; str[i] != '\0'; ++i)
-    {
-
-        switch(str[i])
-        {
-
-            /*
-                Just a simple rundown on what each thing here does:
-
-                 - \n means new line. That is the case for most languages.
-
-                 - \b means backspace. I wrote this bit myself as I had to figure it out one morning in government class (what does an operating system have to do with politics T_T)
-
-                 - \a means "clear the screen". There's something around that is messing with it and including a bullet point, though.
-
-                 - Anything else on the keyboard placed in printf() will just input an ordinary IBM Code Page 437 character.
-                 - Use \' or \" if you need to insert an apostrophe or quotation mark as you'll break it otherwise!
-                 - Don't input anything not in the keyboard unless you want to break the graphics, I tried it and that's what happened!
-            */
-
-            case '\n':
-            {
-                y++; curY++;
-                x = 0; curX = 0;
-                break;
-            }
-
-            case '\b':
-            {
-                if(x == 0)
-                {
-                    if(y != 0)
-                    {
-                        y--; curY--;
-                        int backX = 79;
-                        while (backX >= 0 && (videoMemory[80*y+backX] & 0x00FF) == ' ') backX--;
-                        if (backX < 0)
-                        {
-                            x = 0;
-                            curX = 0;
-                        }
-                        else
-                        {
-                            x = backX;
-                            curX = backX;
-                        }
-
-                        videoMemory[80*y+x] = (currentColour << 8) | ' ';
-                    }
-                }
-                else
-                {
-                    x--; curX--;
-                    videoMemory[80*y+x] = (currentColour << 8) | ' ';
-                }
-                break;
-            }
-      
-            case '\a':
-            {
-                for (y = 0; y < 25; y++)
-                    for (x = 0; x < 80; x++)
-                        videoMemory[80*y+x] = (currentColour << 8) | ' ';
-                x = 0; curX = 0;
-                y = 0; curY = 0;
-                break;
-            }
-
-            case '%':
-                i++;
-                switch (str[i])
-                {
-                    case 'i': case 'd':
-                    {
-                        int intval = va_arg(params, int);
-                        char buffer[12];
-
-                        itoa(intval, buffer, 10);
-
-                        for (int j = 0; buffer[j] != '\0'; j++)
-                        {
-                            videoMemory[80*y+x] = (currentColour << 8) | buffer[j];
-                            x++; curX++;
-                        }
-
-                        break;
-                    }
-
-                    case 'c':
-                    {
-                        char charVal = va_arg(params, int);
-                        videoMemory[80*y+x] = (currentColour << 8) | charVal;
-                        x++; curX++;
-
-                        break;
-                    }
-
-                    case 'x':
-                    {
-                        uint8_t key = va_arg(params, int);
-
-                        char* foo = "00";
-                        char* hex = "0123456789ABCDEF";
-                        foo[0] = hex[(key >> 4) & 0xF];
-                        foo[1] = hex[key & 0xF];
-            
-                        videoMemory[80*y+x] = (currentColour << 8) | foo[0]; x++; curX++;
-                        videoMemory[80*y+x] = (currentColour << 8) | foo[1]; x++; curX++;
-
-                        break;
-                    }
-
-                    case 's':
-                    {
-                        const char* s = va_arg(params, const char*);
-                        if (!s) s = "0x14_invalid";
-
-                        while (*s != '\0')
-                        {
-                            videoMemory[80*y+x] = (currentColour << 8) | *s;
-                            x++; curX++; s++;
-                        }
-                        break;
-                    }
-
-                    case 'R':
-                    {
-                        currentColour = (uint8_t)va_arg(params, int);
-                        break;
-                    }
-
-                    default:
-                    {
-                        i--;
-                        videoMemory[80*y+x] = (currentColour << 8) | str[i];
-                        x++; curX++;
-                        break;
-                    }
-                }
-
-            continue;
-
-            default:
-            {
-                videoMemory[80*y+x] = (currentColour << 8) | str[i];
-                x++; curX++;
-                break;
-            }
-        }
-
-        if(x >= 80)
-        {
-            x = 0; curX = 0;
-            y++; curY++;
-        }
-
-        if(y >= 25)
-        {
-            for(int r = 1; r < 25; r++)
-                for(int c = 0; c < 80; c++)
-                {
-                    if(r == 0)
-                    {
-                    }
-                    else
-                    {
-                        videoMemory[80 * (r - 1) + c] = videoMemory[80 * r + c];
-
-                        // it ain't perfect (or close to, *for now*) but it works. will need to make it not print cursor spaghetti in a later build
-                    }
-                }
-      
-            for(x = 0; x < 80; x++)
-            videoMemory[80 * 24 + x] = (currentColour << 8);
-
-            x = 0; curX = 0;
-            y = 24; curY = 24;
-        }
-    }
-
-    va_end(params);
 }
 
 void printfHex(uint8_t key)
@@ -395,87 +203,6 @@ void TestTask3()
         printf(" TCC");
         taskManager.sleep(50);
     }
-}
-
-// Crash handler logic and function
-void panic(uint32_t errorId)
-{
-    static volatile bool inStateOfPanic = false;
-
-    // go right here if already in panic
-    if (inStateOfPanic) asm volatile ("cli; hlt");
-
-    inStateOfPanic = true;
-    asm volatile ("cli");
-    const char* errorTextID[24] =
-    {
-        "DIVIDE_BY_ZERO", "DEBUG_TRAP", "NON_MASKABLE_INTERRUPT", "BREAKPOINT",
-        "OVERFLOW_INCIDENT", "BOUND_RANGE_EXCEEDED", "INVALID_OPCODE", "DEVICE_UNAVAILABLE",
-        "DOUBLE_FAULT", "COPROCCESSOR_OVERRUN", "INVALID_TASK_STATE_SEGMENT", "SEGMENT_NOT_PRESENT",
-        "STACK_SEGMENT_FAULT", "GENERAL_PROTECTION_FAULT", "PAGE_FAULT", "0x0F",
-        "X87_FLOATING_POINT_EXCEPTION", "MISALIGNED_MEMORY", "HARDWARE_ERROR", "SIMD_FLOATING_POINT_EXCEPTION",
-        "VIRTUALISATION_EXCEPTION", "CONTROL_PROTECTION_EXCEPTION", "DRIVER_VIOLATION", "KILLSWITCH_INVOKED"
-    };
-
-    const char* errorName = "UNKNOWN_EXCEPTION";
-    if (errorId < 24)
-        errorName = errorTextID[errorId];
-
-    // red screen of death
-    printf("%R\a", 0x4F);
-    printf(" <!> STOP                                                                   >_< ");
-    printf("                                                                                ");
-    printf(" OpenSteel/OS %d.%d.%d\n", verMajor, verMinor, verBuild);
-    printf(" Exception ID 0x%x - %s\n", errorId, errorName); // keep it simple, only tell the end user what program/process broke it and why
-    printf("                                                                                ");
-    printf(" A problem has occurred and OpenSteel/OS has shut down.                         ");
-
-    switch (errorId)
-    {
-        case 0x00:
-            printf(" Attempt to divide by zero in the kernel or a kernel-level task caused a        ");
-            printf(" system crash. Please contact the vendor of the faulting task to resolve this   ");
-            printf(" problem.                                                                       ");
-            break;
-
-        case 0x09:
-            printf(" Your system invoked a legacy error that has not been used since the Intel i486 ");
-            printf(" series of processors. If you are running OpenSteel/OS on a computer with an    ");
-            printf(" Intel Pentium (1993) or newer, you should not be seeing this error. If you are ");
-            printf(" running OpenSteel/OS on a computer with an Intel i486 series processor or      ");
-            printf(" older, please turn off the computer and restart it.                            ");
-            break;
-
-        case 0x12:
-            printf(" This error, also called a machine check, indicates that there was a serious    ");
-            printf(" hardware problem and that the CPU aborted itself. Please contact your hardware ");
-            printf(" vendor(s) or distributor(s) for technical support.                             ");
-            break;
-
-        case 0x16:
-            printf(" A task attempted to access a driver function without an appropriate system     ");
-            printf(" call or API or construct its own driver outside of the driver manager.         ");
-            break;
-
-        case 0x17:
-            printf(" A killswitch has been flipped to intentionally crash OpenSteel/OS. This could  ");
-            printf(" be for a variety of reasons, ranging from you just want to have fun to you     ");
-            printf(" could not access a shutdown interface safely and have a killswitch keybind.    ");
-            printf(" Regardless, please try to avoid this error and shut the PC down normally, so   ");
-            printf(" that you are not as numb to a serious error.                                   ");
-            break;
-        
-        default:
-            printf(" A description for this error is unavailable.                                   ");
-            break;
-    }
-
-    printf("                                                                                ");
-    printf("     system halted. please press the power button, it is now safe to do so.     ");
-    while(1)
-    {
-        asm volatile ("cli; hlt");
-    };
 }
 
 void shutdown()
@@ -627,16 +354,14 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // drivers loading
     printf("initialising drivers...                                                    ");
 
-    RecommendedStandard232Driver serialPort;
     //serialPort.InitialiseSerial();
-    serialPort.WriteString("OpenSteel/OS 0.22 \"Denver\" [OpenSteel/OS RS232 COM+Serial Driver]\nYou are seeing this because a successful COM1 connection was made.\n\n");
 
     KeyboardEventHandler kbhandler;
     KeyboardDriver keyboard(&interrupts, &kbhandler);
     drvManager.AddDriver(&keyboard);
 
-    ProgrammableIntervalTimer programmableIntervalTimer(&interrupts);
-    drvManager.AddDriver(&programmableIntervalTimer);
+    ProgrammableIntervalTimer programmableIntervalTimer(&interrupts); drvManager.AddDriver(&programmableIntervalTimer);
+    RecommendedStandard232Driver serialPort(&interrupts); drvManager.AddDriver(&serialPort);
 
     //MouseToConsole mousehandler;
     //MouseDriver mouse(&interrupts, &mousehandler);
@@ -645,7 +370,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // ^ mouse driver sucked. let's not use it, if possible.
 
     Speaker speaker; drvManager.AddDriver(&speaker);
-    ClockBatteryDriver cmos;
+    ClockBatteryDriver cmos; drvManager.AddDriver(&cmos);
     char rtcSec[3], rtcMin[3];
 
     printf("%R[ok!]", 0x0A);
@@ -692,6 +417,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // programmableIntervalTimer.HardSleep(30);
     speaker.LifeChime();
     serialPort.WriteString("Welcome to OpenSteel/OS.\n");
+    serialPort.WriteString("OpenSteel/OS 0.22 \"Denver\" [OpenSteel/OS RS232 COM+Serial Driver]\nYou are seeing this because a successful COM1 connection was made.\n\n");
     printf("\n%RGreetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F,
     time.hour, rtcMin, rtcSec,
     time.day, monthNames[time.month - 1], time.year);
