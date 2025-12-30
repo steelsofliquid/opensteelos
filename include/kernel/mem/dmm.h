@@ -13,7 +13,7 @@ namespace osos
         MemoryChunk *prev;
 
         bool allocated;
-        osos::common::size_t size;
+        size_t size;
     };
 
     class MemoryManager
@@ -24,10 +24,10 @@ namespace osos
         public:
         static MemoryManager *activeMemoryManager;
 
-        MemoryManager(osos::common::size_t start, osos::common::size_t size);
+        MemoryManager(size_t start, size_t size);
         ~MemoryManager();
 
-        void* malloc(osos::common::size_t size);
+        void* malloc(size_t size);
         void free(void* ptr);
     };
 }
