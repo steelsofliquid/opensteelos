@@ -2,11 +2,13 @@
 #define __CLICOMMANDS_H
 
 #include <common/types.h>
+#include <common/lib/libasm.h>
+#include <common/lib/libcpu.h>
+#include <common/lib/libio.h>
 #include <common/version.h>
 #include <drivers/snd/speaker.h>
 #include <drivers/pit.h>
 #include <drivers/rs232.h>
-#include <userland/lib/libcpu.h>
 #include <globalfuncs.h>
 
 namespace osos
@@ -17,20 +19,20 @@ namespace osos
     // for on the repository). The reason these are here is because I got bored in
     // class and OS dev is very irresistable.
 
-    void cmdCpudata(osos::common::uint32_t argc, const char** argv);
-    void cmdUptime(osos::common::uint32_t argc, const char** argv);
-    void cmdShutdown(osos::common::uint32_t agrc, const char** argv);
-    void cmdPacinae(osos::common::uint32_t argc, const char** argv);
+    void cmdCpudata(uint32_t argc, const char** argv);
+    void cmdUptime(uint32_t argc, const char** argv);
+    void cmdShutdown(uint32_t agrc, const char** argv);
+    void cmdPacinae(uint32_t argc, const char** argv);
 
-    void cmdEcho(osos::common::uint32_t argc, const char** argv);
-    void cmdCls(osos::common::uint32_t argc, const char** argv);
-    //void cmdClock(osos::common::uint32_t agrc, const char** argv);
-    //void cmdBeep(osos::common::uint32_t agrc, const char** argv);
+    void cmdEcho(uint32_t argc, const char** argv);
+    void cmdCls(uint32_t argc, const char** argv);
+    //void cmdClock(uint32_t agrc, const char** argv);
+    //void cmdBeep(uint32_t agrc, const char** argv);
     
-    void cmdVer(osos::common::uint32_t argc, const char** argv);
-    void cmdHelp(osos::common::uint32_t argc, const char** argv);
-    void cmdLicensing(osos::common::uint32_t argc, const char** argv);
-    void cmdCredits(osos::common::uint32_t argc, const char** argv);
+    void cmdVer(uint32_t argc, const char** argv);
+    void cmdHelp(uint32_t argc, const char** argv);
+    void cmdLicensing(uint32_t argc, const char** argv);
+    void cmdCredits(uint32_t argc, const char** argv);
     //void cmdAbout(const char* args);
 }
 

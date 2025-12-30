@@ -2,16 +2,17 @@
 #define __CLI_H
 
 #include <common/types.h>
+#include <common/lib/libstr.h>
+#include <common/lib/libio.h>
 #include <common/sysHelpers.h>
 #include <drivers/snd/speaker.h>
-#include <userland/lib/libstr.h>
 
 namespace osos
 {
     struct command_t
     {
         const char* name;
-        osos::common::commandVoid func;
+        commandVoid func;
     };
 
     class NathanRenaudShell
