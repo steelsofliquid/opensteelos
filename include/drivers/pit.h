@@ -4,6 +4,7 @@
 #define __OSOS__DRIVERS__PIT_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <kernel/hwcom/interrupts.h>
 #include <kernel/hwcom/driverModel.h>
 #include <kernel/hwcom/port.h>
@@ -26,11 +27,11 @@ namespace osos
 
 			osos::kernel::hwcom::InterruptHandler* InterruptHandlerForme();
 				
-			osos::common::uint32_t ReadPIT();
-			void SetPITCount(osos::common::uint32_t count);
+			uint32_t ReadPIT();
+			void SetPITCount(uint32_t count);
 
 			virtual void StartDriver();
-			virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
+			virtual uint32_t HandleInterrupt(uint32_t esp);
 		}; // initially forgot a semicolon (almost said semilion for some reason) -▿-
 	}
 }

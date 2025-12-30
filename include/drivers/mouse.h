@@ -3,6 +3,7 @@
 #define __OSOS__DRIVERS__MOUSE_H
 
 #include <common/types.h>
+#include <common/lib/libio.h>
 #include <kernel/hwcom/driverModel.h>
 #include <kernel/hwcom/interrupts.h>
 #include <kernel/hwcom/port.h>
@@ -17,8 +18,8 @@ namespace osos
             MouseEventHandler();
                 
             virtual void OnActivate();
-            virtual void OnMouseDown(osos::common::uint8_t button);
-            virtual void OnMouseUp(osos::common::uint8_t button);
+            virtual void OnMouseDown(uint8_t button);
+            virtual void OnMouseUp(uint8_t button);
             virtual void OnMouseMove(int x, int y);
 
         };
@@ -28,9 +29,9 @@ namespace osos
             osos::kernel::hwcom::Port8Bit dataPort;
             osos::kernel::hwcom::Port8Bit commandPort; // from keyboard driver
 
-            osos::common::uint8_t buffer[3];
-            osos::common::uint8_t offset;
-            osos::common::uint8_t buttons;
+            uint8_t buffer[3];
+            uint8_t offset;
+            uint8_t buttons;
 
             MouseEventHandler* handler;
 
@@ -40,7 +41,7 @@ namespace osos
 
             osos::kernel::hwcom::InterruptHandler* InterruptHandlerForme();
 
-            virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
+            virtual uint32_t HandleInterrupt(uint32_t esp);
             virtual void StartDriver();
 
         };

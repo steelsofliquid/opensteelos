@@ -4,6 +4,7 @@
 
 #include <common/types.h>
 #include <common/sysHelpers.h>
+#include <common/lib/libio.h>
 #include <kernel/hwcom/driverModel.h>
 #include <kernel/hwcom/interrupts.h>
 #include <kernel/hwcom/port.h>
@@ -44,7 +45,7 @@ namespace osos
 
             osos::kernel::hwcom::InterruptHandler* InterruptHandlerForme();
             
-            virtual osos::common::uint32_t HandleInterrupt(osos::common::uint32_t esp);
+            virtual uint32_t HandleInterrupt(uint32_t esp);
             virtual void StartDriver();
             
         };

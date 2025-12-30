@@ -24,22 +24,22 @@ namespace osos
             osos::kernel::hwcom::Port8Bit ACWritePort; // ACWP (Attribute Controller Write Port)
             osos::kernel::hwcom::Port8Bit ACResetPort; // ACResP (Attribute Controller Reset Port)
 
-            void WriteRegisters(osos::common::uint8_t* registers);
-            osos::common::uint8_t* GetFrameBufferSegment();
+            void WriteRegisters(uint8_t* registers);
+            uint8_t* GetFrameBufferSegment();
 
-            virtual osos::common::uint8_t GetColorIndex(osos::common::uint8_t r, osos::common::uint8_t g, osos::common::uint8_t b);
+            virtual uint8_t GetColorIndex(uint8_t r, uint8_t g, uint8_t b);
             
             public:
             VideoGraphicsArray();
             ~VideoGraphicsArray();
 
-            virtual bool SupportsMode(osos::common::uint32_t width, osos::common::uint32_t height, osos::common::uint32_t colordepth);
-            virtual bool SetMode(osos::common::uint32_t width, osos::common::uint32_t height, osos::common::uint32_t colordepth);
-            virtual void PutPixel(osos::common::uint32_t x, osos::common::uint32_t y, osos::common::uint8_t r, osos::common::uint8_t g, osos::common::uint8_t b);
-            virtual void PutPixel(osos::common::uint32_t x, osos::common::uint32_t y, osos::common::uint8_t colorIndex);
+            virtual bool SupportsMode(uint32_t width, uint32_t height, uint32_t colordepth);
+            virtual bool SetMode(uint32_t width, uint32_t height, uint32_t colordepth);
+            virtual void PutPixel(uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b);
+            virtual void PutPixel(uint32_t x, uint32_t y, uint8_t colorIndex);
 
-            virtual void FillRectangle(osos::common::uint32_t x, osos::common::uint32_t y, osos::common::uint32_t w, osos::common::uint32_t h,
-                osos::common::uint8_t r, osos::common::uint8_t g, osos::common::uint8_t b);
+            virtual void FillRectangle(uint32_t x, uint32_t y, uint32_t w, uint32_t h,
+                uint8_t r, uint8_t g, uint8_t b);
 
         };
     }

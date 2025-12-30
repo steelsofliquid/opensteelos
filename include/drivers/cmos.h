@@ -2,8 +2,9 @@
 #define __OSOS__DRIVERS__CMOS_H
 
 #include <common/types.h>
+#include <common/lib/libasm.h>
+#include <kernel/hwcom/driverModel.h>
 #include <kernel/hwcom/port.h>
-#include <globalfuncs.h>
 
 namespace osos
 {
@@ -12,15 +13,15 @@ namespace osos
 
         struct RealTimeClockRegisters
         {
-            osos::common::uint8_t second;
-            osos::common::uint8_t minute;
-            osos::common::uint8_t hour;
-            osos::common::uint8_t day;
-            osos::common::uint8_t month;
-            osos::common::uint32_t year;
+            uint8_t second;
+            uint8_t minute;
+            uint8_t hour;
+            uint8_t day;
+            uint8_t month;
+            uint32_t year;
         };
 
-        class ClockBatteryDriver
+        class ClockBatteryDriver : public osos::kernel::hwcom::DriverModel
         {
             public:
             osos::kernel::hwcom::Port8Bit portAddressCMOS;
@@ -30,15 +31,15 @@ namespace osos
             ClockBatteryDriver();
             ~ClockBatteryDriver();
 
-            osos::common::uint8_t ReadCMOS(osos::common::int32_t port);
-            void WriteCMOS(osos::common::int32_t port, osos::common::int32_t value);
+            uint8_t ReadCMOS(int32_t port);
+            void WriteCMOS(int32_t port, int32_t value);
 
             // this is to assist the realtime clock
-            void PadRTCInteger(char* output, osos::common::uint8_t val);
+            void PadRTCInteger(char* output, uint8_t val);
 
             // these functions are for the realtime clock
             int GetProgressUpdateFlag();
-            osos::common::uint8_t GetRTCregister(osos::common::int32_t reg);
+            uint8_t GetRTCregister(int32_t reg);
             RealTimeClockRegisters GetClockRegisters(RealTimeClockRegisters registerSet);
             RealTimeClockRegisters ReadRTC();
 
