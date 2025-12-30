@@ -15,13 +15,10 @@
 #include <drivers/pit.h>
 
 using namespace osos;
-using namespace osos::common;
 using namespace osos::drivers;
 using namespace osos::kernel;
 
 extern volatile uint32_t tickCount;
-
-void printf(char* str, ...);
 
 
 
