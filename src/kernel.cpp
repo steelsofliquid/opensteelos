@@ -302,7 +302,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     printf("                                                                                ");
 
     // sysagent header
-    printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 5\n", 0x0F, verMajor, verMinor, verBuild);
+    printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 5 [%d-%d-%d]\n", 0x0F, verMajor, verMinor, verBuild, buildDay, buildMon, buildYr);
 
     currentInterface = BootUI;
     GlobalDescriptorTable gdt;
