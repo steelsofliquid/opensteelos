@@ -1,6 +1,6 @@
 #include <drivers/cmos.h>
 
-#define BUILDYEAR       2025
+#define BUILDYEAR       2026
 
 using namespace osos;
 using namespace osos::drivers;
