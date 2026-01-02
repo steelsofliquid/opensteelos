@@ -85,7 +85,7 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
 
     if (helpFlag) 
     {
-        printf("%Recho        %R: Allows you to print text onto the screen.\nExample usage: echo\nFlags: -rs: Send to serial\n", 0x0E, 0x0F);
+        printf("%Recho        %R: Allows you to print text onto the screen.\nExample usage: echo Hello World!\nFlags: -rs: Send to serial\n", 0x0E, 0x0F);
         return;
     }
     
@@ -149,14 +149,25 @@ void osos::cmdBeep(uint32_t argc, const char** argv)
 
 void osos::cmdVer(uint32_t argc, const char** argv)
 {
-    bool helpFlag;
+    bool helpFlag = false;
+    bool dateFlag = false;
+    bool buildFlag = false;
+
     for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[i], "-?") == 0) helpFlag = true;
+        if (strcmp(argv[i], "-?") == 0) helpFlag  = true;
+        if (strcmp(argv[i], "-b") == 0) buildFlag = true;
+        if (strcmp(argv[i], "-d") == 0) dateFlag  = true;
     }
 
-    if (helpFlag) printf("%Rversion\nver         %R: Provides the system version number.\nExample usage: ver\n", 0x0E, 0x0F);
-    else printf(" OpenSteel/OS %d.%d.%d \"Denver\"\n", verMajor, verMinor, verBuild);
+    if (helpFlag) printf("%Rversion\nver         %R: Provides the system version number.\nExample usage: ver\nFlags:\n -b: Display build number + codename.    -d: Display build date.\n", 0x0E, 0x0F);
+    else 
+    {
+        printf(" OpenSteel/OS %d.%d", verMajor, verMinor);
+        if (buildFlag) printf(".%d \"Denver\"", verBuild);
+        if (dateFlag) printf(" (compiled on %d-%d-%d)", buildDay, buildMon, buildYr);
+        printf("\n");
+    }
 }
 
 void osos::cmdHelp(uint32_t argc, const char** argv)
