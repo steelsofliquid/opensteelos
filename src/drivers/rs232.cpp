@@ -13,7 +13,7 @@ RecommendedStandard232Driver::RecommendedStandard232Driver(InterruptManager* man
 {
     driverAttributes.name      = "RS232 Serial Port Driver";
     driverAttributes.publisher = "SteelsOfLiquid";
-    driverAttributes.type      = "inorian"; // TODO: replace the generic typename with what would be most viable
+    driverAttributes.type      = "comms";
 
     driverAttributes.isInitialised = false;
     driverAttributes.isActive      = false;
