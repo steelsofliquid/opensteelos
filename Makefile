@@ -19,6 +19,7 @@ objects = object/loader.o \
  object/drivers/mouse.o \
  object/drivers/pit.o \
  object/drivers/rs232.o \
+ object/drivers/rtcIrq8.o \
  object/drivers/vga.o \
  object/kernel/hwcom/driverManager.o \
  object/kernel/hwcom/driverModel.o \
@@ -84,6 +85,18 @@ OpenSteelOS.iso: opensteelcore.bin
 	rm -rf iso
 	echo 'Compile Attempt: $@ disc image from $< - Time of Compile: $(TIMESTAMP)' >> buildlog.txt
 
+
+test_qemu_normal: qemuNormal
+qemuNormal:
+	qemu-system-x86_64 \
+	-cdrom OpenSteelOS.iso \
+	-audiodev pa,id=snd0 \
+	-machine pcspk-audiodev=snd0
+
+test_qemu_barebones: qemuBB
+qemuBB:
+	qemu-system-x86_64 \
+	-cdrom OpenSteelOS.iso
 
 .PHONY: clean
 clean:
