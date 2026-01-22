@@ -354,8 +354,6 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // drivers loading
     printf("initialising drivers...                                                    ");
 
-    //serialPort.InitialiseSerial();
-
     KeyboardEventHandler kbhandler;
     KeyboardDriver keyboard(&interrupts, &kbhandler);
     drvManager.AddDriver(&keyboard);
@@ -409,6 +407,18 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     cmos.PadRTCInteger(rtcMin, time.minute);
     printf("%R[ok!]", 0x0A);
 
+    printf("%RStarting services...                                                       ", 0x0F);
+
+    // As of 0.22.289, there nominally aren't any services yet. This stage is in a placeholder
+    // state, as service infastructure is being put together. The following code is only a
+    // placeholder that is not final.
+
+    // ServiceManager svcManager;
+    // AudioService audioSvc(&speaker); svcManager.AddService(&audioSvc);
+    // CommunicationService
+    // svcManager.ActivateAll();
+
+    printf("%R[ok!]", 0x0A);
     NathanRenaudShell nrsh;
 
     cpudet();
