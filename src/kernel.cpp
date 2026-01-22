@@ -35,6 +35,7 @@
 #include <drivers/mouse.h>
 #include <drivers/pit.h>
 #include <drivers/rs232.h>
+#include <drivers/rtcIrq8.h>
 #include <drivers/vga.h>
 #include <kernel/hwcom/driverModel.h>
 #include <kernel/hwcom/driverManager.h>
@@ -369,6 +370,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     Speaker speaker; drvManager.AddDriver(&speaker);
     ClockBatteryDriver cmos; drvManager.AddDriver(&cmos);
+    InterruptRequest8AssistantDriver irq8(&interrupts); drvManager.AddDriver(&irq8);
     char rtcSec[3], rtcMin[3];
 
     printf("%R[ok!]", 0x0A);
