@@ -1,6 +1,6 @@
 #include <drivers/cmos.h>
 
-#define BUILDYEAR       2026
+#define BUILDYEAR       1980 // Do not update, will cause a glitch on incorrect CMOS configs
 
 using namespace osos;
 using namespace osos::drivers;
@@ -17,7 +17,7 @@ ClockBatteryDriver::ClockBatteryDriver() :
 {
     driverAttributes.name      = "CMOS Battery Driver";
     driverAttributes.publisher = "SteelsOfLiquid";
-    driverAttributes.type      = "inorian"; // TODO: replace the generic typename with what would be most viable
+    driverAttributes.type      = "clock";
 
     driverAttributes.isInitialised = false;
     driverAttributes.isActive      = false;
