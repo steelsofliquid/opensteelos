@@ -72,6 +72,20 @@ void osos::cmdPacinae(uint32_t argc, const char** argv)
     }
 }
 
+void osos::cmdSetup(uint32_t argc, const char** argv)
+{
+    bool helpFlag;
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "-?") == 0) helpFlag = true;
+    }
+    if (helpFlag) printf("%Rsetup       %R: Placeholder for the eventual installer for OpenSteel/OS.\nNot of use right now.\n", 0x0E, 0x0F);
+    else
+    {
+        printf("OpenSteel/OS does not yet have an installer. While implementing it is planned,\na lot of work still needs to be done before it can be added.\n");
+    }
+}
+
 
 void osos::cmdEcho(uint32_t argc, const char** argv)
 {
@@ -152,20 +166,34 @@ void osos::cmdVer(uint32_t argc, const char** argv)
     bool helpFlag = false;
     bool dateFlag = false;
     bool buildFlag = false;
+    bool copyrightFlag = false;
+    bool pNameFlag = false;
 
     for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[i], "-?") == 0) helpFlag  = true;
-        if (strcmp(argv[i], "-b") == 0) buildFlag = true;
-        if (strcmp(argv[i], "-d") == 0) dateFlag  = true;
+        if (strcmp(argv[i], "-?") == 0) helpFlag      = true;
+        else if (strcmp(argv[i], "-f") == 0)
+        {
+            buildFlag     = true;
+            dateFlag      = true;
+            copyrightFlag = true;
+            pNameFlag     = true;
+        }
+        if (strcmp(argv[i], "-b") == 0) buildFlag     = true;
+        if (strcmp(argv[i], "-d") == 0) dateFlag      = true;
+        if (strcmp(argv[i], "-c") == 0) copyrightFlag = true;
+        if (strcmp(argv[i], "-n") == 0) pNameFlag     = true;
     }
 
     if (helpFlag) printf("%Rversion\nver         %R: Provides the system version number.\nExample usage: ver\nFlags:\n -b: Display build number + codename.    -d: Display build date.\n", 0x0E, 0x0F);
     else 
     {
-        printf(" OpenSteel/OS %d.%d", verMajor, verMinor);
+        printf(" OpenSteel/OS ");
+        if(pNameFlag) printf("100\n");
+        printf("version %d.%d", verMajor, verMinor);
         if (buildFlag) printf(".%d \"Denver\"", verBuild);
         if (dateFlag) printf(" (compiled on %d-%d-%d)", buildDay, buildMon, buildYr);
+        if (copyrightFlag) printf("\nCopyright (C) 2021-2026 SteelsOfLiquid. This software comes with no warranty    whatsoever. Licenced under the General Public Licence 3.0.");
         printf("\n");
     }
 }
@@ -184,8 +212,8 @@ void osos::cmdHelp(uint32_t argc, const char** argv)
         printf("                       --- List of available commands ---                       ");
         printf("To get specific information on a command, type that command, followed by only -?");
         printf("For example, ver -? or uptime -?.\n");
-        printf(" cls          cpuinfo      credits      echo         help         licensing     ");
-        printf(" uptime       shutdown     version      ver");
+        printf(" about        cls          cpuinfo      credits      echo         help          ");
+        printf(" licensing    uptime       shutdown     version      ver");
         printf("\n");
     }
 }
@@ -235,5 +263,49 @@ void osos::cmdCredits(uint32_t argc, const char** argv)
         printf(" - osakaOS                               - Nanami/OS                            ");
         printf(" - Linux kernel and Linus Torvalds       - MINIX 3                              ");
         printf(" - Operating Systems: Three Easy Pieces  - Documentation from many companies. \n");
+    }
+}
+
+void osos::cmdAbout(uint32_t argc, const char** argv)
+{
+    bool helpFlag = false;
+    bool mozillaFlag = false;
+    bool inclVerFlag = false;
+
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "-?") == 0) helpFlag = true;
+        if (strcmp(argv[i], "-moz") == 0) mozillaFlag = true;
+        if (strcmp(argv[i], "-v") == 0) inclVerFlag = true;
+    }
+
+    if (helpFlag) printf("%Rabout       %R: General command for OpenSteel/OS information.\nExample usage: about\nFlags:\n -v: Include version info.\n", 0x0E, 0x0F);
+    else if (mozillaFlag)
+    {
+        // Poorly hidden easter egg. This is a reference to The Book of Mozilla, a parody (i think?) bible found in Netscape, Firefox and other
+        // Mozilla browsers
+        printf("%R                          The Book of OpenSteel - 1:29                          ", 0x1F);
+        printf("    As the flightless bird begins to defy gravity, and wage war against the     ");
+        printf("  decomposing, one of its intellectual allies follows in its creator\'s steps,   ");
+        printf("  seeking unity, neutrality, and liberty. She wanted to incorporate some of its ");
+        printf("   advancements, trim its flaws, and apply its concepts to her own project to   ");
+        printf("    create a greater project, yet not displacing it. This project: A system.    \n");
+        printf(" This system would be forged from steel, its creator providing her ideas and the");
+        printf(" likes, in a simple, friendly and obtainable way, and protecting her system with");
+        printf("   the horns of a gnu, which dictate those who copy the project\'s likeness.    %R\n", 0x0F);
+    }
+    else
+    {
+        printf("OpenSteel/OS is an x86 desktop operating system in development. It aims to one  ");
+        printf("day stand alongside Microsoft Windows, macOS, and (GNU) Linux, with its own OS  ");
+        printf("design (i.e. not a Unix-like), while not intentionally displacing any of those  ");
+        printf("OSes (as to avoid antitrust laws that should be applied to Windows).            \n");
+        if (inclVerFlag) printf("You are using version %d.%d.%d of OpenSteel/OS.\n", verMajor, verMinor, verBuild);
+        printf("Goals of OpenSteel/OS include the supply of in-house OS components instead of   ");
+        printf("already-existing components like the Linux kernel, GRUB or GNU coreutils, the   ");
+        printf("continued support of legacy hardware (i.e. Intel i486 and later) and to provide ");
+        printf("a free and open source OS that builds on the innovations of other OSes, like    ");
+        printf("MINIX, (GNU) Linux, and ironically Microsoft Windows. Also to provide more      ");
+        printf("readable and comprehensive source code.                                         ");
     }
 }

@@ -35,6 +35,7 @@ command_t commandsTable[] =
     {"uptime", cmdUptime},
     {"shutdown", cmdShutdown},
     {"pacinae", cmdPacinae},
+    {"setup", cmdSetup},
     {"cls", cmdCls},
     {"echo", cmdEcho},
     {"help", cmdHelp},
@@ -42,6 +43,7 @@ command_t commandsTable[] =
     {"version", cmdVer},
     {"licensing", cmdLicensing},
     {"credits", cmdCredits},
+    {"about", cmdAbout},
     {nullptr, nullptr}
 };
 
@@ -113,7 +115,7 @@ void NathanRenaudShell::ParseCommand(char* input)
         }
     }
 
-    printf(" <!> This is not a valid command. Type \"help\" for a coherent list of commands.\n");
+    printf("\"%R%s%R\" isn't a known command or program. Stuck? Type %Rhelp%R.\n", 0x0E, args[0], 0x0F, 0x0E, 0x0F);
 }
 
 
