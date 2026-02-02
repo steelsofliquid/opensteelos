@@ -117,6 +117,28 @@ uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp
 
 uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
 {
+    if(interruptNumber == 0x27 || interruptNumber == 0x2F) // is it spurious?
+    {
+        if (interruptNumber == 0x27) // IRQ 7
+        {
+            outb(0x20, 0x0B);
+            uint8_t isrBit = inb(0x20);
+            if (!(isrBit & (1 << 7))) return esp;
+        }
+        else // IRQ 15
+        {
+            outb(0xA0, 0x0B);
+            uint8_t isrBit = inb(0xA0);
+            if (!(isrBit & (1 << 7)))
+            {
+                outb(0x20, 0x20);
+                return esp;
+            }
+        }
+    }
+
+    // else statement is not ideal here
+
     if(handlers[interruptNumber] != 0)
     {
         esp = handlers[interruptNumber]->HandleInterrupt(esp); // should call the appropriate function per driver.
