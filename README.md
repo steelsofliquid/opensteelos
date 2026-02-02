@@ -1,5 +1,5 @@
 # OpenSteel/OS
-OpenSteel/OS is an x86 operating system building heavily on top of the Write Your Own Operating System tutorial using my own additions and revisions. The project started as an independent "fork" of Nanami/OS, which was discontinued on the spot for its horribly organised/managed repository (*by providing source code for every build at once, linker script makes up 1.2% of the repo's code!*), its repository's improper licensing, and rather silly theme of being dedicated to an anime girl that already represents another OS. Currently, OpenSteel/OS is still in very early development, with a baby userland and much incomplete kernel, and is still using another bootloader. This screenshot is of a developer build.   
+OpenSteel/OS is an x86 operating system building heavily on top of the Write Your Own Operating System tutorial using my own additions and revisions. The project started as an independent "fork" of Nanami/OS, which was discontinued on the spot for its horribly organised/managed repository (*by providing source code for every build at once, linker script makes up 1.2% of the repo's code!*), its repository's improper licensing, and rather silly theme of being dedicated to an anime girl that already represents another OS. Currently, OpenSteel/OS is still in very early development, with a baby userland and much incomplete kernel, and is still using another bootloader.   
 ![OpenSteel/OS 0.22 after booting up in VirtualBox.](https://github.com/steelsofliquid/opensteelos/blob/main/screenshot.png "OpenSteel/OS 0.22 after booting up in VirtualBox.")
 
 To see my thoughts and whatnot on the current situation of the project, check out my log repo, https://github.com/steelsofliquid/steelsofliqud_log. *This repo also contains my thoughts and whatnot on my other projects.
@@ -34,12 +34,15 @@ But, I do have some stuff to learn from the tutorial still, so, for the provisio
 The code used, while predominantly C++, uses a lot of C-style syntax instead of C++ syntax. When working on this project, whether a direct contribution or on your own, if you want to add things I'd recommend retaining the C-style syntax as it's quite simple and easy to understand. (the virgin std::cout versus the chad printf)
 
 ## *System Requirements*
- - Processor: x86 or x86-64, preferably something Super Socket 7 or later
+ > *Importantly, OpenSteel/OS is designed to work on a large range of legacy computers, dating back to the late 80's and 90's; this will stick for as long as I can keep it up even if I do not endorse or recommend using OpenSteel/OS on an Intel Pentium or Transmeta Crusoe in later versions.*
+ - Processor: x86 or x86-64, preferably something Super Socket 7 or later (This project has been tested and can boot on QEMU-emulated i486 CPUs, this support extent is intentional but not recommended)
  - Memory: At least 32 megabytes
  - Video Memory: 9 Megabytes
  - Hard Disk: Optional
  - Optical Drive: Required
- - PS/2 or USB Keyboard (the latter is advised)
+ - PS/2 or USB Keyboard
+
+If you don't the hassle of running this project on physical hardware, OpenSteel/OS has been tested in QEMU, VirtualBox and 86Box with multiple configurations in each. You will likely have the best experience with QEMU with audio enabled or with Socket 370 configurations in 86Box. VMWare Workstation and Player have not been tested since the Nanami/OS days, and VirtualBox mostly works if you don't mind a lack of audio.
 
 ## *Compiling on your own*
 It is advised you use the makefile provided. You will need Linux, which you're likely already using. Great! ^_^  
