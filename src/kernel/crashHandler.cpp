@@ -14,7 +14,7 @@ void osos::kernel::panic(uint32_t errorId)
 
     inStateOfPanic = true;
     asm volatile ("cli");
-    const char* errorTextID[26] =
+    const char* errorTextID[27] =
     {
         "DIVIDE_BY_ZERO", "DEBUG_TRAP", "NON_MASKABLE_INTERRUPT", "BREAKPOINT",
         "OVERFLOW_INCIDENT", "BOUND_RANGE_EXCEEDED", "INVALID_OPCODE", "DEVICE_UNAVAILABLE",
@@ -22,11 +22,11 @@ void osos::kernel::panic(uint32_t errorId)
         "STACK_SEGMENT_FAULT", "GENERAL_PROTECTION_FAULT", "PAGE_FAULT", "0x0F",
         "X87_FLOATING_POINT_EXCEPTION", "MISALIGNED_MEMORY", "HARDWARE_ERROR", "SIMD_FLOATING_POINT_EXCEPTION",
         "VIRTUALISATION_EXCEPTION", "CONTROL_PROTECTION_EXCEPTION", "DRIVER_VIOLATION", "KILLSWITCH_INVOKED",
-        "NO_ACCESSIBLE_FPU_MODULES", "OUT_OF_MEMORY"
+        "NO_ACCESSIBLE_FPU_MODULES", "OUT_OF_MEMORY", "A"
     };
 
     const char* errorName = "UNKNOWN_EXCEPTION";
-    if (errorId < 24)
+    if (errorId < 27)
         errorName = errorTextID[errorId];
 
     // red screen of death
