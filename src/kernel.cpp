@@ -303,7 +303,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     printf("                                                                                ");
 
     // sysagent header
-    printf("%RSteelsOfLiquid OpenSteel/OS %d.%d.%d \"Denver\" Beta 2 Circuit 5 [%d-%d-%d]\n", 0x0F, verMajor, verMinor, verBuild, buildDay, buildMon, buildYr);
+    printf("%RSteelsOfLiquid OpenSteel/OS 100 - ver %d.%d.%d \"Denver\" Beta 2 [%d-%d-%d]\n", 0x0F, verMajor, verMinor, verBuild, buildDay, buildMon, buildYr);
 
     currentInterface = BootUI;
     GlobalDescriptorTable gdt;
@@ -311,7 +311,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // Get memory heap, allocate ram, etc. v
 
     uint32_t* memupper = (uint32_t*)(((size_t)multiboot_structure) + 8);
-    size_t heap = 10*1024*1024;
+    size_t heap = 10*1024*1024; // This should be 10 MiB
     MemoryManager MemoryManager(heap, (*memupper)*1024 - heap - 10*1024);
 
     printf("memory heap: %R0x%x%x%x%x%R, ",
@@ -335,7 +335,6 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
   
     printf("\n");
 
-    // since a thing with this build is scheduler refinement, feel free to play around with my infinite-looping commands.
     // register tasks v
 
     //taskManager = new TaskManager();
@@ -350,6 +349,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     InterruptManager interrupts(0x20, &gdt, &taskManager);
 
+    const char* welcomeMessage;
 
     DriverManager drvManager;
     // drivers loading
@@ -407,13 +407,26 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     RealTimeClockRegisters time = cmos.ReadRTC();
     cmos.PadRTCInteger(rtcSec, time.second);
     cmos.PadRTCInteger(rtcMin, time.minute);
+
+    // Determine, based on the time of day, what to say during the startup message.
+    // We can test this easily on an old Dell Dimension with a dead CMOS battery and Windows 2000,
+    // improving productivity and reducing all-nighters of just, well, TESTING.
+    // Oh, huh, I forgot that I've got 86Box installed.
+    // Point is, morning (defined as after 4 and before 11 AM) = good morning, etc.
+    if ((time.hour <= 10) && (time.hour >= 5)) welcomeMessage = "Good morning";
+    else if ((time.hour <= 1) || (time.hour >= 22)) welcomeMessage = "Up late, eh? Anyways, greetings"; // maple syrup and poutine. oh, uh yeah the original message here produced a grammatical error. "Greetings. Up late, huh? Anyways, and welcome to OpenSteel/OS."
+    else if ((time.hour <= 21) && (time.hour >= 18)) welcomeMessage = "Good evening";
+    else welcomeMessage = "Greetings"; // ...and welcome to an LGR thing. (sorry, i had to. clint is a brilliant youtuber)
+
     printf("%R[ok!]", 0x0A);
+
+    if (time.year < buildYr) printf("%RThe system date may not be set correctly or the CMOS battery has failed.   %R[wrn]", 0x0F, 0x0E);
 
     printf("%RStarting services...                                                       ", 0x0F);
 
     // As of 0.22.289, there nominally aren't any services yet. This stage is in a placeholder
     // state, as service infastructure is being put together. The following code is only a
-    // placeholder that is not final.
+    // placeholder that is not final. And you'll get errors trying to activate the code
 
     // ServiceManager svcManager;
     // AudioService audioSvc(&speaker); svcManager.AddService(&audioSvc);
@@ -429,8 +442,8 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // programmableIntervalTimer.HardSleep(30);
     speaker.LifeChime();
     serialPort.WriteString("Welcome to OpenSteel/OS.\n");
-    serialPort.WriteString("OpenSteel/OS 0.22 \"Denver\" [OpenSteel/OS RS232 COM+Serial Driver]\nYou are seeing this because a successful COM1 connection was made.\n\n");
-    printf("\n%RGreetings, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F,
+    serialPort.WriteString("OpenSteel/OS 100 version 0.22 \"Denver\" [OpenSteel/OS RS232 COM+Serial Driver]\nYou are seeing this because a successful COM1 connection was made.\n\n");
+    printf("\n%R%s, and welcome to OpenSteel/OS. It is %d:%s:%s, %d %s, %d.\nType help for help.\n", 0x0F, welcomeMessage,
     time.hour, rtcMin, rtcSec,
     time.day, monthNames[time.month - 1], time.year);
     // Denotes end of booting process  ^
@@ -459,6 +472,49 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     if (interrupts.handlerExists(0x21)) printf("\nIRQ 1 Handler Exists"); else printf("\nIRQ 1 handler doesn\'t exist.");
     if (interrupts.handlerExists(0x2C)) printf("\nIRQ 12 Handler exists."); else printf("\nIRQ 12 Handler doesn\'t exist.");
  */
+
+    printf("memory test\n");
+    void* memoryTestA = MemoryManager.malloc(32);
+    void* memoryTestB = MemoryManager.malloc(64);
+    void* memoryTestC = MemoryManager.malloc(128);
+
+    MemoryManager.free(memoryTestB);
+
+    void* memoryTestD = MemoryManager.malloc(48);
+
+    printf("a: 0x%x%x%x%x ",
+        (((size_t)memoryTestA >> 24) & 0xFF),
+        (((size_t)memoryTestA >> 16) & 0xFF),
+        (((size_t)memoryTestA >> 8 ) & 0xFF),
+        (((size_t)memoryTestA      ) & 0xFF)
+    );
+
+    printf("b: 0x%x%x%x%x ",
+        (((size_t)memoryTestB >> 24) & 0xFF),
+        (((size_t)memoryTestB >> 16) & 0xFF),
+        (((size_t)memoryTestB >> 8 ) & 0xFF),
+        (((size_t)memoryTestB      ) & 0xFF)
+    );
+
+    printf("c: 0x%x%x%x%x ",
+        (((size_t)memoryTestC >> 24) & 0xFF),
+        (((size_t)memoryTestC >> 16) & 0xFF),
+        (((size_t)memoryTestC >> 8 ) & 0xFF),
+        (((size_t)memoryTestC      ) & 0xFF)
+    );
+
+    printf("d: 0x%x%x%x%x\n",
+        (((size_t)memoryTestD >> 24) & 0xFF),
+        (((size_t)memoryTestD >> 16) & 0xFF),
+        (((size_t)memoryTestD >> 8 ) & 0xFF),
+        (((size_t)memoryTestD      ) & 0xFF)
+    );
+
+    memset(memoryTestA, 0xAA, 32);
+    memset(memoryTestC, 0xCC, 128);
+
+    for (int i = 0; i < 32; i++) if (((uint8_t*)memoryTestA)[i] != 0xAA) panic(0x17);
+
     EnableCursor(13, 15);
     FlushShell();
     nrsh.Initialise();
