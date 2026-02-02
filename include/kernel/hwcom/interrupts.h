@@ -3,6 +3,7 @@
 #define __OSOS__KERNEL__HWCOM__INTERRUPTS_H
 
 #include <common/types.h>
+#include <common/lib/libasm.h>
 #include <common/lib/libio.h>
 #include <kernel/hwcom/port.h>
 #include <kernel/crashHandler.h>
