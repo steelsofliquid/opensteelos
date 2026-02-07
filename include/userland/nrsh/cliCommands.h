@@ -9,6 +9,7 @@
 #include <drivers/snd/speaker.h>
 #include <drivers/pit.h>
 #include <drivers/rs232.h>
+#include <kernel/crashHandler.h>
 #include <globalfuncs.h>
 
 namespace osos
@@ -23,29 +24,29 @@ namespace osos
     // labelled as such.
 
     // Technical commands; related to the kernel, userland or hardware or some other shit I forgor to bring up
-    void cmdCpudata(uint32_t argc, const char** argv);
-    void cmdUptime(uint32_t argc, const char** argv);
-    void cmdShutdown(uint32_t agrc, const char** argv); // feature needs service
-    //void cmdDevices(uint32_t argc, const char** argv);  // command needs service
-    //void cmdServices(uint32_t argc, const char** argv); // command needs service
-    //void cmdIrqcount(uint32_t argc, const char** argv);
+    void cmdCpudata(uint32_t argc, char** argv);
+    void cmdUptime(uint32_t argc, char** argv);
+    void cmdShutdown(uint32_t agrc, char** argv); // feature needs service
+    //void cmdDevices(uint32_t argc, char** argv);  // command needs service
+    //void cmdServices(uint32_t argc, char** argv); // command needs service
+    //void cmdIrqcount(uint32_t argc, char** argv);
 
     // Hardcoded commands for future programs/implementations
-    void cmdPacinae(uint32_t argc, const char** argv);
-    void cmdSetup(uint32_t argc, const char** argv); // haha, checkmate torvalds, user-friendly installers prevent fragme- oh wait they only help prevent that.
+    void cmdPacinae(uint32_t argc, char** argv);
+    void cmdSetup(uint32_t argc, char** argv); // haha, checkmate torvalds, user-friendly installers prevent fragme- oh wait they only help prevent that.
 
     // Everyday use commands, the shit you'd expect to find on an average terminal ("OMG SHE'S HACKING O_o")
-    void cmdEcho(uint32_t argc, const char** argv);    // feature needs syscall(?)
-    void cmdCls(uint32_t argc, const char** argv);
-    //void cmdClock(uint32_t agrc, const char** argv); // command needs service/syscall
-    //void cmdBeep(uint32_t agrc, const char** argv);  // command needs service
+    void cmdEcho(uint32_t argc, char** argv);    // feature needs syscall(?)
+    void cmdCls(uint32_t argc, char** argv);
+    //void cmdClock(uint32_t agrc, char** argv); // command needs service/syscall
+    //void cmdBeep(uint32_t agrc, char** argv);  // command needs service
     
     // Informational commands. Basically either walls of text or the humble ver command.
-    void cmdVer(uint32_t argc, const char** argv);
-    void cmdHelp(uint32_t argc, const char** argv);
-    void cmdLicensing(uint32_t argc, const char** argv);
-    void cmdCredits(uint32_t argc, const char** argv);
-    void cmdAbout(uint32_t argc, const char** argv);
+    void cmdVer(uint32_t argc, char** argv);
+    void cmdHelp(uint32_t argc, char** argv);
+    void cmdLicensing(uint32_t argc, char** argv);
+    void cmdCredits(uint32_t argc, char** argv);
+    void cmdAbout(uint32_t argc, char** argv);
 
     // Temporary commands
 }
