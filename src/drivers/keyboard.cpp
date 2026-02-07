@@ -1,4 +1,5 @@
 // The oldest OpenSteel/OS driver.
+// convert current char model to a key-based enum and struct
 
 #include <drivers/keyboard.h>
 
@@ -13,7 +14,7 @@ void printfHex(uint8_t);
 
 
 volatile KeystrokeMode keymode = PrintAndNotify;
-volatile char lastChar;
+volatile keyEvent lastChar;
 
 
 
@@ -21,12 +22,12 @@ KeyboardEventHandler::KeyboardEventHandler()
 {
 }
 
-char KeyboardEventHandler::SendKeystroke(char key)
+void KeyboardEventHandler::SendKeystroke(keyCode key, char ch = 0)
 {
     //if ((unsigned char)key < 32 && key != '\n' && key != '\b') return 0;
 
-    lastChar = key;
-    return lastChar;
+    lastChar.code      = key;
+    lastChar.character = ch;
 }
 
 
@@ -38,20 +39,17 @@ void KeyboardEventHandler::OnKeyDown(char c)
     if (c == '\n')
     {
         if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("\n");
-        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
+        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(KEY_CHAR, '\n');
     }
     else if (c == '\b')
     {
         if (((keymode == PrintOnly ) || ((keymode == PrintAndNotify)) && (currentInterface == TextModeEditor))) printf("\b");
-        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(c);
+        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(KEY_CHAR, '\b');
     }
     else
     {
         if ((keymode == PrintOnly ) || (keymode == PrintAndNotify)) printf("%c", c);
-        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify))
-        {
-            SendKeystroke(c);
-        }
+        if ((keymode == NotifyOnly) || (keymode == PrintAndNotify)) SendKeystroke(KEY_CHAR, c);
     }
 }
 
@@ -111,13 +109,20 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 
     if(handler)
     {
-        static bool Shift = false;
-        static bool Control = false;
-        static bool Alt = false;
+        static bool Shift    = false;
+        static bool Control  = false;
+        static bool Alt      = false;
         static bool capsLock = false;
+        static bool extended = false;
 
         switch(key)
         {
+            case 0xE0: 
+            {
+                extended = true;
+                //break;
+            }
+
             /*
                 This function is currently designed for Canadian English QWERTY keyboards, also
                 used in the United States of America. Not the CMS (Canadian Mutlilingual Standard)
@@ -140,6 +145,13 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 additional hardware to use to further driver development - Not just keyboards, but also
                 printers, networking cards, sound cards, graphics cards, mice, trackpads and more laptops.
             */
+
+            if (extended)
+            {
+                extended = false;
+                case 0x48: handler->SendKeystroke(KEY_UP); break;
+                case 0x50: handler->SendKeystroke(KEY_DOWN); break;
+            }
             case 0xFA: break;
 
             case 0x29: if(Shift) handler->OnKeyDown('~'); else handler->OnKeyDown('`'); break;
@@ -211,6 +223,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 if (capsLock == false)
                 {
                     capsLock = true;
+                    // TODO: add keyboard status light toggles
                     break;
                 }
                 else
