@@ -2,6 +2,7 @@
 
 using namespace osos;
 using namespace osos::drivers;
+using namespace osos::kernel;
 
 extern volatile uint32_t tickCount;
 
@@ -14,7 +15,7 @@ void shutdown();
 
 
 
-void osos::cmdCpudata(uint32_t argc, const char** argv)
+void osos::cmdCpudata(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -26,7 +27,7 @@ void osos::cmdCpudata(uint32_t argc, const char** argv)
     else printf("Vendor: %s\nCPU: %s\n", cpuven(), cpubrd());
 }
 
-void osos::cmdUptime(uint32_t argc, const char** argv)
+void osos::cmdUptime(uint32_t argc, char** argv)
 {
     bool helpFlag;
     
@@ -39,7 +40,7 @@ void osos::cmdUptime(uint32_t argc, const char** argv)
     else printf("tick speed: 100 Hz\nuptime in ticks: %d\n", tickCount);
 }
 
-void osos::cmdShutdown(uint32_t argc, const char** argv)
+void osos::cmdShutdown(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -57,7 +58,7 @@ void osos::cmdShutdown(uint32_t argc, const char** argv)
     }
 }
 
-void osos::cmdPacinae(uint32_t argc, const char** argv)
+void osos::cmdPacinae(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -68,11 +69,11 @@ void osos::cmdPacinae(uint32_t argc, const char** argv)
     if (helpFlag) printf("%Rpacinae     %R: Placeholder command for eventual OpenSteel/OS Package Manager.\nNot of use right now.\n", 0x0E, 0x0F);
     else
     {
-        printf("OpenSteel/OS Package Manager (Pacinae)\nThe command %Rpacinae%R will be utilised by the, as of this build, unimplemented\npackage manager that will be added at a later date.", 0x0E, 0x0F);
+        printf("OpenSteel/OS Package Manager (Pacinae)\nThe command %Rpacinae%R will be utilised by the, as of this build, unimplemented\npackage manager that will be added at a later date.\n", 0x0E, 0x0F);
     }
 }
 
-void osos::cmdSetup(uint32_t argc, const char** argv)
+void osos::cmdSetup(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -87,7 +88,7 @@ void osos::cmdSetup(uint32_t argc, const char** argv)
 }
 
 
-void osos::cmdEcho(uint32_t argc, const char** argv)
+void osos::cmdEcho(uint32_t argc, char** argv)
 {
     bool helpFlag = false;
     bool serialFlag = false;
@@ -132,7 +133,7 @@ void osos::cmdEcho(uint32_t argc, const char** argv)
     }
 }
 
-void osos::cmdCls(uint32_t argc, const char** argv)
+void osos::cmdCls(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -144,10 +145,10 @@ void osos::cmdCls(uint32_t argc, const char** argv)
     else printf("\a");
 }
 
-/*void osos::cmdClock(uint32_t argc, const char** argv)
+/*void osos::cmdClock(uint32_t argc, char** argv)
 {}
 
-void osos::cmdBeep(uint32_t argc, const char** argv)
+void osos::cmdBeep(uint32_t argc, char** argv)
 {
     bool helpFlag;
     uint32_t argFreq = 0;
@@ -161,7 +162,7 @@ void osos::cmdBeep(uint32_t argc, const char** argv)
 }*/
 
 
-void osos::cmdVer(uint32_t argc, const char** argv)
+void osos::cmdVer(uint32_t argc, char** argv)
 {
     bool helpFlag = false;
     bool dateFlag = false;
@@ -179,13 +180,16 @@ void osos::cmdVer(uint32_t argc, const char** argv)
             copyrightFlag = true;
             pNameFlag     = true;
         }
-        if (strcmp(argv[i], "-b") == 0) buildFlag     = true;
-        if (strcmp(argv[i], "-d") == 0) dateFlag      = true;
-        if (strcmp(argv[i], "-c") == 0) copyrightFlag = true;
-        if (strcmp(argv[i], "-n") == 0) pNameFlag     = true;
+        else
+        {
+            if (strcmp(argv[i], "-b") == 0) buildFlag     = true;
+            if (strcmp(argv[i], "-d") == 0) dateFlag      = true;
+            if (strcmp(argv[i], "-c") == 0) copyrightFlag = true;
+            if (strcmp(argv[i], "-n") == 0) pNameFlag     = true;
+        }
     }
 
-    if (helpFlag) printf("%Rversion\nver         %R: Provides the system version number.\nExample usage: ver\nFlags:\n -b: Display build number + codename.    -d: Display build date.\n", 0x0E, 0x0F);
+    if (helpFlag) printf("%Rversion\nver         %R: Provides the system version number.\nExample usage: ver\nFlags:\n -b: Display build number + codename.    -d: Display build date.                 -c: Display copyright info.             -n: Display formal product naming.      -f: Invoke all flags.\n", 0x0E, 0x0F);
     else 
     {
         printf(" OpenSteel/OS ");
@@ -198,7 +202,7 @@ void osos::cmdVer(uint32_t argc, const char** argv)
     }
 }
 
-void osos::cmdHelp(uint32_t argc, const char** argv)
+void osos::cmdHelp(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -213,12 +217,14 @@ void osos::cmdHelp(uint32_t argc, const char** argv)
         printf("To get specific information on a command, type that command, followed by only -?");
         printf("For example, ver -? or uptime -?.\n");
         printf(" about        cls          cpuinfo      credits      echo         help          ");
-        printf(" licensing    uptime       shutdown     version      ver");
+        printf(" licensing    uptime       shutdown     version      ver\n");
+        printf("These additional commands are placeholders for later-date applications:         ");
+        printf(" pacinae      setup");
         printf("\n");
     }
 }
 
-void osos::cmdLicensing(uint32_t argc, const char** argv)
+void osos::cmdLicensing(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -242,7 +248,7 @@ void osos::cmdLicensing(uint32_t argc, const char** argv)
     }
 }
 
-void osos::cmdCredits(uint32_t argc, const char** argv)
+void osos::cmdCredits(uint32_t argc, char** argv)
 {
     bool helpFlag;
     for (int i = 1; i < argc; i++)
@@ -266,7 +272,7 @@ void osos::cmdCredits(uint32_t argc, const char** argv)
     }
 }
 
-void osos::cmdAbout(uint32_t argc, const char** argv)
+void osos::cmdAbout(uint32_t argc, char** argv)
 {
     bool helpFlag = false;
     bool mozillaFlag = false;
@@ -279,7 +285,11 @@ void osos::cmdAbout(uint32_t argc, const char** argv)
         if (strcmp(argv[i], "-v") == 0) inclVerFlag = true;
     }
 
-    if (helpFlag) printf("%Rabout       %R: General command for OpenSteel/OS information.\nExample usage: about\nFlags:\n -v: Include version info.\n", 0x0E, 0x0F);
+    if (helpFlag)
+    {
+        if (mozillaFlag) panic(0x1A); // intentional behaviour
+        else printf("%Rabout       %R: General command for OpenSteel/OS information.\nExample usage: about\nFlags:\n -v: Include version info.\n\nSee also:\n%R credits      help         licensing\n", 0x0E, 0x0F, 0x0E, 0x0F);
+    }
     else if (mozillaFlag)
     {
         // Poorly hidden easter egg. This is a reference to The Book of Mozilla, a parody (i think?) bible found in Netscape, Firefox and other
