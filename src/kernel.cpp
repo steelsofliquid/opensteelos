@@ -61,7 +61,7 @@ using namespace osos::kernel::hwcom;
 
 // external variables and whatnot
 extern volatile uint32_t tickCount;
-extern volatile char lastChar;
+extern volatile keyEvent lastChar;
 extern volatile KeystrokeMode keymode;
 extern volatile bool isShellInitialised;
 extern volatile char inputBuffer[256];
@@ -449,6 +449,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // Denotes end of booting process  ^
 
     // the code below is supposed to try to determine if the OS is in real mode or not. spoiler: it's not.
+    // it might be useful later, when neisaboot is developed, so we'll keep it in here for now, just unactivated
     /*
     uint32_t cr0;
     printf("Conducting test to determine if we\'re in realmode, will crash if so...");
@@ -463,9 +464,6 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
             vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
     */
 
-
-    //printf("Integer and printf Output Test _________________________________________________");
-    //printf("Int 1: %d | Int 2: %d | Int 3: %d | Int 4: %d |Int 5: %d", testInteger1, testInteger2, testInteger3, testInteger4, testInteger5);
 /* 
     if (interrupts.handlerExists(0x24)) printf("\nIRQ 4 Handler Exists."); else printf("\nIRQ 4 Handler doesn\'t exist.");
     if (interrupts.handlerExists(0x2E)) printf("\nIRQ 14 Handler Exists."); else printf("\nIRQ 14 Handler doesn\'t exist.");
@@ -473,58 +471,20 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     if (interrupts.handlerExists(0x2C)) printf("\nIRQ 12 Handler exists."); else printf("\nIRQ 12 Handler doesn\'t exist.");
  */
 
-    printf("memory test\n");
-    void* memoryTestA = MemoryManager.malloc(32);
-    void* memoryTestB = MemoryManager.malloc(64);
-    void* memoryTestC = MemoryManager.malloc(128);
-
-    MemoryManager.free(memoryTestB);
-
-    void* memoryTestD = MemoryManager.malloc(48);
-
-    printf("a: 0x%x%x%x%x ",
-        (((size_t)memoryTestA >> 24) & 0xFF),
-        (((size_t)memoryTestA >> 16) & 0xFF),
-        (((size_t)memoryTestA >> 8 ) & 0xFF),
-        (((size_t)memoryTestA      ) & 0xFF)
-    );
-
-    printf("b: 0x%x%x%x%x ",
-        (((size_t)memoryTestB >> 24) & 0xFF),
-        (((size_t)memoryTestB >> 16) & 0xFF),
-        (((size_t)memoryTestB >> 8 ) & 0xFF),
-        (((size_t)memoryTestB      ) & 0xFF)
-    );
-
-    printf("c: 0x%x%x%x%x ",
-        (((size_t)memoryTestC >> 24) & 0xFF),
-        (((size_t)memoryTestC >> 16) & 0xFF),
-        (((size_t)memoryTestC >> 8 ) & 0xFF),
-        (((size_t)memoryTestC      ) & 0xFF)
-    );
-
-    printf("d: 0x%x%x%x%x\n",
-        (((size_t)memoryTestD >> 24) & 0xFF),
-        (((size_t)memoryTestD >> 16) & 0xFF),
-        (((size_t)memoryTestD >> 8 ) & 0xFF),
-        (((size_t)memoryTestD      ) & 0xFF)
-    );
-
-    memset(memoryTestA, 0xAA, 32);
-    memset(memoryTestC, 0xCC, 128);
-
-    for (int i = 0; i < 32; i++) if (((uint8_t*)memoryTestA)[i] != 0xAA) panic(0x17);
-
     EnableCursor(13, 15);
     FlushShell();
     nrsh.Initialise();
 
     while(1)
     {
-        if (lastChar != 0)
+        if (lastChar.code != KEY_NONE)
         {
-            nrsh.HandleInput(lastChar);
-            lastChar = 0;
+            keyEvent kbEvent;
+            kbEvent.code = lastChar.code;
+            kbEvent.character = lastChar.character;
+
+            nrsh.HandleInput(kbEvent);
+            lastChar.code = KEY_NONE;
         }
         asm volatile ("hlt");
     }
