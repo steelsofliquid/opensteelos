@@ -1,5 +1,7 @@
 #include <common/lib/libstr.h>
 
+using namespace osos;
+
 // me on my way to dump the most inspiring and influential quotes in my comments
 // (please don't go put an entry for "SteelsOfLiquid", "OpenSteel/OS" or "Neisa Sapphira-Aera" into Wikiquote)
 
@@ -14,6 +16,14 @@ size_t strlen(const char* string)
 {
     size_t len = 0;
     while (string[len] != '\0') len++; // very simple
+            
+    return len;
+}
+
+size_t strnlen(const char* string, int limit)
+{
+    size_t len = 0;
+    while ((len < limit) && (string[len] != '\0')) len++; // very simple
             
     return len;
 }
@@ -51,12 +61,12 @@ int32_t strncmp(const char* string1, const char* string2, size_t n)
 }
 
 
-int8_t* strcpy(char* destination, const char* source)
+char* strcpy(char* destination, const char* source)
 {
     // don't you love a derivative of memcpy? well go look at libmem.cpp and compare strcpy with memcpy!
             
-    int8_t* dest = (int8_t*) destination;
-    const int8_t* sourc = (const int8_t*) source;
+    char* dest = (char*) destination;
+    const char* sourc = (const char*) source;
 
     size_t i = 0;
 
@@ -68,23 +78,23 @@ int8_t* strcpy(char* destination, const char* source)
     return destination;
 }
 
-int8_t* strncpy(char* destination, const char* source, size_t n)
+char* strncpy(char* destination, const char* source, size_t n)
 {
-    int8_t* dest = (int8_t*) destination;
-    const int8_t* sourc = (const int8_t*) source;
+    char* dest = (char*) destination;
+    const char* sourc = (const char*) source;
 
     for (size_t i = 0; i < n; i++) dest[i] = sourc[i];
 
     return destination;
 }
 
-int8_t* strcat(char* destination, const char* source)
+char* strcat(char* destination, const char* source)
 {
     // this should be a tinge like strcpy, but presumably just appending the string.
     // actually, by doing field research, it's not appending a string.
 
-    int8_t* dest = (int8_t*) destination;
-    const int8_t* sourc = (const int8_t*) source;
+    char* dest = (char*) destination;
+    const char* sourc = (const char*) source;
 
     size_t i = strlen(dest); // hopefully this doesn't make g++ spontaneouly combust, probably won't since dmm.cpp uses its own functions and it's fine
     size_t j = 0;
@@ -102,11 +112,23 @@ int8_t* strcat(char* destination, const char* source)
 }
 
 
-int8_t* strchr(const char* string, int32_t character)
+
+char* strdup(const char* source)
 {
-    const int8_t* str = (const int8_t*) string;
+    size_t len = strnlen(source, 256) + 1;
+    char* dest = (char*)osos::MemoryManager::activeMemoryManager->malloc(len);
+    if (!dest) return 0;
+    memcpy(dest, source, len);
+    dest[len - 1] = '\0';
+    return dest;
+}
+
+
+char* strchr(const char* string, int32_t character)
+{
+    const char* str = (const char*) string;
     int32_t charac = (int32_t) character;
-    int8_t* result; // We give this at the end as it seems simple
+    char* result; // We give this at the end as it seems simple
 
     size_t i = 0; // for str[i]
     size_t j = 0; // for result[j]
@@ -129,7 +151,7 @@ int8_t* strchr(const char* string, int32_t character)
     return result;
 }
 
-int8_t* strrchr(const char* string, int32_t character)
+char* strrchr(const char* string, int32_t character)
 {
     // strchr, but in reverse! dear neisa-sama...
 
@@ -146,9 +168,9 @@ int8_t* strrchr(const char* string, int32_t character)
         4. Return with result.
     */
 
-    const int8_t* str = (const int8_t*) string;
+    const char* str = (const char*) string;
     int32_t charac = (int32_t) character;
-    int8_t* result;
+    char* result;
 
     size_t i = 0;
     size_t j = 0;
@@ -177,13 +199,13 @@ int8_t* strrchr(const char* string, int32_t character)
     return result;
 }
 
-int8_t* strstr(const char* haystack, const char* needle)
+char* strstr(const char* haystack, const char* needle)
 {
     // This is honestly a bit broken right now, apologies. Will be changed as needed once an executable can be made to demonstrate these functions
 
-    const int8_t* hays = (const int8_t*) haystack; // [insert f1 movie joke here]
-    const int8_t* need = (const int8_t*) needle;
-    int8_t* result;
+    const char* hays = (const char*) haystack; // [insert f1 movie joke here]
+    const char* need = (const char*) needle;
+    char* result;
 
     size_t i = 0;
     size_t j = 0;
@@ -226,13 +248,13 @@ int8_t* strstr(const char* haystack, const char* needle)
 
 
 
-int8_t* itoa(int32_t value, char* string, int32_t base)
+char* itoa(int32_t value, char* string, int32_t base)
 {
     // based off of a mix of multiple interpretations of itoa.
 
     char* temp1 = string;
     char* temp2 = string;
-    int8_t tchar;
+    char tchar;
     int32_t tval;
     uint32_t v;
 
@@ -280,10 +302,10 @@ static inline bool isDelim(char c, const char* delim)
     return false;
 }
 
-int8_t* strtok(char* newstr, const char* delim)
+char* strtok(char* newstr, const char* delim)
 {
     static char* saved = nullptr;
-    int8_t* result;
+    char* result;
 
     if (newstr != nullptr) saved = newstr;
     if (saved == nullptr) return nullptr;

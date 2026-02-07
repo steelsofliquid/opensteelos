@@ -84,6 +84,14 @@ void printf(char* str, ...) // the main screen output function.
                 break;
             }
 
+            case '\r':
+            {
+                x = 0; curX = 0;
+
+                for (x = 0; x < 80; x++) videoMemory[80*y+x] = (currentColour << 8) | ' ';
+                x = 0; curX = 0;
+            }
+
             case '%':
                 i++;
                 switch (str[i])
