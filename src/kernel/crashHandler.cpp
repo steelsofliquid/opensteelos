@@ -22,7 +22,7 @@ void osos::kernel::panic(uint32_t errorId)
         "STACK_SEGMENT_FAULT", "GENERAL_PROTECTION_FAULT", "PAGE_FAULT", "0x0F",
         "X87_FLOATING_POINT_EXCEPTION", "MISALIGNED_MEMORY", "HARDWARE_ERROR", "SIMD_FLOATING_POINT_EXCEPTION",
         "VIRTUALISATION_EXCEPTION", "CONTROL_PROTECTION_EXCEPTION", "DRIVER_VIOLATION", "KILLSWITCH_INVOKED",
-        "NO_ACCESSIBLE_FPU_MODULES", "OUT_OF_MEMORY", "A"
+        "NO_ACCESSIBLE_FPU_MODULES", "OUT_OF_MEMORY", "LMAO_GOTCHA_NICE_TRY"
     };
 
     const char* errorName = "UNKNOWN_EXCEPTION";
@@ -30,7 +30,7 @@ void osos::kernel::panic(uint32_t errorId)
         errorName = errorTextID[errorId];
 
     // red screen of death
-    printf("%R\a", 0x4F);
+    printf("%R\a%R\a", 0x0F, 0x4F);
     printf(" <!> STOP                                                                   >_< ");
     printf("                                                                                ");
     printf(" OpenSteel/OS %d.%d.%d\n", verMajor, verMinor, verBuild);
@@ -85,6 +85,9 @@ void osos::kernel::panic(uint32_t errorId)
             printf(" OpenSteel/OS ran out of usable memory. The most likely cause is a memory leak, ");
             printf(" or your computer is experiencing RAM issues or requires a RAM upgrade.         ");
             break;
+
+        case 0x1A:
+            printf("%R Ha ha. Nice try. Maybe don\'%Rt ask about the ╚fe%Ratù▓re. ♥︎☺︎%R\nHey!! HEY!!! It\'s just a joke! It honestly isn't in me to troll you. That\'s not my kind of mentality. You just found an easter egg and maybe running this command without the help flag will help you find another one.\n", 0xF8, 0x2A, 0xCD, 0x4C); break; // this should cause a graphical glitch.
 
         default:
             printf(" A description for this error is unavailable.                                   ");
