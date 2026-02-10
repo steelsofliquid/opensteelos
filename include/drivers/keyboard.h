@@ -25,7 +25,17 @@ namespace osos
             KEY_SHIFT,
             KEY_ALT,
             KEY_WIN,
-            KEY_FUNCTION
+            KEY_FUNCTION,
+            KEY_CHAR_REL,
+            KEY_UP_REL,
+            KEY_DOWN_REL,
+            KEY_LEFT_REL,
+            KEY_RIGHT_REL,
+            KEY_CONTROL_REL,
+            KEY_SHIFT_REL,
+            KEY_ALT_REL,
+            KEY_WIN_REL,
+            kEY_FUNCTION_REL
         };
 
         struct keyEvent
