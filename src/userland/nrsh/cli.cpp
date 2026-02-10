@@ -3,6 +3,7 @@
 
 using namespace osos;
 using namespace osos::drivers;
+using namespace osos::kernel;
 
 extern volatile InterfaceModes currentInterface;
 
@@ -16,13 +17,15 @@ static Speaker speakCLI;
 
 volatile bool isShellAvailable;
 volatile bool isShellInitialised = false;
-volatile char inputBuffer[256];
+char inputBuffer[256];
 volatile uint32_t inputLength = 0;
 
 
 
 NathanRenaudShell::NathanRenaudShell()
 {
+    for (int i = 0; i < 32; i++) commandHistoryEntries[i] = nullptr;
+    cmdHstCount = 0;
 }
 
 NathanRenaudShell::~NathanRenaudShell()
@@ -53,6 +56,97 @@ void NathanRenaudShell::Initialise()
 {
     currentInterface = TextShell;
     printf("%R> %R", 0x0B, 0x0F);
+}
+
+
+
+void NathanRenaudShell::RedrawInputLine()
+{
+    printf("\r%R> %R%s", 0x0B, 0x0F, inputBuffer);
+    FlushShell();
+}
+
+void NathanRenaudShell::SaveToHistory(char* command)
+{
+    if ((cmdHstCount > 0) && (strcmp(commandHistoryEntries[0], command) == 0)) return;
+
+    size_t found = 0;
+    bool foundCommand = false;
+    for (int i = 0; i < cmdHstCount; i++)
+    {
+        if (strcmp(command, commandHistoryEntries[i]) == 0)
+        {
+            found = i;
+            foundCommand = true;
+            break;
+        }
+    }
+
+    if (foundCommand)
+    {
+        char* reusedCmd = commandHistoryEntries[found];
+        for (size_t i = found; i > 0; i--) commandHistoryEntries[i] = commandHistoryEntries [i - 1];
+
+        commandHistoryEntries[0] = reusedCmd;
+        return;
+    }
+
+    if (cmdHstCount == 32)
+    {
+        osos::MemoryManager::activeMemoryManager->free(commandHistoryEntries[31]);
+        cmdHstCount--;
+    }
+
+    for (size_t i = cmdHstCount; i > 0; i--) commandHistoryEntries[i] = commandHistoryEntries [i - 1];
+
+    commandHistoryEntries[0] = strdup(command);
+    cmdHstCount++;
+}
+
+char* NathanRenaudShell::GrabFromHistory(size_t index)
+{
+    return commandHistoryEntries[index];
+}
+
+void NathanRenaudShell::LoadHistoryEntry(size_t index)
+{
+    if (index < 0 || index >= cmdHstCount) return;
+
+    char* entry = commandHistoryEntries[index];
+    if (!entry || entry[0] == '\0') return;
+
+    size_t len = strlen(entry);
+    if (len > 255) len = 255;
+
+    memcpy(inputBuffer, entry, len);
+    inputBuffer[len] = '\0';
+    inputLength = len;
+
+    RedrawInputLine();
+}
+
+
+uint32_t NathanRenaudShell::Tokenise(char* input, char* argv[], uint32_t max)
+{
+    uint32_t count = 0;
+    char* p = input;
+
+    while (*p && count < max)
+    {
+        while (*p == ' ') p++;
+        if (*p == 0) break;
+
+        argv[count++] = p;
+
+        while (*p && *p != ' ') p++;
+        if (*p)
+        {
+            *p = 0;
+            p++;
+        }
+    }
+
+    return count;
 }
 
 void NathanRenaudShell::Trim(char* str)
@@ -95,16 +189,10 @@ void NathanRenaudShell::ParseCommand(char* input)
     
     if(input[0] == 0) return;
 
-    //const char* cmd = GetToken(input);
-    const char* token = strtok(input, " ");
-    const char* args[32];
-    uint32_t argsCount = 0;
+    SaveToHistory(inputBuffer);
 
-    while (token != nullptr && argsCount < 32)
-    {
-        args[argsCount++] = token;
-        token = strtok(nullptr, " ");
-    }
+    char* args[32];
+    uint32_t argsCount = Tokenise(input, args, 32);
 
     for (int i = 0; commandsTable[i].name != 0; i++)
     {
@@ -120,7 +208,71 @@ void NathanRenaudShell::ParseCommand(char* input)
 
 
 
-void NathanRenaudShell::HandleInput(char c)
+void NathanRenaudShell::HandleInput(keyEvent key)
+{
+    static int historyIndexIndicator = -1;
+    static bool navKeyHeld = false;
+
+    if ((key.code == KEY_UP) || (key.code == KEY_DOWN))
+    {
+        if (navKeyHeld == true)
+        {
+            return;
+        }
+
+        navKeyHeld = true;
+    }
+    else navKeyHeld = false;
+
+    switch (key.code)
+    {
+        case KEY_CHAR:
+            navKeyHeld = false;
+            HandleChar(key.character);
+            if (key.character == '\n') historyIndexIndicator = -1;
+            break;
+        
+        case KEY_UP:
+            if (cmdHstCount == 0) break;
+            if (historyIndexIndicator == (cmdHstCount - 1)) break;
+            else historyIndexIndicator++;
+            LoadHistoryEntry(historyIndexIndicator);
+            break;
+        
+        case KEY_DOWN:
+            if (historyIndexIndicator <= -1) break;
+            historyIndexIndicator--;
+
+            if (historyIndexIndicator <= -1)
+            {
+                historyIndexIndicator = -1;
+                printf("\r%R> %R", 0x0B, 0x0F);
+                inputBuffer[0] = '\0';
+                inputLength = 0;
+                FlushShell();
+            }
+            else
+            {
+                LoadHistoryEntry(historyIndexIndicator);
+            }
+            break;
+
+        case KEY_UP_REL:
+        {
+            navKeyHeld = false;
+            break;
+        }
+
+        case KEY_DOWN_REL:
+        {
+            navKeyHeld = false;
+            break;
+        }
+
+    }
+}
+
+void NathanRenaudShell::HandleChar(char c)
 {
     if (c == '\b')
     {
@@ -142,7 +294,7 @@ void NathanRenaudShell::HandleInput(char c)
     {
         inputBuffer[inputLength] = '\0';
 
-        ParseCommand((char*)inputBuffer);
+        ParseCommand(inputBuffer);
         inputLength = 0;
         printf("%R> %R", 0x0B, 0x0F);
         FlushShell();

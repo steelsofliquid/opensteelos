@@ -6,6 +6,8 @@
 #include <common/lib/libio.h>
 #include <common/sysHelpers.h>
 #include <drivers/snd/speaker.h>
+#include <drivers/keyboard.h>
+#include <kernel/crashHandler.h>
 
 namespace osos
 {
@@ -17,16 +19,28 @@ namespace osos
 
     class NathanRenaudShell
     {
+        private:
+        char* commandHistoryEntries[32];
+        size_t cmdHstCount;
+
         public:
         NathanRenaudShell();
         ~NathanRenaudShell();
 
         void Initialise();
+
+        void RedrawInputLine();
+        void SaveToHistory(char* command);
+        char* GrabFromHistory(size_t index);
+        void LoadHistoryEntry(size_t index);
+
+        uint32_t Tokenise(char* input, char* argv[], uint32_t max);
         void Trim(char* str);
         const char* GetToken(char* str);
         void ParseCommand(char* input);
 
-        void HandleInput(char c);
+        void HandleInput(osos::drivers::keyEvent key);
+        void HandleChar(char c);
     };
 }
 

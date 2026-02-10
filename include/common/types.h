@@ -16,6 +16,6 @@ typedef const char* string;
 typedef uint32_t size_t;
 typedef uint32_t uintptr_t;
 
-typedef void (*commandVoid)(uint32_t argc, const char** argv);
+typedef void (*commandVoid)(uint32_t argc, char** argv);
 
 #endif

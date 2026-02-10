@@ -13,6 +13,37 @@ namespace osos
 {
     namespace drivers
     {
+        enum keyCode 
+        {
+            KEY_NONE,
+            KEY_CHAR,
+            KEY_UP,
+            KEY_DOWN,
+            KEY_LEFT,
+            KEY_RIGHT,
+            KEY_CONTROL,
+            KEY_SHIFT,
+            KEY_ALT,
+            KEY_WIN,
+            KEY_FUNCTION,
+            KEY_CHAR_REL,
+            KEY_UP_REL,
+            KEY_DOWN_REL,
+            KEY_LEFT_REL,
+            KEY_RIGHT_REL,
+            KEY_CONTROL_REL,
+            KEY_SHIFT_REL,
+            KEY_ALT_REL,
+            KEY_WIN_REL,
+            kEY_FUNCTION_REL
+        };
+
+        struct keyEvent
+        {
+            keyCode code;
+            char character;
+        };
+
         enum KeystrokeMode
         {
             PrintOnly      = 0,
@@ -25,7 +56,7 @@ namespace osos
             public:
             KeyboardEventHandler();
             
-            char SendKeystroke(char key);
+            void SendKeystroke(keyCode key, char ch);
             
             virtual void OnKeyDown(char c);
             virtual void OnKeyUp(char);
