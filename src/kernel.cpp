@@ -64,8 +64,8 @@ extern volatile uint32_t tickCount;
 extern volatile keyEvent lastChar;
 extern volatile KeystrokeMode keymode;
 extern volatile bool isShellInitialised;
-extern volatile char inputBuffer[256];
-extern volatile uint32_t inputLength;
+//extern volatile char inputBuffer[256];
+//extern volatile uint32_t inputLength;
 
 
 
@@ -359,7 +359,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     KeyboardDriver keyboard(&interrupts, &kbhandler);
     drvManager.AddDriver(&keyboard);
 
-    ProgrammableIntervalTimer programmableIntervalTimer(&interrupts); drvManager.AddDriver(&programmableIntervalTimer);
+    ProgrammableIntervalTimer programmableIntervalTimer(&interrupts, &taskManager); drvManager.AddDriver(&programmableIntervalTimer);
     RecommendedStandard232Driver serialPort(&interrupts); drvManager.AddDriver(&serialPort);
 
     //MouseToConsole mousehandler;
