@@ -29,8 +29,10 @@ namespace osos
 
         void Initialise();
 
+        void RedrawInputLine();
         void SaveToHistory(char* command);
         char* GrabFromHistory(size_t index);
+        void LoadHistoryEntry(size_t index);
 
         uint32_t Tokenise(char* input, char* argv[], uint32_t max);
         void Trim(char* str);
