@@ -14,7 +14,7 @@ uint32_t tickSecs = 0;
 uint32_t prevSecTick = 0;
 bool isExactlySecond;
 
-ProgrammableIntervalTimer::ProgrammableIntervalTimer(InterruptManager* manager) :
+ProgrammableIntervalTimer::ProgrammableIntervalTimer(InterruptManager* manager, TaskManager* taskman) :
     DriverModel(),
     InterruptHandler(manager, 0x20),
     Channel0(0x40),
@@ -23,6 +23,8 @@ ProgrammableIntervalTimer::ProgrammableIntervalTimer(InterruptManager* manager) 
     PITComPort(0x43),
     ProgIC(0x20)
 {
+    this->taskman = taskman;
+
     driverAttributes.name      = "Intel i8254 PIT Driver";
     driverAttributes.publisher = "SteelsOfLiquid";
     driverAttributes.type      = "timers";
@@ -103,8 +105,8 @@ uint32_t ProgrammableIntervalTimer::HandleInterrupt(uint32_t esp)
     {
         isExactlySecond = false;
     }
-    esp = (uint32_t)taskManager.Schedule((CPUState*)esp);
-    taskManager.WakeTask(tickCount);
+    esp = (uint32_t)taskman->Schedule((CPUState*)esp);
+    taskman->WakeTask(tickCount);
     return esp;
 }
 
