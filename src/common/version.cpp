@@ -2,8 +2,8 @@
 
 int32_t verMajor = 0;
 int32_t verMinor = 22;
-int32_t verBuild = 325;
+int32_t verBuild = 374;
 
 int32_t buildYr  = 2026;
 int32_t buildMon = 2;
-int32_t buildDay = 6;
+int32_t buildDay = 10;
