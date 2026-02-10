@@ -1,3 +1,8 @@
+// This library is simply a giant TODO for later.
+// I don't think there's value in implementing this
+// yet without userspace and the likes, just see
+// wtf happened with strtok.
+
 // Based off of my own stack functions as they were in Python
 // from the late 2023 Python course
 //
@@ -19,7 +24,37 @@ class StringStack // This library (libstack.h) defines a sort of pseudo-type. St
     StringStack(size_t capacity);
     ~StringStack();
 
-    void push(const char* str);
+    void push(char* str);
+    void pop();
+};
+
+class IntStack
+{
+    public:
+    IntStack(size_t capacity);
+    ~IntStack();
+
+    void push(int value);
+    void pop();
+};
+
+class HexStack
+{
+    public:
+    HexStack(size_t capacity);
+    ~HexStack();
+
+    void push(uint16_t value);
+    void pop();
+};
+
+class UnsignedIntStack
+{
+    public:
+    UnsignedIntStack(size_t capacity);
+    ~UnsignedIntStack();
+
+    void push(uint32_t value);
     void pop();
 };
 
