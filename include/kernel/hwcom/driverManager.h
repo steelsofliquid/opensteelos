@@ -19,6 +19,8 @@ namespace osos
                 int32_t driverCount;
 
                 public:
+                static DriverManager *activeDriverManager;
+                
                 DriverManager();
                 ~DriverManager();
 
