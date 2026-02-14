@@ -4,6 +4,8 @@
 #include <common/types.h>
 #include <common/lib/libio.h>
 #include <drivers/rs232.h>
+#include <kernel/hwcom/driverModel.h>
+#include <kernel/hwcom/interrupts.h>
 #include <kernel/hwcom/port.h>
 
 namespace osos
@@ -12,7 +14,7 @@ namespace osos
     {
         namespace drives
         {
-            class AdvancedTechnologyAttachment
+            class AdvancedTechnologyAttachment : public osos::kernel::hwcom::DriverModel, public osos::kernel::hwcom::InterruptHandler
             {
                 protected:
                 osos::kernel::hwcom::Port16Bit dataPort;
@@ -34,8 +36,10 @@ namespace osos
                 uint16_t bytesPerSector;
 
                 public:
-                AdvancedTechnologyAttachment(uint16_t portBase, bool lead);
+                AdvancedTechnologyAttachment(uint16_t portBase, bool lead, uint8_t irqNumber, osos::kernel::hwcom::InterruptManager* manager);
                 ~AdvancedTechnologyAttachment();
+
+                bool PollDrive(bool checkDrqBit);
 
                 void IdentifyDrive();
                 void Read28Bit(uint32_t sector, char* data, int count);
