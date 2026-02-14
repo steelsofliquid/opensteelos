@@ -11,4 +11,12 @@ enum InterfaceModes
     TextModeOther  = 5
 };
 
+enum ProcessStatuses
+{
+    offline,
+    online,
+    asleep,
+    dismissed
+};
+
 #endif

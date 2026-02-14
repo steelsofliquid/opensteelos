@@ -17,5 +17,6 @@ typedef uint32_t size_t;
 typedef uint32_t uintptr_t;
 
 typedef void (*commandVoid)(uint32_t argc, char** argv);
+typedef void (*TaskEntry)(void*);
 
 #endif
