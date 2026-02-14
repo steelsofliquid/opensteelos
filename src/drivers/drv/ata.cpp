@@ -12,7 +12,7 @@ using namespace osos::kernel::hwcom;
 
 
 
-AdvancedTechnologyAttachment::AdvancedTechnologyAttachment(uint16_t portBase, bool lead) :
+AdvancedTechnologyAttachment::AdvancedTechnologyAttachment(uint16_t portBase, bool lead, uint8_t irqNumber, InterruptManager* manager) :
     dataPort        (portBase),
     errorPort       (portBase + 1),
     sectorCountPort (portBase + 2),
@@ -21,14 +21,39 @@ AdvancedTechnologyAttachment::AdvancedTechnologyAttachment(uint16_t portBase, bo
     lbaHighPort     (portBase + 5),
     devicePort      (portBase + 6),
     commandPort     (portBase + 7),
-    controlPort     (portBase + 0x206)
+    controlPort     (portBase + 0x206),
+    InterruptHandler(manager, irqNumber) // Unlike the RS232 or keyboard drivers, the IRQ number can't be hardcoded due to different HDDs using different IRQs
 {
     bytesPerSector = 512;
     this->lead = lead;
+
+    driverAttributes.name      = "ATA Hard Disk Driver";
+    driverAttributes.publisher = "SteelsOfLiquid";
+    driverAttributes.type      = "drives";
+
+    driverAttributes.isInitialised = false;
+    driverAttributes.isActive      = false;
+
+    driverAttributes.hasInterruptRequest  = true;
+    driverAttributes.interruptRequestLine = (interruptNumber - 0x20); // de facto. could also be 0x0F
+    driverAttributes.vectorOffset         = interruptNumber;
 }
 
 AdvancedTechnologyAttachment::~AdvancedTechnologyAttachment()
 {
+}
+
+bool AdvancedTechnologyAttachment::PollDrive(bool checkDrqBit)
+{
+    uint8_t status;
+
+    while ((status = commandPort.Read()) & 0x80);
+
+    if (status & 0x01) return false;
+    if (status & 0x20) return false;
+    if (checkDrqBit && !(status & 0x08)) return false;
+
+    return true;
 }
 
 void AdvancedTechnologyAttachment::IdentifyDrive()
@@ -37,6 +62,7 @@ void AdvancedTechnologyAttachment::IdentifyDrive()
     controlPort.Write(0);
 
     devicePort.Write(0xA0);
+    for (int i = 0; i < 4; i++) commandPort.Read();
     uint8_t status = commandPort.Read();
     if (status == 0xFF) return;
 
@@ -50,19 +76,18 @@ void AdvancedTechnologyAttachment::IdentifyDrive()
     status = commandPort.Read();
     if (status == 0xFF) return;
 
-    while (((status & 0x80) == 0x80) && ((status & 0x01) != 0x01)) status = commandPort.Read();
+    if (!PollDrive(true)) return;
 
     if (status & 0x01)
     {
         //rs232AtaHelper.WriteString("ERROR");
-        printf("ERROR");
+        printf("\nError trying to recognise the hard disk.                                   %R[err]%R", 0x0C, 0x0F);
         return;
     }
 
     for (uint16_t i = 0; i < 256; i++)
     {
         uint16_t data = dataPort.Read();
-        printf("%x", data);
     }
     //rs232AtaHelper.WriteString("DISK OK");
 }
@@ -82,7 +107,7 @@ void AdvancedTechnologyAttachment::Read28Bit(uint32_t sector, char* data, int co
     commandPort.Write(0x20);
 
     uint8_t status = commandPort.Read();
-    while (((status & 0x80) == 0x80) && ((status & 0x01) != 0x01)) status = commandPort.Read();
+    if (!PollDrive(true)) return;
 
     if (status & 0x01)
     {
@@ -93,11 +118,10 @@ void AdvancedTechnologyAttachment::Read28Bit(uint32_t sector, char* data, int co
     for (uint16_t i = 0; i < count; i += 2)
     {
         uint16_t writeData = dataPort.Read();
-        dataPort.Write(writeData);
 
         data[i] = writeData & 0x00FF;
-        printf("%c", data[i]);
         if ((i + 1) < count) data[i + 1] = (writeData >> 8) & 0x00FF;
+        //printf("%c%c", data[i], (i + 1 < count) ? data[i + 1] : 0);
     }
 
     for (uint16_t i = count + (count % 2); i < bytesPerSector; i += 2) dataPort.Read();
@@ -117,15 +141,19 @@ void AdvancedTechnologyAttachment::Write28Bit(uint32_t sector, char* data, int c
     lbaHighPort.Write((sector & 0x00FF0000) >> 16);
     commandPort.Write(0x30);
 
+    if (!PollDrive(true)) return;
+
     for (uint16_t i = 0; i < count; i += 2)
     {
-        uint16_t writeData = data[i];
-        if ((i + 1) < count) writeData |= ((uint16_t)data[i + 1]) << 8;
+        uint16_t writeData = (uint8_t)data[i];
+        if ((i + 1) < count) writeData |= ((uint16_t)(uint8_t)data[i + 1]) << 8;
 
         dataPort.Write(writeData);
     }
 
     for (uint16_t i = count + (count % 2); i < bytesPerSector; i += 2) dataPort.Write(0x0000);
+    if (!PollDrive(false)) return;
+    FlushDrive();
 }
 
 void AdvancedTechnologyAttachment::FlushDrive()
