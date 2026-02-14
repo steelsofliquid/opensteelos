@@ -4,6 +4,7 @@
 
 #include <common/types.h>
 #include <common/lib/libio.h>
+#include <common/sysHelpers.h>
 #include <kernel/gdt.h>
 
 namespace osos
@@ -38,11 +39,14 @@ namespace osos
             private:
             uint8_t stack[4096]; // 4 KiB
             CPUState* cpuState;
+            TaskEntry entry;
+            void* context;
 
             public:
             bool isAsleep;
+            ProcessStatuses taskStatus;
             uint32_t wakeTick;
-            Task(GlobalDescriptorTable *gdt, void entrypoint());
+            Task(GlobalDescriptorTable *gdt, TaskEntry entrypoint, void* contx);
             ~Task();
         };
 
@@ -54,16 +58,24 @@ namespace osos
             int currentTask;
             
             public:
+            static TaskManager *activeTaskManager;
+
             TaskManager();
             ~TaskManager();
-            bool AddTask(Task* task);
-            CPUState* Schedule(CPUState* cpuState);
 
-            void sleep(uint32_t interval);
+            bool AddTask(Task* task);
+            Task* GetCurrentTask();
+
+            CPUState* Schedule(CPUState* cpuState);
+            void Yield();
+
             void WakeTask(uint32_t ticks);
+            void RunCurrentTask();
+            void EndCurrentTask();
         };
 
-        extern TaskManager taskManager;
+        void sleep(uint32_t interval);
+        void TaskTrampoline();
     }
 }
 
