@@ -8,6 +8,8 @@ using namespace osos::kernel::hwcom;
 
 
 
+DriverManager* DriverManager::activeDriverManager = 0;
+
 // These allow for the driver manager to cycle through drivers
 int driverCycle      = 0;
 int driverCycleSaved = 0;
@@ -16,10 +18,13 @@ DriverManager::DriverManager()
 {
     driverCount = 0;
     drivers[255] = nullptr; 
+
+    activeDriverManager = this;
 }
 
 DriverManager::~DriverManager()
 {
+    if (activeDriverManager == this) activeDriverManager = 0;
 }
 
 
