@@ -84,14 +84,6 @@ volatile uint16_t curY = 0;
 
 volatile InterfaceModes currentInterface;
 
-namespace osos
-{
-    namespace kernel
-    {
-        //TaskManager* taskManager = nullptr;
-    }
-}
-
 void printfHex(uint8_t key)
 {
     char* foo = "00";
@@ -183,27 +175,68 @@ static const char* monthAbrev[12] =
     "sep", "oct", "nov", "dec"
 };
 
-void TestTask1()
+void TestTask1(void* context)
 {
+    (void)context;
     while(true)
         printf("A");
 }
 
-void TestTask2()
+void TestTask2(void* context)
 {
+    (void)context;
     while(true)
         printf("TT2B");
 }
 
-void TestTask3()
+void TestTask3(void* context)
 {
+    (void)context;
     while(true)
     {
         printf("n3isa");
-        taskManager.sleep(3000);
+        sleep(3000);
         printf(" TCC");
-        taskManager.sleep(50);
+        sleep(50);
     }
+}
+
+void NRShTaskSystem(void* context)
+{
+    (void)context;
+    NathanRenaudShell nrsh;
+    nrsh.Initialise();
+
+    while(1)
+    {
+        if (lastChar.code != KEY_NONE)
+        {
+            keyEvent kbEvent;
+            kbEvent.code = lastChar.code;
+            kbEvent.character = lastChar.character;
+
+            nrsh.HandleInput(kbEvent);
+            lastChar.code = KEY_NONE;
+        }
+        asm volatile("hlt");
+    }
+}
+
+struct ClockContext
+{
+    ClockBatteryDriver* rtcThing;
+    RealTimeClockRegisters rtcTarget;
+};
+
+void ClockUpdatingTask(void* context)
+{
+    char rtcMinT[3], rtcSecT[3];
+    ClockContext* contx = (ClockContext*)context;
+
+    contx->rtcThing->PadRTCInteger(rtcSecT, contx->rtcTarget.second);
+    contx->rtcThing->PadRTCInteger(rtcMinT, contx->rtcTarget.minute);
+
+    sleep (100);
 }
 
 void shutdown()
@@ -337,10 +370,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     // register tasks v
 
-    //taskManager = new TaskManager();
-    Task task1(&gdt, TestTask1);
-    Task task2(&gdt, TestTask2);
-    Task task3(&gdt, TestTask3);
+    TaskManager taskManager;
+    Task task1(&gdt, TestTask1, nullptr);
+    Task task2(&gdt, TestTask2, nullptr);
+    Task task3(&gdt, TestTask3, nullptr);
     //taskManager.AddTask(&task1);
     //taskManager.AddTask(&task2);
     //taskManager.AddTask(&task3);
@@ -384,23 +417,25 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     printf("%Rstarting drivers and interrupts...                                         ", 0x0F);
     drvManager.ActivateAll(&interrupts);
+    serialPort.WriteString("OpenSteel/OS version 0.22: COM1 connection has been made; the serial port driver has been started.\n");
 
-/*     AdvancedTechnologyAttachment ata0l(0x1F0, true);  // IRQ 14
-    serialPort.WriteString("ATA Pri. Lead: "); printf("%RATA Pri. Lead: ", 0x0F); ata0l.IdentifyDrive();
-    AdvancedTechnologyAttachment ata0f(0x1F0, false);
-    serialPort.WriteString("ATA Pri. Follow: "); printf("ATA Pri. Follow: "); ata0f.IdentifyDrive();
+    AdvancedTechnologyAttachment ata0l(0x1F0, true, 0x2E, &interrupts);  // IRQ 14
+    serialPort.WriteString("ATA Pri. Lead: "); ata0l.IdentifyDrive();
+    AdvancedTechnologyAttachment ata0f(0x1F0, false, 0x2E, &interrupts);
+    serialPort.WriteString("ATA Pri. Follow: "); ata0f.IdentifyDrive();
 
-    char* testDriveString = "Testing hard drive stuff";
-    ata0l.Write28Bit(0, testDriveString, 25);
-    ata0l.FlushDrive();
+    char testDriveString[] = "Testing hard drive stuff";
+    char secondTestDriveStr[] = "OpenSteel/OS 0.22 \"Denver\" - Sample Test thing for HDD driver";
+    //ata0l.Write28Bit(0, testDriveString, 25);
+    //ata0l.Write28Bit(26, secondTestDriveStr, 62);
 
-    ata0l.Read28Bit(0, testDriveString, 25);
+    //ata0l.Read28Bit(0, testDriveString, 25);
+    //ata0l.Read28Bit(26, secondTestDriveStr, 62);
 
-    AdvancedTechnologyAttachment ata1l(0x170, true);  // IRQ 15
-    serialPort.WriteString("\nATA Sec. Lead: "); printf("\nATA Sec. Lead: "); ata1l.IdentifyDrive();
-    AdvancedTechnologyAttachment ata1f(0x170, false);
-    serialPort.WriteString("ATA Sec. Follow: "); printf("ATA Sec. Follow: "); ata1f.IdentifyDrive();
- */
+    AdvancedTechnologyAttachment ata1l(0x170, true, 0x2F, &interrupts);  // IRQ 15
+    serialPort.WriteString("\nATA Sec. Lead: "); ata1l.IdentifyDrive();
+    AdvancedTechnologyAttachment ata1f(0x170, false, 0x2F, &interrupts);
+    serialPort.WriteString("ATA Sec. Follow: "); ata1f.IdentifyDrive();
     // the others are 0x1E8 and 0x168
 
     interrupts.Activate();
@@ -426,7 +461,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     // As of 0.22.289, there nominally aren't any services yet. This stage is in a placeholder
     // state, as service infastructure is being put together. The following code is only a
-    // placeholder that is not final. And you'll get errors trying to activate the code
+    // placeholder that is not final. And you'll get errors trying to activate the code.
+    //
+    // As of 0.22.374, plans to implement a services-like thing via tasks is planned.
+    // But still.
 
     // ServiceManager svcManager;
     // AudioService audioSvc(&speaker); svcManager.AddService(&audioSvc);
@@ -434,12 +472,10 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
     // svcManager.ActivateAll();
 
     printf("%R[ok!]", 0x0A);
-    NathanRenaudShell nrsh;
 
     cpudet();
     // booting is at the home stretch ^v
 
-    // programmableIntervalTimer.HardSleep(30);
     speaker.LifeChime();
     serialPort.WriteString("Welcome to OpenSteel/OS.\n");
     serialPort.WriteString("OpenSteel/OS 100 version 0.22 \"Denver\" [OpenSteel/OS RS232 COM+Serial Driver]\nYou are seeing this because a successful COM1 connection was made.\n\n");
@@ -473,19 +509,15 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber)
 
     EnableCursor(13, 15);
     FlushShell();
-    nrsh.Initialise();
 
+    Task NRSh(&gdt, NRShTaskSystem, nullptr); taskManager.AddTask(&NRSh);
+
+    ClockContext clockCtx;
+    clockCtx.rtcThing = &cmos;
+    clockCtx.rtcTarget = time;
+    Task ClockUpdate(&gdt, ClockUpdatingTask, &clockCtx);
     while(1)
     {
-        if (lastChar.code != KEY_NONE)
-        {
-            keyEvent kbEvent;
-            kbEvent.code = lastChar.code;
-            kbEvent.character = lastChar.character;
-
-            nrsh.HandleInput(kbEvent);
-            lastChar.code = KEY_NONE;
-        }
         asm volatile ("hlt");
     }
   
