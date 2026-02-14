@@ -24,10 +24,15 @@ extern volatile uint32_t tickCount;
 
 
 
+TaskManager* TaskManager::activeTaskManager = 0;
+
 // Class Task
 
-Task::Task(GlobalDescriptorTable *gdt, void entrypoint())
+Task::Task(GlobalDescriptorTable *gdt, TaskEntry entrypoint, void* contx)
 {
+    entry = entrypoint;
+    context = contx;
+
     cpuState = (CPUState*)(stack + 4096 - sizeof(CPUState));
 
     cpuState -> eax = 0;
@@ -48,12 +53,13 @@ Task::Task(GlobalDescriptorTable *gdt, void entrypoint())
     cpuState -> error = 0;
     */
     // cpuState -> esp = 0;
-    cpuState -> eip = (uint32_t)entrypoint;
+    cpuState -> eip = (uint32_t)TaskTrampoline;
     cpuState -> cs = gdt->CodeSegmentSelector();
     // cpuState -> ds = 0;
     cpuState -> eflags = 0x202;
 
     isAsleep = false;
+    taskStatus = offline;
     wakeTick = 0;
 }
 
@@ -70,10 +76,12 @@ TaskManager::TaskManager()
 {
     numTasks = 0;
     currentTask = -1;
+    activeTaskManager = this;
 }
 
 TaskManager::~TaskManager()
 {
+    if (activeTaskManager == this) activeTaskManager = 0;
 }
 
 bool TaskManager::AddTask(Task* task)
@@ -81,7 +89,13 @@ bool TaskManager::AddTask(Task* task)
     if(numTasks >= 256)
         return false;
     tasks[numTasks++] = task;
+    task->taskStatus = online;
     return true;
+}
+
+Task* TaskManager::GetCurrentTask()
+{
+    return tasks[currentTask];
 }
 
 CPUState* TaskManager::Schedule(CPUState* cpuState)
@@ -104,30 +118,60 @@ CPUState* TaskManager::Schedule(CPUState* cpuState)
     return cpuState;
 }
 
-
-void TaskManager::sleep(uint32_t interval)
+void TaskManager::Yield()
 {
-    const uint32_t freqPIT = 100;
-    uint32_t intervalInTicks = interval / 10;
-
-    Task* TaskToSleep = tasks[currentTask];
-    TaskToSleep->isAsleep = true;
-    TaskToSleep->wakeTick = tickCount + intervalInTicks;
+    asm volatile ("int $0x20");
 }
+
 
 void TaskManager::WakeTask(uint32_t ticks)
 {
     for (int i = 0; i < numTasks; i++)
     {
         if (tasks[i] -> isAsleep && ticks >= tasks[i] -> wakeTick)
-            tasks[i] -> isAsleep = false;
+        {
+            tasks[i] -> isAsleep   = false;
+            tasks[i] -> taskStatus = online;
+        }
     }
 }
 
-namespace osos
+void TaskManager::RunCurrentTask()
 {
-    namespace kernel
-    {
-        TaskManager taskManager; // we sent this piece from the kernel off to the gulag, otherwise known as where the class this thing is defined in. on that thought why don't i do this for shit like the libraries?
-    }
+    Task* current = GetCurrentTask();
+    current->entry(current->context);
+}
+
+void TaskManager::EndCurrentTask()
+{
+    Task* current = GetCurrentTask();
+    current->taskStatus = dismissed;
+
+    Schedule(nullptr);
+}
+
+
+
+
+
+void osos::kernel::sleep(uint32_t interval)
+{
+    Task* taskToSleep = TaskManager::activeTaskManager->GetCurrentTask();
+
+    const uint32_t freqPIT = 100;
+    uint32_t intervalInTicks = interval / 10;
+
+    taskToSleep->isAsleep = true;
+    taskToSleep->taskStatus = asleep;
+    taskToSleep->wakeTick = tickCount + intervalInTicks;
+
+    TaskManager::activeTaskManager->Yield();
+}
+
+void osos::kernel::TaskTrampoline()
+{
+    TaskManager::activeTaskManager->RunCurrentTask();
+    TaskManager::activeTaskManager->EndCurrentTask();
+
+    while(true) asm volatile("hlt");
 }
