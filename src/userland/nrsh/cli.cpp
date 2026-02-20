@@ -7,8 +7,6 @@ using namespace osos::kernel;
 
 extern volatile InterfaceModes currentInterface;
 
-void FlushShell();
-
 static Speaker speakCLI;
 
 
