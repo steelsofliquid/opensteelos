@@ -4,16 +4,100 @@
 // GCC headers
 #include <stdarg.h>
 
-extern volatile uint16_t curX;
-extern volatile uint16_t curY;
+static uint16_t* videoMemory = (uint16_t*)0xb8000;
+
+static uint8_t x = 0;
+static uint8_t y = 0;
+static uint8_t currentColour = 0x0F;
+
+volatile uint16_t curX = 0;
+volatile uint16_t curY = 0;
+
+static bool textPrintInProgress = false;
+static const char* textPrintSource;
+
+void VerifyXY()
+{
+    if(x >= 80)
+    {
+        x = 0; curX = 0;
+        y++; curY++;
+    }
+
+    if(y >= 25)
+    {
+        for(int r = 1; r < 25; r++)
+            for(int c = 0; c < 80; c++)
+            {
+                if(r == 0)
+                {
+                }
+                else
+                {
+                    videoMemory[80 * (r - 1) + c] = videoMemory[80 * r + c];
+                }
+            }
+      
+        for(x = 0; x < 80; x++)
+            videoMemory[80 * 24 + x] = (currentColour << 8);
+
+        x = 0; curX = 0;
+        y = 24; curY = 24;
+    }
+}
+
+int32_t VerifyPrintProgress(const char* functionInUse)
+{
+    if (textPrintInProgress == false) return 1; // check false
+    if (textPrintInProgress == true && textPrintSource != functionInUse) return 2;
+    if (textPrintInProgress == true && textPrintSource == functionInUse) return 3;
+    else return 0;
+}
+
+void putchar(uint8_t character)
+{
+    if (!textPrintInProgress)
+    {
+        textPrintInProgress = true;
+        textPrintSource = "putchar";
+    }
+
+    if (character == '\n')
+    {
+        y++; curY++;
+        x = 0; curX = 0;
+    }
+    else
+    {
+        videoMemory[80*y+x] = (currentColour << 8) | character;
+        if (VerifyPrintProgress("putchar") == 3)
+        {
+            x++;
+            curX++;
+        }
+    }
+    
+    VerifyXY();
+}
 
 void printf(char* str, ...) // the main screen output function.
 {
+    // TODO: Fix strings/integers printing into the void (aka off of the screen)
+    //       Should be simple enough, however. We ideally wrap the code in a
+    //       new function for simply placing a char.
+    //
+    // UPDATE: That has been done, but is kinda awkward, needing putchar to not
+    //         increment x. Scrolling also might be odd.
+    
+    if (!textPrintInProgress)
+    {
+        textPrintInProgress = true;
+        textPrintSource = "printf";
+    }
+
     va_list params;
     va_start (params, str);
 
-    static uint16_t* videoMemory = (uint16_t*)0xb8000;
-    static uint8_t x = 0 , y = 0;
     static uint8_t currentColour = 0x0F;
 
     for(int i = 0; str[i] != '\0'; ++i)
@@ -106,8 +190,12 @@ void printf(char* str, ...) // the main screen output function.
 
                         for (int j = 0; buffer[j] != '\0'; j++)
                         {
-                            videoMemory[80*y+x] = (currentColour << 8) | buffer[j];
-                            x++; curX++;
+                            putchar(buffer[j]);
+                            if (VerifyPrintProgress("printf") == 3) 
+                            {
+                                x++;
+                                curX++;
+                            }
                         }
 
                         break;
@@ -117,7 +205,11 @@ void printf(char* str, ...) // the main screen output function.
                     {
                         char charVal = va_arg(params, int);
                         videoMemory[80*y+x] = (currentColour << 8) | charVal;
-                        x++; curX++;
+                        if (VerifyPrintProgress("printf") == 3)
+                        {
+                            x++;
+                            curX++;
+                        }
 
                         break;
                     }
@@ -144,8 +236,14 @@ void printf(char* str, ...) // the main screen output function.
 
                         while (*s != '\0')
                         {
-                            videoMemory[80*y+x] = (currentColour << 8) | *s;
-                            x++; curX++; s++;
+                            putchar(*s);
+                            //videoMemory[80*y+x] = (currentColour << 8) | *s;
+                            if (VerifyPrintProgress("printf") == 3)
+                            {
+                                x++;
+                                curX++;
+                            }
+                            s++;
                         }
                         break;
                     }
@@ -167,7 +265,12 @@ void printf(char* str, ...) // the main screen output function.
                     {
                         i--;
                         videoMemory[80*y+x] = (currentColour << 8) | str[i];
-                        x++; curX++;
+                        if (VerifyPrintProgress("printf") == 3)
+                        {
+                            x++;
+                            curX++;
+                        }
+
                         break;
                     }
                 }
@@ -177,40 +280,48 @@ void printf(char* str, ...) // the main screen output function.
             default:
             {
                 videoMemory[80*y+x] = (currentColour << 8) | str[i];
-                x++; curX++;
+                if (VerifyPrintProgress("printf") == 3)
+                {
+                    x++;
+                    curX++;
+                }
+
                 break;
             }
         }
 
-        if(x >= 80)
-        {
-            x = 0; curX = 0;
-            y++; curY++;
-        }
-
-        if(y >= 25)
-        {
-            for(int r = 1; r < 25; r++)
-                for(int c = 0; c < 80; c++)
-                {
-                    if(r == 0)
-                    {
-                    }
-                    else
-                    {
-                        videoMemory[80 * (r - 1) + c] = videoMemory[80 * r + c];
-
-                        // it ain't perfect (or close to, *for now*) but it works. will need to make it not print cursor spaghetti in a later build
-                    }
-                }
-      
-            for(x = 0; x < 80; x++)
-            videoMemory[80 * 24 + x] = (currentColour << 8);
-
-            x = 0; curX = 0;
-            y = 24; curY = 24;
-        }
+        VerifyXY();
     }
 
     va_end(params);
+}
+
+void EnableCursor(uint8_t start, uint8_t end)
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (inb(0x3D5) & 0xC0) | start);
+
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (inb(0x3D5) & 0xE0) | end);
+}
+
+void DisableCursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
+}
+
+void UpdateCursor()
+{
+    uint16_t pos = curY * 80 + curX;
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
+void FlushShell()
+{
+    UpdateCursor();
 }
