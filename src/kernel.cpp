@@ -76,8 +76,6 @@ int32_t testInteger2 = 15;
 int32_t testInteger3 = 327;
 int32_t testInteger4 = 7629;
 int32_t testInteger5 = 0;
-volatile uint16_t curX = 0;
-volatile uint16_t curY = 0;
 
 //uint8_t userAgentSafe = 'OpenSteelOS_0.22_Denver';
 //uint8_t userAgent = 'OpenSteel/OS 0.22 \"Denver\"';
@@ -130,36 +128,6 @@ class MouseToConsole : public MouseEventHandler // This moves the sometimes very
     }
 
 };
-
-void EnableCursor(uint8_t start, uint8_t end)
-{
-    outb(0x3D4, 0x0A);
-    outb(0x3D5, (inb(0x3D5) & 0xC0) | start);
-
-    outb(0x3D4, 0x0B);
-    outb(0x3D5, (inb(0x3D5) & 0xE0) | end);
-}
-
-void DisableCursor()
-{
-    outb(0x3D4, 0x0A);
-    outb(0x3D5, 0x20);
-}
-
-void UpdateCursor()
-{
-    uint16_t pos = curY * 80 + curX;
-
-    outb(0x3D4, 0x0F);
-    outb(0x3D5, (uint8_t)(pos & 0xFF));
-    outb(0x3D4, 0x0E);
-    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
-}
-
-void FlushShell()
-{
-    UpdateCursor();
-}
 
 static const char* monthNames[12] =
 {
