@@ -7,7 +7,9 @@ To see my thoughts and whatnot on the current situation of the project, check ou
 This repository was designed to be more clear and concise compared to major open source projects, such as Linux and particularly LibreOffice. Anyone interested should be able to work on open source, and so for those who either (a) want to start their own OS project wanting insight into how they should organise their project, (b) those who are trying to find the source code, (c) those who want to help out or develop a fork of OpenSteel/OS, and/or (d) not too familiar with coding and wish to see simpler layouts, you're welcome. Anywhere I think it's not as clear, I'll provide a readme with context so that it's more understandable.
 
 # Project currently on hold
-Due to circumstances related to this project's very fast development during November 2025, and how it has caused setbacks in other aspects of my life, I need to put this project on hold until I am able to rectify these issues. I was in the process of renovating the directory structure and the driver/device manager, as in 0.22 Circuit 4, it is, to put it simply, broken. If you want to see the currently broken state that is in (where drivers are not operating correctly), I either will make or have made a branch with the new structure.
+I am working on OpenSteel/OS slowly but as of 2026 March 21 my focus is on maintaining my channel's stability, finishing high school (I got the option to graduate early) and getting things set up and whatnot on my laptop once more, as I switched from Kubuntu to Ubuntu MATE (Though I think KDE is cool my install was acting up and I really like MATE already; I also swithced from Brave to LibreWolf for most of my browsing as it does not need a keyring/wallet like Brave does on (GNU)Linux). I've put in a bug in issues I am working on, as it could hinder usability of OpenSteel/OS with USB keyboards.
+
+Anyways, I'll be on spring break and 5 and a half months' spare time shortly so expect the floodgates to open with progress ^^
 
 ## *What's new in OpenSteel/OS (as of 2025-11-16)*
  - PIT driver heavily reworked
@@ -48,6 +50,7 @@ If you don't the hassle of running this project on physical hardware, OpenSteel/
 It is advised you use the makefile provided. You will need Linux, which you're likely already using. Great! ^_^  
 Well, you'll need tools for working with the i386 (iirc) platform (namely binutils and libc6-dev-i386), the G++ compiler (that's what the turorial said, it is a part of gcc and so you very likely already have it), and a copy of GRUB with a specific folder, at least from my experience as Debian wouldn't compile the ISO correctly while Ubuntu could. I'm unsure. Meh. If you want to compile OpenSteel/OS on a low-power system, please figure out a resources limiter or compile each file by hand. The latter may be tedious, but I'd rather you not inflict thermal damage on your system.  
 A pre-built copy is provided, so if this seems too intimidating or you just want to try the OS, you don't have to compile and whatnot. To compile, please for the love of Neisa-sama, SPECIFY "object/subdir(s)/*filename*.o" and not the source code file. I made this mistake after months away from working on the project and I want to clarify that.  
+ > If you are having difficulty creating a bootable ISO of OpenSteel/OS, you may need to install the `grub-pc-bin` package. This issue may affect some Linux distros, such as vanilla Debian or Ubuntu MATE, but not on other distros such as vanilla Ubuntu or Kubuntu. Fedora, Mint, Cachy, Zorin, Arch Gentoo etc. have not been tested.
 
   
 ## *Major Issues*
