@@ -1,5 +1,10 @@
 // The oldest OpenSteel/OS driver.
-// convert current char model to a key-based enum and struct
+// As of 0.22.396, this driver (and mouse driver) are being refactored to resolve a bug in
+// USB keyboards (supported via PS/2 backwards compatibility). As burning a new ISO every time
+// I compile a new build is unfeasible, I have to commit this code to main/ and use the Makefile
+// to install the build on appropriate testing machines. Sadly, there aren't many 32-bit distros
+// left and even still browsers are 64-bit only for the most part these days. So, some of the
+// systems of concern (like the ThinkPad R51) will have to go for a manual live-CD burn-and-test.
 
 #include <drivers/keyboard.h>
 
@@ -89,23 +94,40 @@ InterruptHandler* KeyboardDriver::InterruptHandlerForme()
 
 void KeyboardDriver::StartDriver()
 {
-    while (commandPort.Read() & 0x02); commandPort.Write(0xAE); // Activate interrupts
-    while (commandPort.Read() & 0x02); commandPort.Write(0x20); // Get current state
+    while (commandPort.Read() & 0x02); commandPort.Write(0xAD);
+    while (commandPort.Read() & 0x01) dataPort.Read();
+    while (commandPort.Read() & 0x02); commandPort.Write(0x20);
 
     while (!(commandPort.Read() & 0x01));
     uint8_t status = dataPort.Read();
     status |= 0x01;
     status &= ~0x10;
 
-    while (commandPort.Read() & 0x02); commandPort.Write(0x60); // Set the state
+    while (commandPort.Read() & 0x02); commandPort.Write(0x60);
     while (commandPort.Read() & 0x02); dataPort.Write(status);
 
+    while (commandPort.Read() & 0x02); commandPort.Write(0xAE);
+    while (commandPort.Read() & 0x01) dataPort.Read();
     while (commandPort.Read() & 0x02); dataPort.Write(0xF4);
+    while (!(commandPort.Read() & 0x01)); dataPort.Read();
+
+    while (commandPort.Read() & 0x02); dataPort.Write(0xF3);
+    while (!(commandPort.Read() & 0x01)); dataPort.Read();
+    while (commandPort.Read() & 0x02); dataPort.Write(0x7F);
+    while (!(commandPort.Read() & 0x01)); dataPort.Read();
 }
 
 uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
 {
-    uint8_t key = dataPort.Read();
+    if (!(commandPort.Read() & 0x01)) return esp;
+    
+    uint8_t key;
+
+    while(commandPort.Read() & 0x01)
+    {
+        key = dataPort.Read();
+        if (key == 0xFA || key == 0xFE) continue;
+    }
 
     static bool Shift    = false;
     static bool Control  = false;
@@ -113,56 +135,81 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
     static bool capsLock = false;
     static bool extended = false; // It is important that the keys here are coupled with their release scancodes.
 
+    bool released = key & 0x80;
+
     if(handler)
     {
+        if (key == 0xE0)
+        {
+            extended = true;
+            return esp;
+        }
+
         if (extended)
         {
             extended = false;
 
-            switch (key)
+            if (released)
+            {
+                switch(key)
+                {
+                    case 0xC8: handler->SendKeystroke(KEY_UP_REL); break;
+                    case 0xD0: handler->SendKeystroke(KEY_DOWN_REL); break;
+
+                    default: break;
+                }
+
+                return esp;
+            }
+
+            switch(key)
             {
                 case 0x48: handler->SendKeystroke(KEY_UP); break;
-                case 0xC8: handler->SendKeystroke(KEY_UP_REL); break;
-
                 case 0x50: handler->SendKeystroke(KEY_DOWN); break;
-                case 0xD0: handler->SendKeystroke(KEY_DOWN_REL); break;
+
                 default: break;
             }
         }
 
         else
         {
-            switch(key)
+            /*
+                This function is currently designed for Canadian English QWERTY keyboards, also
+                used in the United States of America. Not the CMS (Canadian Mutlilingual Standard)
+                or Canadien French layouts, or QWERTZ, British QWERTY, AZERTY, Dvorak or other
+                layouts.
+
+                As such, this function will be revised in the future to do the following:
+                (1) Automatically send a couple of keyboard interrupts to determine which keys make
+                    up a given selection (i.e. where keys QWERTY, ASDF, and ZXCV are) of scancodes.
+                (2) Calibrate the driver to the keyboard layout.
+                (3) Assign OnKeyDown('[key]'); based off of a map from the calibrated result.
+
+                This will likely result in these functions:
+                - ScanKeyboardLayout();
+                - CalibrateKeyboardLayout();
+                - keymap[]; (array)
+
+                But this isn't even close to happening. I'd need to likely buy a Dvorak keyboard and
+                import QWERTZ and AZERTY keyboards from Germany and France. I do need to buy a lot of
+                additional hardware to use to further driver development - Not just keyboards, but also
+                printers, networking cards, sound cards, graphics cards, mice, trackpads and more laptops.
+            */
+
+            if (released)
             {
-                case 0xE0:
+                switch (key)
                 {
-                    extended = true;
-                    break;
+                    case 0xAA: case 0xB6: Shift = false; break;
+                    case 0x9D: Control = false; break;
+                    case 0xB8: Alt = false; break;
                 }
 
-                /*
-                    This function is currently designed for Canadian English QWERTY keyboards, also
-                    used in the United States of America. Not the CMS (Canadian Mutlilingual Standard)
-                    or Canadien French layouts, or QWERTZ, British QWERTY, AZERTY, Dvorak or other
-                    layouts.
+                return esp;
+            }
 
-                    As such, this function will be revised in the future to do the following:
-                    (1) Automatically send a couple of keyboard interrupts to determine which keys make
-                        up a given selection (i.e. where keys QWERTY, ASDF, and ZXCV are) of scancodes.
-                    (2) Calibrate the driver to the keyboard layout.
-                    (3) Assign OnKeyDown('[key]'); based off of a map from the calibrated result.
-
-                    This will likely result in these functions:
-                    - ScanKeyboardLayout();
-                    - CalibrateKeyboardLayout();
-                    - keymap[]; (array)
-
-                    But this isn't even close to happening. I'd need to likely buy a Dvorak keyboard and
-                    import QWERTZ and AZERTY keyboards from Germany and France. I do need to buy a lot of
-                    additional hardware to use to further driver development - Not just keyboards, but also
-                    printers, networking cards, sound cards, graphics cards, mice, trackpads and more laptops.
-                */
-
+            switch(key)
+            {
                 case 0xFA: break;
 
                 case 0x29: if(Shift) handler->OnKeyDown('~'); else handler->OnKeyDown('`'); break;
@@ -223,11 +270,8 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 case 0x39: handler->OnKeyDown(' '); break; // Space key
 
                 case 0x2A: case 0x36: Shift = true; break;
-                case 0xAA: case 0xB6: Shift = false; break;
                 case 0x1D: Control = true; break;
-                case 0x9D: Control = false; break;
                 case 0x38: Alt = true; break;
-                case 0xB8: Alt = false; break;
 
                 case 0x3A:
                 {
@@ -292,13 +336,7 @@ uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp)
                 }
 
                 case 0x45: case 0xC5: break; // NumLock key. Some PCs don't have number pads. My ThinkPad doesn't have one.
-
-                default:
-                {
-                    //printf("KB:0x");
-                    //printfHex(key);
-                    break;
-                }
+                default: break;
             }
         }
     }
