@@ -82,13 +82,6 @@ void putchar(uint8_t character)
 
 void printf(char* str, ...) // the main screen output function.
 {
-    // TODO: Fix strings/integers printing into the void (aka off of the screen)
-    //       Should be simple enough, however. We ideally wrap the code in a
-    //       new function for simply placing a char.
-    //
-    // UPDATE: That has been done, but is kinda awkward, needing putchar to not
-    //         increment x. Scrolling also might be odd.
-    
     if (!textPrintInProgress)
     {
         textPrintInProgress = true;
