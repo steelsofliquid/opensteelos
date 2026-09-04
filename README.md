@@ -6,31 +6,8 @@ To see my thoughts and whatnot on the current situation of the project, check ou
 
 This repository was designed to be more clear and concise compared to major open source projects, such as Linux and particularly LibreOffice. Anyone interested should be able to work on open source, and so for those who either (a) want to start their own OS project wanting insight into how they should organise their project, (b) those who are trying to find the source code, (c) those who want to help out or develop a fork of OpenSteel/OS, and/or (d) not too familiar with coding and wish to see simpler layouts, you're welcome. Anywhere I think it's not as clear, I'll provide a readme with context so that it's more understandable.
 
-# Project currently on hold
-I am working on OpenSteel/OS slowly but as of 2026 March 21 my focus is on maintaining my channel's stability, finishing high school (I got the option to graduate early) and getting things set up and whatnot on my laptop once more, as I switched from Kubuntu to Ubuntu MATE (Though I think KDE is cool my install was acting up and I really like MATE already; I also swithced from Brave to LibreWolf for most of my browsing as it does not need a keyring/wallet like Brave does on (GNU)Linux). I've put in a bug in issues I am working on, as it could hinder usability of OpenSteel/OS with USB keyboards.
-
-Anyways, I'll be on spring break and 5 and a half months' spare time shortly so expect the floodgates to open with progress ^^
-
-## *What's new in OpenSteel/OS (as of 2025-11-16)*
- - PIT driver heavily reworked
- - Better organisation
- - Modified experience (startup sound, bootscreen, etc.)
- - Changes to video memory functions (addition of screen clearing and integer printing)
- - Inclusion of function libraries
- - Starting to add documentation
-
-## *Current Roadmap*
-Right now, it's quite basic. If I do get into college (sorry to any admissions director, employer, professor or boss who may have been exposed to the more profane parts of my vocabularity and my semi-unhinged commentary; *I do try to be concious on what I say and I like to have fun in my code comments ^_^*), I would bet good money that I'll take courses related to computer science and engineering, which, of course, includes OSes. Honestly, I'm hot among colleges and I've got my eyes deadset on one. And even still, I have a college textbook on OSes, so I could learn many things from that.    
-  
-But, I do have some stuff to learn from the tutorial still, so, for the provisional future, here's some stuff:  
- - Paging (0.22 "Denver")
- - Basic APIC support (maybe a bit overkill; 0.22 "Denver")
- - HDD support (0.22 "Denver" for ATA)
- - System calls (0.22 "Denver")
- - Filesystem Support (FAT in 0.22 "Denver")
- - Including userland and a shell with Unix-style command names (i.e. shell = command line, commands like echo, cat, grep and mkdir, development expected for 0.22 "Denver")
- - Network card drivers (0.29 "TBD" or later)
- - Networking (such as TCP and UDP) (0.33 "TBD" or later)
+# Project abandoned
+I have decided to start over on developing an OS, and one under the original Nanami/OS name.
 
 ## *Code Conventions*
 The code used, while predominantly C++, uses a lot of C-style syntax instead of C++ syntax. When working on this project, whether a direct contribution or on your own, if you want to add things I'd recommend retaining the C-style syntax as it's quite simple and easy to understand. (the virgin std::cout versus the chad printf)
